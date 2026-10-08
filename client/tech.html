@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Technician Portal — JC TECH ZONE</title>
+  <meta name="description" content="JC Tech Zone Technician Bench Terminal — view assigned jobs, log diagnostic findings, record parts used, and update ticket status." />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .job-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .job-card:hover { border-color: var(--primary-mid); box-shadow: var(--shadow-glow); }
+    .job-card.selected { border-color: var(--primary); background: var(--primary-dim); }
+    select.form-select-jc option { background: #0e1621; color: #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-jc">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <i class="bi bi-cpu-fill text-primary-jc"></i> JC TECH ZONE
+      <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
+            style="background:#00d8ff12;border:1px solid #00d8ff33;font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
+        <span class="status-dot"></span> TECH PORTAL
+      </span>
+    </a>
+    <div class="d-flex gap-2 align-items-center">
+      <a class="nav-link" href="index.html" style="color:var(--text-muted);font-size:.82rem;"><i class="bi bi-house me-1"></i>Home</a>
+      <a class="nav-link" href="track.html" style="color:var(--text-muted);font-size:.82rem;"><i class="bi bi-search me-1"></i>Track</a>
+      <a class="nav-link" href="admin.html" style="color:var(--text-muted);font-size:.82rem;"><i class="bi bi-shield-check me-1"></i>Admin</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="section-title mb-0">
+        <i class="bi bi-terminal me-2" style="color:#00d8ff;"></i>Technician <span class="accent">Bench Terminal</span>
+      </h1>
+      <p style="color:var(--text-muted);font-size:.82rem;margin-top:.25rem;">
+        Select a ticket from the queue, log findings, record parts used, and update the repair status.
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn-outline-jc" onclick="loadJobs()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh Queue</button>
+    </div>
+  </div>
+
+  <!-- Technician select -->
+  <div class="card-jc mb-4 p-3">
+    <div class="d-flex flex-wrap align-items-center gap-3">
+      <div style="flex:1;min-width:200px;">
+        <label class="form-label-jc">Working as Technician</label>
+        <select id="techSelect" class="form-select-jc">
+          <option value="">— Select your name —</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <label class="form-label-jc">Queue Filter</label>
+        <select id="queueFilter" class="form-select-jc" onchange="applyFilter()">
+          <option value="active">Active Jobs (Received + Diagnostics + In Progress)</option>
+          <option value="ready">Ready for Pick-Up</option>
+          <option value="all">All Tickets</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Left: Job Queue -->
+    <div class="col-md-5 col-lg-4">
+      <div class="card-jc">
+        <div class="card-header-jc justify-content-between">
+          <span><i class="bi bi-list-task me-1"></i>Repair Queue</span>
+          <span id="queueCount" class="font-mono" style="font-size:.7rem;color:var(--text-muted);">0 jobs</span>
+        </div>
+        <div id="jobQueue" style="max-height:600px;overflow-y:auto;padding:.75rem;">
+          <div class="text-center py-4"><div class="spinner-jc"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Work Log Panel -->
+    <div class="col-md-7 col-lg-8">
+
+      <!-- No ticket selected -->
+      <div id="noTicketSelected" class="card-jc p-5 text-center">
+        <i class="bi bi-cursor-fill mb-3" style="font-size:2.5rem;color:var(--text-muted);display:block;"></i>
+        <p style="color:var(--text-muted);">Select a ticket from the queue to begin logging work.</p>
+      </div>
+
+      <!-- Ticket Detail Panel -->
+      <div id="ticketPanel" class="d-none">
+
+        <!-- Ticket header -->
+        <div class="card-jc mb-3">
+          <div class="card-header-jc justify-content-between flex-wrap gap-2">
+            <span>
+              <i class="bi bi-ticket-perforated me-1"></i>
+              <span id="panelRef" class="font-mono" style="color:var(--primary);"></span>
+            </span>
+            <span id="panelStatusBadge"></span>
+          </div>
+          <div class="p-3 row g-2" id="panelInfoGrid"></div>
+        </div>
+
+        <!-- Quick Status Advance -->
+        <div class="card-jc mb-3">
+          <div class="card-header-jc"><i class="bi bi-lightning me-1"></i>Quick Status Advance</div>
+          <div class="p-3 d-flex flex-wrap gap-2">
+            <button class="btn-outline-jc btn-sm-jc" onclick="quickStatus('Under Diagnostics')">
+              <i class="bi bi-search me-1"></i>Under Diagnostics
+            </button>
+            <button class="btn-outline-jc btn-sm-jc" onclick="quickStatus('In Progress')">
+              <i class="bi bi-wrench me-1"></i>In Progress
+            </button>
+            <button class="btn-outline-jc btn-sm-jc" onclick="quickStatus('Ready for Pick-Up')"
+                    style="border-color:var(--success);color:var(--success);">
+              <i class="bi bi-check-circle me-1"></i>Ready for Pick-Up
+            </button>
+            <button class="btn-outline-jc btn-sm-jc" onclick="quickStatus('Completed')"
+                    style="border-color:var(--success);color:var(--success);">
+              <i class="bi bi-patch-check me-1"></i>Mark Completed
+            </button>
+            <button class="btn-outline-jc btn-sm-jc" onclick="quickStatus('Cancelled')"
+                    style="border-color:var(--danger);color:var(--danger);">
+              <i class="bi bi-x-circle me-1"></i>Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Add Work Log -->
+        <div class="card-jc mb-3">
+          <div class="card-header-jc"><i class="bi bi-journal-plus me-1"></i>Add Work Log Entry</div>
+          <div class="p-3">
+            <form id="workLogForm">
+              <div class="row g-2 mb-2">
+                <div class="col-sm-6">
+                  <label class="form-label-jc">Log Type</label>
+                  <select id="logAction" class="form-select-jc">
+                    <option>Bench Diagnostic</option>
+                    <option>Parts Replacement</option>
+                    <option>Software Fix</option>
+                    <option>Network Configuration</option>
+                    <option>Customer Update</option>
+                    <option>Quality Check</option>
+                    <option>General Note</option>
+                  </select>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label-jc">Parts Used <span style="color:var(--text-muted);">(optional)</span></label>
+                  <input type="text" id="logParts" class="form-control-jc" placeholder="e.g. 16GB RAM, SATA SSD" />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label-jc">Labor Cost (₱) <span style="color:var(--text-muted);">(optional)</span></label>
+                <input type="number" id="logLabor" class="form-control-jc" placeholder="0.00" min="0" step="0.01" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label-jc">Work Notes / Findings *</label>
+                <textarea id="logNotes" class="form-control-jc" rows="4"
+                          placeholder="Describe findings, steps taken, diagnostic results, parts installed, and any observations..."></textarea>
+              </div>
+              <div id="logError" class="alert-jc danger mb-2 d-none">
+                <i class="bi bi-exclamation-triangle me-2"></i><span id="logErrorMsg"></span>
+              </div>
+              <button type="submit" class="btn-primary-jc w-100">
+                <span id="logSpinner" class="spinner-jc me-2 d-none" style="width:14px;height:14px;border-width:2px;"></span>
+                <i class="bi bi-send me-1"></i>Submit Work Log
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Existing Logs -->
+        <div class="card-jc">
+          <div class="card-header-jc"><i class="bi bi-journal-text me-1"></i>Technician Work History</div>
+          <div class="p-3">
+            <div class="log-timeline" id="techWorkLogs"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer-jc">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <div class="footer-brand"><i class="bi bi-cpu-fill me-2" style="color:var(--primary);"></i>JC TECH ZONE</div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem;">3 E. Santos Street, Concepcion Uno, Marikina City</p>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);">
+        BSIT – LFSA411A034 · Busita · Ledesma · Macabingkil · Santos · Velsis<br>
+        Instructor: Mr. Carlos Jessneir D. Javier
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+let allJobs = [];
+let selectedTicket = null;
+const STATUS_BADGE = {
+  'Received':          'badge-received',
+  'Under Diagnostics': 'badge-diagnostics',
+  'In Progress':       'badge-in-progress',
+  'Ready for Pick-Up': 'badge-ready',
+  'Completed':         'badge-completed',
+  'Cancelled':         'badge-cancelled',
+};
+
+// ── Load Technicians ───────────────────────────────────────
+function loadTechDropdown() {
+  API.getTechnicians().then(techs => {
+    const $sel = $('#techSelect');
+    $sel.empty().append('<option value="">— Select your name —</option>');
+    techs.forEach(t => $sel.append(`<option value="${t.id}" data-name="${t.full_name}">${t.full_name} (${t.role})</option>`));
+  });
+}
+
+// ── Load Jobs ──────────────────────────────────────────────
+function loadJobs() {
+  API.getTickets().then(tickets => {
+    allJobs = tickets;
+    applyFilter();
+  }).catch(() => {
+    $('#jobQueue').html('<p style="color:var(--text-muted);font-size:.82rem;text-align:center;">Failed to load jobs.</p>');
+  });
+}
+
+function applyFilter() {
+  const filter = $('#queueFilter').val();
+  let filtered = allJobs;
+  if (filter === 'active')    filtered = allJobs.filter(j => ['Received','Under Diagnostics','In Progress'].includes(j.status));
+  if (filter === 'ready')     filtered = allJobs.filter(j => j.status === 'Ready for Pick-Up');
+  if (filter === 'completed') filtered = allJobs.filter(j => j.status === 'Completed');
+
+  renderJobQueue(filtered);
+}
+
+function renderJobQueue(jobs) {
+  const $queue = $('#jobQueue');
+  $queue.empty();
+  $('#queueCount').text(`${jobs.length} job${jobs.length !== 1 ? 's':''}`);
+
+  if (!jobs.length) {
+    $queue.html('<p style="color:var(--text-muted);font-size:.82rem;text-align:center;padding:1rem 0;">No tickets in this queue.</p>');
+    return;
+  }
+
+  jobs.forEach(job => {
+    const isSelected = selectedTicket && selectedTicket.id === job.id;
+    const cls = STATUS_BADGE[job.status] || 'badge-received';
+    const dt = new Date(job.created_at).toLocaleDateString('en-PH', { month:'short', day:'numeric' });
+    $queue.append(`
+      <div class="job-card mb-2 ${isSelected ? 'selected':''}" onclick="selectJob('${job.id}')">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div class="font-mono" style="font-size:.72rem;color:var(--primary);">${job.ticket_reference_id}</div>
+          <span class="badge-status ${cls}" style="font-size:.58rem;">${job.status}</span>
+        </div>
+        <div style="font-weight:600;font-size:.85rem;margin-top:.3rem;">${job.customer_name}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);">${job.device_type || '—'}</div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <span style="font-size:.7rem;color:var(--text-muted);">${job.service_type === 'home_service' ? '🏡 Home':'🏬 Drop-Off'} · ${dt}</span>
+          ${job.technicians ? `<span style="font-size:.68rem;color:var(--primary);">${job.technicians.full_name}</span>` : ''}
+        </div>
+      </div>`);
+  });
+}
+
+function selectJob(id) {
+  API.getTicket(id).then(res => {
+    selectedTicket = res.ticket;
+    const logs = res.logs || [];
+
+    // Mark selected in queue
+    applyFilter();
+
+    // Show panel
+    $('#noTicketSelected').addClass('d-none');
+    $('#ticketPanel').removeClass('d-none');
+
+    // Populate panel
+    $('#panelRef').text(selectedTicket.ticket_reference_id);
+    const cls = STATUS_BADGE[selectedTicket.status] || 'badge-received';
+    $('#panelStatusBadge').html(`<span class="badge-status ${cls}">${selectedTicket.status}</span>`);
+
+    const fields = [
+      { label:'Customer', value: selectedTicket.customer_name },
+      { label:'Contact',  value: selectedTicket.contact_number },
+      { label:'Device',   value: selectedTicket.device_type || '—' },
+      { label:'Type',     value: selectedTicket.service_type === 'home_service' ? '🏡 Home Service':'🏬 Drop-Off' },
+    ];
+    if (selectedTicket.address) fields.push({ label:'Address', value: selectedTicket.address, full: true });
+    fields.push({ label:'Issue', value: `<span style="color:var(--text-dim);font-size:.8rem;">${selectedTicket.issue_description}</span>`, full: true });
+    if (selectedTicket.estimated_cost > 0) {
+      fields.push({ label:'Est. Cost', value: `<span style="color:var(--success);" class="font-mono">₱${Number(selectedTicket.estimated_cost).toFixed(2)}</span>` });
+    }
+
+    const $grid = $('#panelInfoGrid');
+    $grid.empty();
+    fields.forEach(f => {
+      const col = f.full ? 'col-12' : 'col-sm-6';
+      $grid.append(`<div class="${col}"><div class="form-label-jc">${f.label}</div>
+        <div style="font-size:.83rem;font-weight:500;">${f.value}</div></div>`);
+    });
+
+    renderTechLogs(logs);
+  });
+}
+
+function renderTechLogs(logs) {
+  const $tl = $('#techWorkLogs');
+  $tl.empty();
+  if (!logs.length) {
+    $tl.html('<p style="color:var(--text-muted);font-size:.82rem;">No logs yet for this ticket.</p>');
+    return;
+  }
+  logs.forEach(log => {
+    const tech = log.technicians?.full_name || 'System';
+    const dt = new Date(log.created_at).toLocaleString('en-PH', { dateStyle:'medium', timeStyle:'short' });
+    const parts = log.parts_used ? `<div style="font-size:.73rem;color:var(--text-muted);margin-top:.3rem;"><i class="bi bi-box me-1"></i>${log.parts_used}</div>` : '';
+    const labor = log.labor_cost > 0 ? `<div style="font-size:.73rem;color:var(--success);margin-top:.2rem;"><i class="bi bi-currency-dollar me-1"></i>₱${Number(log.labor_cost).toFixed(2)}</div>` : '';
+    $tl.append(`
+      <div class="log-entry">
+        <div class="log-dot"><i class="bi bi-wrench"></i></div>
+        <div class="log-content">
+          <div class="log-meta">${dt} · <strong>${tech}</strong></div>
+          <div class="log-text">${log.work_notes}</div>
+          ${parts}${labor}
+        </div>
+      </div>`);
+  });
+}
+
+// ── Quick Status ───────────────────────────────────────────
+function quickStatus(status) {
+  if (!selectedTicket) return;
+  const techId = $('#techSelect').val() || null;
+  API.updateTicket(selectedTicket.id, {
+    status,
+    assigned_technician_id: techId,
+    work_log_note: `Status advanced to: ${status}`,
+  }).then(() => {
+    selectedTicket.status = status;
+    selectJob(selectedTicket.id);
+    loadJobs();
+  }).catch(err => alert('Error: ' + err.message));
+}
+
+// ── Work Log Submit ────────────────────────────────────────
+$('#workLogForm').on('submit', function(e) {
+  e.preventDefault();
+  if (!selectedTicket) return;
+
+  const notes = $('#logNotes').val().trim();
+  if (!notes) {
+    $('#logErrorMsg').text('Work notes are required.');
+    $('#logError').removeClass('d-none');
+    return;
+  }
+
+  const techId = $('#techSelect').val() || null;
+  const $btn = $(this).find('button[type=submit]');
+  $btn.prop('disabled', true);
+  $('#logSpinner').removeClass('d-none');
+  $('#logError').addClass('d-none');
+
+  API.addWorkLog(selectedTicket.id, {
+    technician_id: techId,
+    work_notes: notes,
+    parts_used: $('#logParts').val().trim() || null,
+    labor_cost: parseFloat($('#logLabor').val()) || 0,
+    status_change: null,
+  }).then(() => {
+    $('#logNotes').val('');
+    $('#logParts').val('');
+    $('#logLabor').val('');
+    selectJob(selectedTicket.id);
+  }).catch(err => {
+    $('#logErrorMsg').text(err.message);
+    $('#logError').removeClass('d-none');
+  }).finally(() => {
+    $btn.prop('disabled', false);
+    $('#logSpinner').addClass('d-none');
+  });
+});
+
+// ── Init ───────────────────────────────────────────────────
+$(document).ready(() => {
+  loadTechDropdown();
+  loadJobs();
+});
+</script>
+</body>
+</html>

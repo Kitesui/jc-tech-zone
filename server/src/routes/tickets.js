@@ -1,0 +1,237 @@
+// ============================================================
+// routes/tickets.js — Service Tickets REST API
+// POST /api/tickets                          — create guest ticket (no auth)
+// GET  /api/tickets                          — list all tickets (admin)
+// GET  /api/tickets/track/:ref               — track ticket by reference ID (public)
+// GET  /api/tickets/:id                      — get single ticket with logs
+// PUT  /api/tickets/:id                      — update ticket status/assignment/cost
+// DELETE /api/tickets/:id                    — delete ticket (admin only)
+// POST /api/tickets/:id/logs                 — add work log entry
+// ============================================================
+import express from 'express';
+import crypto from 'crypto';
+import supabase from '../db.js';
+
+const router = express.Router();
+
+// Generate unique reference ID, e.g. JCT-2026-A1B2
+const generateReferenceId = () => `JCT-${new Date().getFullYear()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+
+
+// ─── POST /api/tickets ────────────────────────────────────────────────────────
+router.post('/', async (req, res) => {
+  const {
+    customer_name,
+    contact_number,
+    email,
+    service_type,
+    device_type,
+    issue_description,
+    address,
+    preferred_schedule,
+    estimated_cost,
+  } = req.body;
+
+  if (!customer_name || !contact_number || !service_type || !issue_description) {
+    return res.status(400).json({ error: 'Missing required fields: customer_name, contact_number, service_type, issue_description' });
+  }
+  if (!['home_service', 'drop_off'].includes(service_type)) {
+    return res.status(400).json({ error: 'service_type must be "home_service" or "drop_off"' });
+  }
+  if (service_type === 'home_service' && !address) {
+    return res.status(400).json({ error: 'address is required for home_service bookings' });
+  }
+
+  const ticket_reference_id = generateReferenceId();
+
+  const baseFee = service_type === 'home_service' ? 800.00 : 0.00;
+  const initialCost = estimated_cost ? Math.max(parseFloat(estimated_cost), baseFee) : baseFee;
+
+  const { data, error } = await supabase
+    .from('tickets')
+    .insert([{
+      ticket_reference_id,
+      customer_name: customer_name.trim(),
+      contact_number: contact_number.trim(),
+      email: email ? email.trim() : null,
+      service_type,
+      device_type: device_type ? device_type.trim() : null,
+      issue_description: issue_description.trim(),
+      address: address ? address.trim() : null,
+      preferred_schedule: preferred_schedule || null,
+      estimated_cost: initialCost,
+      status: 'Received',
+    }])
+    .select()
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  // Insert initial log
+  const initialNote = service_type === 'home_service'
+    ? 'Home-service booking received. Fixed Home Service Fee: ₱800.00.'
+    : 'Drop-off booking received via online portal. Ticket dispatched.';
+
+  await supabase.from('ticket_logs').insert([{
+    ticket_id: data.id,
+    work_notes: initialNote,
+    status_change: 'Received',
+  }]);
+
+  res.status(201).json({ message: 'Ticket created', ticket_reference_id, ticket: data });
+});
+
+// ─── GET /api/tickets/track/:ref ──────────────────────────────────────────────
+router.get('/track/:ref', async (req, res) => {
+  const ref = req.params.ref.trim().toUpperCase();
+
+  const { data: ticket, error } = await supabase
+    .from('tickets')
+    .select('*, technicians(id, full_name, role, phone)')
+    .eq('ticket_reference_id', ref)
+    .single();
+
+  if (error || !ticket) return res.status(404).json({ error: 'No ticket found with this reference ID' });
+
+  const { data: logs } = await supabase
+    .from('ticket_logs')
+    .select('*, technicians(full_name)')
+    .eq('ticket_id', ticket.id)
+    .order('created_at', { ascending: true });
+
+  const { data: feedback } = await supabase
+    .from('ticket_feedback')
+    .select('*')
+    .eq('ticket_id', ticket.id)
+    .maybeSingle();
+
+  res.json({ ticket, logs: logs || [], feedback: feedback || null });
+});
+
+// ─── GET /api/tickets ─────────────────────────────────────────────────────────
+router.get('/', async (req, res) => {
+  const { status, technician_id, search } = req.query;
+
+  let query = supabase
+    .from('tickets')
+    .select('*, technicians(id, full_name, role)')
+    .order('created_at', { ascending: false });
+
+  if (status && status !== 'all') query = query.eq('status', status);
+  if (technician_id) query = query.eq('assigned_technician_id', technician_id);
+  if (search) {
+    query = query.or(
+      `ticket_reference_id.ilike.%${search}%,customer_name.ilike.%${search}%,contact_number.ilike.%${search}%,device_type.ilike.%${search}%`
+    );
+  }
+
+  const { data, error } = await query;
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// ─── GET /api/tickets/:id ─────────────────────────────────────────────────────
+router.get('/:id', async (req, res) => {
+  const { data: ticket, error } = await supabase
+    .from('tickets')
+    .select('*, technicians(id, full_name, role, phone)')
+    .eq('id', req.params.id)
+    .single();
+
+  if (error || !ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+  const { data: logs } = await supabase
+    .from('ticket_logs')
+    .select('*, technicians(full_name)')
+    .eq('ticket_id', ticket.id)
+    .order('created_at', { ascending: true });
+
+  res.json({ ticket, logs: logs || [] });
+});
+
+// ─── PUT /api/tickets/:id ─────────────────────────────────────────────────────
+router.put('/:id', async (req, res) => {
+  const {
+    status,
+    assigned_technician_id,
+    estimated_cost,
+    work_log_note,
+    technician_name,
+    parts_used,
+    labor_cost,
+    status_change,
+  } = req.body;
+
+  const { data: current, error: fetchErr } = await supabase
+    .from('tickets')
+    .select('*')
+    .eq('id', req.params.id)
+    .single();
+
+  if (fetchErr || !current) return res.status(404).json({ error: 'Ticket not found' });
+
+  const updates = { updated_at: new Date().toISOString() };
+  if (status) updates.status = status;
+  if (assigned_technician_id !== undefined) updates.assigned_technician_id = assigned_technician_id || null;
+  if (estimated_cost !== undefined) updates.estimated_cost = parseFloat(estimated_cost) || 0;
+
+  const { data: updated, error: updateErr } = await supabase
+    .from('tickets')
+    .update(updates)
+    .eq('id', req.params.id)
+    .select('*, technicians(id, full_name, role, phone)')
+    .single();
+
+  if (updateErr) return res.status(400).json({ error: updateErr.message });
+
+  // Add work log if note or status changed
+  if (work_log_note?.trim() || (status && status !== current.status)) {
+    await supabase.from('ticket_logs').insert([{
+      ticket_id: req.params.id,
+      technician_id: assigned_technician_id || null,
+      work_notes: work_log_note?.trim() || `Status changed to: ${status}`,
+      parts_used: parts_used || null,
+      labor_cost: labor_cost ? parseFloat(labor_cost) : 0,
+      status_change: status && status !== current.status ? status : null,
+    }]);
+  }
+
+  const { data: logs } = await supabase
+    .from('ticket_logs')
+    .select('*, technicians(full_name)')
+    .eq('ticket_id', req.params.id)
+    .order('created_at', { ascending: true });
+
+  res.json({ message: 'Ticket updated', ticket: updated, logs: logs || [] });
+});
+
+// ─── POST /api/tickets/:id/logs ───────────────────────────────────────────────
+router.post('/:id/logs', async (req, res) => {
+  const { work_notes, technician_id, parts_used, labor_cost, status_change } = req.body;
+  if (!work_notes?.trim()) return res.status(400).json({ error: 'work_notes is required' });
+
+  const { data, error } = await supabase
+    .from('ticket_logs')
+    .insert([{
+      ticket_id: req.params.id,
+      technician_id: technician_id || null,
+      work_notes: work_notes.trim(),
+      parts_used: parts_used || null,
+      labor_cost: labor_cost ? parseFloat(labor_cost) : 0,
+      status_change: status_change || null,
+    }])
+    .select('*, technicians(full_name)')
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(201).json(data);
+});
+
+// ─── DELETE /api/tickets/:id ──────────────────────────────────────────────────
+router.delete('/:id', async (req, res) => {
+  const { error } = await supabase.from('tickets').delete().eq('id', req.params.id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ message: 'Ticket deleted' });
+});
+
+export default router;

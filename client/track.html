@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Repair — JC TECH ZONE</title>
+  <meta name="description" content="Track the live status of your repair ticket at JC Tech Zone Marikina. View milestone progress, technician notes, parts used, and submit post-service feedback." />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-jc">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <i class="bi bi-cpu-fill text-primary-jc"></i> JC TECH ZONE
+      <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
+            style="background:#00d8ff12;border:1px solid #00d8ff33;font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
+        <span class="status-dot"></span> SYS-ONLINE
+      </span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
+            style="color:var(--text-muted);"><i class="bi bi-list" style="font-size:1.4rem;"></i></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1 align-items-lg-center py-2 py-lg-0">
+        <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="track.html"><i class="bi bi-search me-1"></i>Track Repair</a></li>
+        <li class="nav-item"><a class="nav-link" href="catalog.html"><i class="bi bi-hdd-stack me-1"></i>Hardware Catalog</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin.html"><i class="bi bi-shield-check me-1"></i>Admin</a></li>
+        <li class="nav-item"><a class="nav-link" href="tech.html"><i class="bi bi-terminal me-1"></i>Tech Portal</a></li>
+      </ul>
+      <a href="index.html" class="btn-outline-jc ms-lg-3 mt-2 mt-lg-0">
+        <i class="bi bi-plus me-1"></i>New Ticket
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+
+  <!-- Search Header -->
+  <section class="card-jc mb-4">
+    <div class="card-header-jc"><i class="bi bi-search me-1"></i>Live Ticket Status Tracker</div>
+    <div class="p-4">
+      <div class="row align-items-center g-3">
+        <div class="col-md-8">
+          <h1 class="section-title mb-1">Track Your <span class="accent">Repair</span></h1>
+          <p style="color:var(--text-muted);font-size:.85rem;">
+            Enter your reference ID (e.g. JCT-2026-AB12) to view real-time technician progress and work logs.
+          </p>
+        </div>
+        <div class="col-md-4">
+          <form id="trackForm">
+            <label class="form-label-jc">Ticket Reference ID</label>
+            <div class="input-group">
+              <input type="text" id="refInput" class="form-control-jc"
+                     placeholder="JCT-2026-XXXX" style="border-radius:8px 0 0 8px;" />
+              <button type="submit" class="btn-primary-jc" style="border-radius:0 8px 8px 0;">
+                <i class="bi bi-search"></i> Track
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error State -->
+  <div id="trackError" class="alert-jc danger mb-4 d-none">
+    <i class="bi bi-exclamation-triangle me-2"></i><span id="trackErrorMsg">No ticket found.</span>
+  </div>
+
+  <!-- Results (hidden until search) -->
+  <div id="trackResults" class="d-none">
+
+    <!-- Ticket Info & Status -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-7">
+        <div class="card-jc h-100">
+          <div class="card-header-jc d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-ticket-perforated me-1"></i>Ticket Details</span>
+            <button type="button" class="btn-outline-jc btn-sm-jc no-print" onclick="window.print()" style="font-size:.72rem;">
+              <i class="bi bi-printer me-1"></i>Print Slip
+            </button>
+          </div>
+          <div class="p-4">
+            <div class="row g-2" id="ticketInfoGrid"><!-- JS --></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-5">
+        <div class="card-jc h-100">
+          <div class="card-header-jc"><i class="bi bi-graph-up me-1"></i>Current Status</div>
+          <div class="p-4 d-flex flex-column gap-3">
+            <div class="text-center">
+              <div id="statusBadgeDisplay" class="mb-3"></div>
+              <div id="statusMessageDisplay" style="font-size:.82rem;color:var(--text-muted);"></div>
+            </div>
+            <div id="estimatedCostDisplay"></div>
+            <div id="assignedTechDisplay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Milestone Tracker -->
+    <div class="card-jc mb-4">
+      <div class="card-header-jc"><i class="bi bi-diagram-3 me-1"></i>Repair Progress Milestones</div>
+      <div class="p-4">
+        <div class="milestone-bar" id="milestoneBar"><!-- JS --></div>
+      </div>
+    </div>
+
+    <!-- Work Logs / Technician Notes -->
+    <div class="card-jc mb-4">
+      <div class="card-header-jc"><i class="bi bi-journal-text me-1"></i>Technician Work Logs</div>
+      <div class="p-4">
+        <div class="log-timeline" id="workLogTimeline">
+          <p style="color:var(--text-muted);font-size:.85rem;">No logs yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Rating & Feedback (shown only if Completed + no existing feedback) -->
+    <div class="card-jc mb-4 d-none" id="feedbackSection">
+      <div class="card-header-jc" style="color:var(--warning);"><i class="bi bi-star me-1"></i>Rate Your Service Experience</div>
+      <div class="p-4">
+        <div id="existingFeedback" class="d-none">
+          <div class="alert-jc success"><i class="bi bi-check-circle me-2"></i>Your feedback has been submitted. Thank you!</div>
+          <div id="existingFeedbackDisplay" class="mt-3"></div>
+        </div>
+        <form id="feedbackForm" class="d-block">
+          <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem;">
+            Your service is completed! How was your experience with JC Tech Zone?
+          </p>
+          <div class="mb-3">
+            <label class="form-label-jc">Star Rating *</label>
+            <div class="star-rating" id="starRating">
+              <span class="star" data-val="1">★</span>
+              <span class="star" data-val="2">★</span>
+              <span class="star" data-val="3">★</span>
+              <span class="star" data-val="4">★</span>
+              <span class="star" data-val="5">★</span>
+            </div>
+            <input type="hidden" id="ratingValue" value="0" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label-jc">Comments <span style="color:var(--text-muted);">(optional)</span></label>
+            <textarea id="feedbackComments" class="form-control-jc" rows="3"
+                      placeholder="Tell us about your experience..."></textarea>
+          </div>
+          <div id="feedbackError" class="alert-jc danger mb-3 d-none">
+            <i class="bi bi-exclamation-triangle me-2"></i><span id="feedbackErrorMsg"></span>
+          </div>
+          <button type="submit" class="btn-primary-jc">
+            <i class="bi bi-send me-1"></i>Submit Feedback
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div><!-- /trackResults -->
+
+</main>
+
+<!-- Footer -->
+<footer class="footer-jc">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <div class="footer-brand"><i class="bi bi-cpu-fill me-2" style="color:var(--primary);"></i>JC TECH ZONE</div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem;">3 E. Santos Street, Concepcion Uno, Marikina City</p>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);">
+        BSIT – LFSA411A034 · Busita · Ledesma · Macabingkil · Santos · Velsis<br>
+        Instructor: Mr. Carlos Jessneir D. Javier
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+// ── Constants ──────────────────────────────────────────────
+const MILESTONES = [
+  { status: 'Received',          icon: 'bi-inbox-fill',      label: 'Received',          desc: 'Ticket logged in system' },
+  { status: 'Under Diagnostics', icon: 'bi-search',          label: 'Under Diagnostics', desc: 'Device being assessed' },
+  { status: 'In Progress',       icon: 'bi-wrench-adjustable',label: 'In Progress',       desc: 'Repair in progress' },
+  { status: 'Ready for Pick-Up', icon: 'bi-check2-circle',   label: 'Ready for Pick-Up', desc: 'Ready — please collect' },
+  { status: 'Completed',         icon: 'bi-patch-check-fill',label: 'Completed',          desc: 'Service complete' },
+];
+
+const STATUS_BADGE_MAP = {
+  'Received':          'badge-received',
+  'Under Diagnostics': 'badge-diagnostics',
+  'In Progress':       'badge-in-progress',
+  'Ready for Pick-Up': 'badge-ready',
+  'Completed':         'badge-completed',
+  'Cancelled':         'badge-cancelled',
+};
+
+const STATUS_MESSAGES = {
+  'Received':          'Your ticket has been received and is queued for inspection.',
+  'Under Diagnostics': 'Our technicians are actively diagnosing your device.',
+  'In Progress':       'Your device is currently being repaired.',
+  'Ready for Pick-Up': 'Great news! Your device is repaired and ready for collection.',
+  'Completed':         'Your repair has been completed. Thank you for trusting JC Tech Zone!',
+  'Cancelled':         'This ticket has been cancelled. Please contact us for details.',
+};
+
+let currentTicketId = null;
+let starSelected = 0;
+
+// ── Render Helpers ─────────────────────────────────────────
+function getMilestoneIndex(status) {
+  return MILESTONES.findIndex(m => m.status === status);
+}
+
+function renderMilestones(currentStatus) {
+  const $bar = $('#milestoneBar');
+  $bar.empty();
+  const currentIdx = getMilestoneIndex(currentStatus);
+
+  MILESTONES.forEach((m, i) => {
+    let cls = 'upcoming';
+    if (i < currentIdx) cls = 'done';
+    else if (i === currentIdx) cls = 'active';
+
+    $bar.append(`
+      <div class="milestone-step ${cls}">
+        <div class="milestone-dot">
+          <i class="${m.icon}"></i>
+        </div>
+        <div class="milestone-label">${m.label}<br><span style="font-size:.58rem;opacity:.7;">${m.desc}</span></div>
+      </div>`);
+  });
+}
+
+function renderWorkLogs(logs) {
+  const $tl = $('#workLogTimeline');
+  $tl.empty();
+  if (!logs || logs.length === 0) {
+    $tl.html('<p style="color:var(--text-muted);font-size:.85rem;">No technician notes recorded yet.</p>');
+    return;
+  }
+  logs.forEach(log => {
+    const techName = log.technicians?.full_name || 'System';
+    const dt = new Date(log.created_at).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
+    const badge = log.status_change
+      ? `<span class="badge-status ${STATUS_BADGE_MAP[log.status_change] || 'badge-received'} ms-2">${log.status_change}</span>`
+      : '';
+    const parts = log.parts_used
+      ? `<div style="font-size:.75rem;color:var(--text-muted);margin-top:.4rem;"><i class="bi bi-box me-1"></i>Parts: ${log.parts_used}</div>`
+      : '';
+    const labor = (log.labor_cost > 0)
+      ? `<div style="font-size:.75rem;color:var(--success);margin-top:.2rem;"><i class="bi bi-currency-dollar me-1"></i>Labor: ₱${Number(log.labor_cost).toFixed(2)}</div>`
+      : '';
+    $tl.append(`
+      <div class="log-entry">
+        <div class="log-dot"><i class="bi bi-wrench"></i></div>
+        <div class="log-content">
+          <div class="log-meta">${dt} · <strong style="color:var(--text-dim);">${techName}</strong>${badge}</div>
+          <div class="log-text">${log.work_notes}</div>
+          ${parts}${labor}
+        </div>
+      </div>`);
+  });
+}
+
+function renderTicketInfo(ticket) {
+  const fields = [
+    { label: 'Reference ID',    value: `<span class="font-mono" style="color:var(--primary);font-size:.9rem;">${ticket.ticket_reference_id}</span>` },
+    { label: 'Customer Name',   value: ticket.customer_name },
+    { label: 'Contact Number',  value: ticket.contact_number },
+    { label: 'Email',           value: ticket.email || '—' },
+    { label: 'Device',          value: ticket.device_type || '—' },
+    { label: 'Service Type',    value: ticket.service_type === 'home_service' ? '🏡 Home Service' : '🏬 Drop-Off at Shop' },
+  ];
+  if (ticket.service_type === 'home_service') {
+    fields.push({ label: 'Address', value: ticket.address || '—' });
+    if (ticket.preferred_schedule) {
+      fields.push({ label: 'Schedule', value: new Date(ticket.preferred_schedule).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) });
+    }
+  }
+  fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;">${ticket.issue_description}</span>`, full: true });
+  fields.push({ label: 'Submitted', value: new Date(ticket.created_at).toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' }) });
+
+  const $grid = $('#ticketInfoGrid');
+  $grid.empty();
+  fields.forEach(f => {
+    const col = f.full ? 'col-12' : 'col-sm-6';
+    $grid.append(`
+      <div class="${col}">
+        <div class="form-label-jc">${f.label}</div>
+        <div style="font-size:.85rem;color:var(--text);font-weight:500;">${f.value}</div>
+      </div>`);
+  });
+}
+
+// ── Track Function ─────────────────────────────────────────
+function doTrack(ref) {
+  const $results = $('#trackResults');
+  const $error   = $('#trackError');
+  $results.addClass('d-none');
+  $error.addClass('d-none');
+
+  API.trackTicket(ref).then(res => {
+    const { ticket, logs, feedback } = res;
+    currentTicketId = ticket.id;
+
+    renderTicketInfo(ticket);
+    renderMilestones(ticket.status);
+    renderWorkLogs(logs);
+
+    // Status badge & message
+    const cls = STATUS_BADGE_MAP[ticket.status] || 'badge-received';
+    $('#statusBadgeDisplay').html(`<span class="badge-status ${cls}" style="font-size:.9rem;padding:.5rem 1rem;">${ticket.status}</span>`);
+    $('#statusMessageDisplay').text(STATUS_MESSAGES[ticket.status] || '');
+
+    // Estimated cost
+    if (ticket.estimated_cost > 0) {
+      $('#estimatedCostDisplay').html(`
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-cash-coin" style="color:var(--success);"></i>
+          <div>
+            <div class="form-label-jc">Estimated Cost</div>
+            <div class="font-mono" style="color:var(--success);font-size:1.1rem;font-weight:700;">
+              ₱${Number(ticket.estimated_cost).toLocaleString('en-PH', {minimumFractionDigits:2})}
+            </div>
+          </div>
+        </div>`);
+    } else {
+      $('#estimatedCostDisplay').html(`<div style="font-size:.8rem;color:var(--text-muted);">
+        <i class="bi bi-info-circle me-1"></i>Estimated cost will be updated after diagnostics.
+      </div>`);
+    }
+
+    // Assigned tech
+    if (ticket.technicians) {
+      $('#assignedTechDisplay').html(`
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-person-badge" style="color:var(--primary);"></i>
+          <div>
+            <div class="form-label-jc">Assigned Technician</div>
+            <div style="font-size:.85rem;font-weight:600;">${ticket.technicians.full_name}</div>
+            <div style="font-size:.75rem;color:var(--text-muted);">${ticket.technicians.role}</div>
+          </div>
+        </div>`);
+    } else {
+      $('#assignedTechDisplay').html(`<div style="font-size:.8rem;color:var(--text-muted);">
+        <i class="bi bi-hourglass me-1"></i>Awaiting technician assignment.
+      </div>`);
+    }
+
+    // Feedback section
+    if (ticket.status === 'Completed') {
+      $('#feedbackSection').removeClass('d-none');
+      if (feedback) {
+        $('#feedbackForm').addClass('d-none');
+        $('#existingFeedback').removeClass('d-none');
+        const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
+        $('#existingFeedbackDisplay').html(`
+          <div style="font-size:1.4rem;color:#f59e0b;">${stars}</div>
+          ${feedback.comments ? `<p style="color:var(--text-dim);font-size:.85rem;margin-top:.5rem;">"${feedback.comments}"</p>` : ''}`);
+      }
+    } else {
+      $('#feedbackSection').addClass('d-none');
+    }
+
+    $results.removeClass('d-none');
+  }).catch(err => {
+    $('#trackErrorMsg').text(err.message || 'No ticket found with this reference ID.');
+    $error.removeClass('d-none');
+  });
+}
+
+// ── Events ─────────────────────────────────────────────────
+$('#trackForm').on('submit', function(e) {
+  e.preventDefault();
+  const ref = $('#refInput').val().trim().toUpperCase();
+  if (!ref) return;
+  history.replaceState(null, '', `?ref=${encodeURIComponent(ref)}`);
+  doTrack(ref);
+});
+
+// Star rating
+$('#starRating').on('mouseenter', '.star', function() {
+  const val = parseInt($(this).data('val'));
+  $('#starRating .star').each(function(i) {
+    $(this).toggleClass('active', i < val);
+  });
+}).on('mouseleave', () => {
+  $('#starRating .star').each(function(i) {
+    $(this).toggleClass('active', i < starSelected);
+  });
+}).on('click', '.star', function() {
+  starSelected = parseInt($(this).data('val'));
+  $('#ratingValue').val(starSelected);
+});
+
+$('#feedbackForm').on('submit', function(e) {
+  e.preventDefault();
+  const rating = parseInt($('#ratingValue').val());
+  if (rating < 1) {
+    $('#feedbackErrorMsg').text('Please select a star rating.');
+    $('#feedbackError').removeClass('d-none');
+    return;
+  }
+  API.submitFeedback({
+    ticket_id: currentTicketId,
+    rating,
+    comments: $('#feedbackComments').val().trim() || null,
+  }).then(() => {
+    $('#feedbackForm').addClass('d-none');
+    $('#existingFeedback').removeClass('d-none');
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    $('#existingFeedbackDisplay').html(`<div style="font-size:1.4rem;color:#f59e0b;">${stars}</div>`);
+  }).catch(err => {
+    $('#feedbackErrorMsg').text(err.message);
+    $('#feedbackError').removeClass('d-none');
+  });
+});
+
+// ── Init: check URL param ──────────────────────────────────
+$(document).ready(() => {
+  const params = new URLSearchParams(location.search);
+  const ref = params.get('ref');
+  if (ref) {
+    $('#refInput').val(ref);
+    doTrack(ref.toUpperCase());
+  }
+});
+</script>
+</body>
+</html>

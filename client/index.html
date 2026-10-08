@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JC TECH ZONE — IT Service Ticketing & Booking Portal</title>
+  <meta name="description" content="JC TECH ZONE Marikina — Guest service ticketing, home-service booking, live ticket tracking, and hardware price catalog. No account needed." />
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ════════════ NAVBAR ════════════ -->
+<nav class="navbar navbar-expand-lg navbar-jc">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <i class="bi bi-cpu-fill text-primary-jc"></i>
+      JC TECH ZONE
+      <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
+            style="background:#00d8ff12;border:1px solid #00d8ff33;font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
+        <span class="status-dot"></span> SYS-ONLINE
+      </span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
+            style="color:var(--text-muted);">
+      <i class="bi bi-list" style="font-size:1.4rem;"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1 align-items-lg-center py-2 py-lg-0">
+        <li class="nav-item"><a class="nav-link active" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="track.html"><i class="bi bi-search me-1"></i>Track Repair</a></li>
+        <li class="nav-item"><a class="nav-link" href="catalog.html"><i class="bi bi-hdd-stack me-1"></i>Hardware Catalog</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin.html"><i class="bi bi-shield-check me-1"></i>Admin</a></li>
+        <li class="nav-item"><a class="nav-link" href="tech.html"><i class="bi bi-terminal me-1"></i>Tech Portal</a></li>
+      </ul>
+      <button class="btn-primary-jc ms-lg-3 mt-2 mt-lg-0" data-bs-toggle="modal" data-bs-target="#bookingModal" id="navBookBtn">
+        <i class="bi bi-wrench me-1"></i> Book Repair
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════ MAIN ════════════ -->
+<main class="container py-4">
+
+  <!-- Hero -->
+  <section class="hero-section mb-4">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <p class="font-mono mb-2" style="font-size:.75rem;color:var(--primary);">
+          <span class="status-dot me-1"></span> v3.0.0 · 3 E. Santos Street, Concepcion Uno, Marikina City
+        </p>
+        <h1 style="font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;">
+          IT Service, <br><span style="color:var(--primary);">dispatched &amp; tracked.</span>
+        </h1>
+        <p class="mt-3 mb-4" style="color:var(--text-dim);max-width:540px;line-height:1.7;">
+          Submit a repair ticket without creating an account. Book home service visits, track real-time technician
+          progress with milestone work logs, and check verified hardware stock prices — all in one portal.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <button class="btn-primary-jc" data-bs-toggle="modal" data-bs-target="#bookingModal">
+            <i class="bi bi-wrench me-2"></i>Book New Repair
+          </button>
+          <a href="track.html" class="btn-outline-jc">
+            <i class="bi bi-search me-2"></i>Track My Ticket
+          </a>
+          <a href="catalog.html" class="btn-outline-jc">
+            <i class="bi bi-cpu me-2"></i>Browse Hardware
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 d-none d-lg-flex justify-content-end align-items-center pt-4 pt-lg-0">
+        <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted);line-height:2;text-align:right;">
+          <div><span style="color:var(--primary);">SERVICES:</span> Drop-Off | Home-Visit</div>
+          <div><span style="color:var(--primary);">TURN-AROUND:</span> 24–48 hrs</div>
+          <div><span style="color:var(--primary);">ADDRESS:</span> Marikina City</div>
+          <div><span style="color:var(--primary);">CONTACT:</span> (02) 8XXX-XXXX</div>
+          <div><span style="color:var(--primary);">STATUS:</span> <span class="status-dot me-1"></span>ACCEPTING TICKETS</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Categories + Quick Tracker row -->
+  <div class="row g-4 mb-4">
+
+    <!-- Services Grid -->
+    <div class="col-lg-8">
+      <div class="card-jc h-100">
+        <div class="card-header-jc">
+          <i class="bi bi-grid-3x3-gap"></i> Service Categories
+        </div>
+        <div class="p-4">
+          <div class="row g-3" id="serviceCategoryGrid">
+            <!-- Populated by JS -->
+            <div class="col-12 text-center py-4"><div class="spinner-jc"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Tracker -->
+    <div class="col-lg-4">
+      <div class="card-jc h-100">
+        <div class="card-header-jc">
+          <i class="bi bi-search"></i> Quick Ticket Tracker
+        </div>
+        <div class="p-4">
+          <p style="color:var(--text-muted);font-size:.82rem;">Enter your reference ID to view real-time status.</p>
+          <form id="quickTrackForm" class="mt-3">
+            <label class="form-label-jc">Reference ID</label>
+            <div class="input-group">
+              <input type="text" id="quickTrackInput" class="form-control-jc"
+                     placeholder="e.g. JCT-2026-AB12" style="border-radius:8px 0 0 8px;" />
+              <button type="submit" class="btn-primary-jc" style="border-radius:0 8px 8px 0;white-space:nowrap;">
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </form>
+
+          <!-- Status Steps Preview -->
+          <div class="mt-4">
+            <p class="font-mono mb-2" style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Ticket Stages</p>
+            <div class="d-flex flex-column gap-2">
+              <div class="d-flex align-items-center gap-2" style="font-size:.78rem;">
+                <i class="bi bi-1-circle-fill" style="color:var(--primary);"></i>
+                <span style="color:var(--text-dim);">Received</span>
+              </div>
+              <div class="d-flex align-items-center gap-2" style="font-size:.78rem;">
+                <i class="bi bi-2-circle-fill" style="color:var(--primary);"></i>
+                <span style="color:var(--text-dim);">Under Diagnostics</span>
+              </div>
+              <div class="d-flex align-items-center gap-2" style="font-size:.78rem;">
+                <i class="bi bi-3-circle-fill" style="color:var(--primary);"></i>
+                <span style="color:var(--text-dim);">In Progress</span>
+              </div>
+              <div class="d-flex align-items-center gap-2" style="font-size:.78rem;">
+                <i class="bi bi-4-circle-fill" style="color:var(--primary);"></i>
+                <span style="color:var(--text-dim);">Ready for Pick-Up</span>
+              </div>
+              <div class="d-flex align-items-center gap-2" style="font-size:.78rem;">
+                <i class="bi bi-5-circle-fill" style="color:var(--primary);"></i>
+                <span style="color:var(--text-dim);">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hardware Catalog Preview -->
+  <section class="card-jc mb-4">
+    <div class="card-header-jc d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-cpu me-1"></i> Hardware Catalog Preview</span>
+      <a href="catalog.html" class="btn-outline-jc btn-sm-jc" style="font-size:.7rem;">
+        View All <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+    <div class="p-4">
+      <div class="row g-3" id="catalogPreviewGrid">
+        <div class="col-12 text-center py-4"><div class="spinner-jc"></div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer class="footer-jc">
+  <div class="container">
+    <div class="row g-4 mb-3">
+      <div class="col-md-4">
+        <div class="footer-brand mb-1"><i class="bi bi-cpu-fill me-2" style="color:var(--primary);"></i>JC TECH ZONE</div>
+        <p style="font-size:.78rem;color:var(--text-muted);line-height:1.7;">
+          Web-Based IT Service Ticketing, Home-Service Booking, and Management System with Product Catalog.
+        </p>
+      </div>
+      <div class="col-md-4">
+        <p class="font-mono mb-1" style="font-size:.68rem;color:var(--primary);text-transform:uppercase;letter-spacing:.07em;">Location</p>
+        <p style="font-size:.8rem;line-height:1.7;">
+          3 E. Santos Street, Concepcion Uno,<br>Marikina City
+        </p>
+        <a href="track.html" style="font-size:.8rem;"><i class="bi bi-search me-1"></i>Track a Ticket</a>
+      </div>
+      <div class="col-md-4">
+        <p class="font-mono mb-1" style="font-size:.68rem;color:var(--primary);text-transform:uppercase;letter-spacing:.07em;">Project Credits</p>
+        <p style="font-size:.75rem;line-height:1.8;color:var(--text-muted);">
+          BSIT – LFSA411A034<br>
+          Busita, Katherine Paula V.<br>
+          Ledesma, Cairo Angela<br>
+          Macabingkil, Icel<br>
+          Santos, Alexander D.<br>
+          Velsis, Jake S.<br>
+          <span style="color:var(--text-dim);">Instructor: Mr. Carlos Jessneir D. Javier</span>
+        </p>
+      </div>
+    </div>
+    <div class="border-top border-jc pt-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span style="font-size:.72rem;color:var(--text-muted);">
+        © 2026 JC TECH ZONE · September 28, 2026
+      </span>
+      <span class="font-mono" style="font-size:.65rem;color:var(--text-muted);">
+        Stack: Express.js · Supabase (PostgreSQL) · Bootstrap 5 · jQuery
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════ BOOKING MODAL ════════════ -->
+<div class="modal fade modal-jc" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title" id="bookingModalLabel" style="font-family:var(--font-display);font-size:1rem;">
+            <i class="bi bi-wrench me-2" style="color:var(--primary);"></i>Book a Service Ticket
+          </h5>
+          <p class="font-mono mb-0" style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">JC TECH ZONE RAPID INTAKE — NO ACCOUNT REQUIRED</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Success View (hidden initially) -->
+      <div id="bookingSuccess" class="modal-body text-center py-5 d-none">
+        <div style="width:64px;height:64px;border-radius:50%;background:#10b98115;border:2px solid #10b98140;
+                    display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+          <i class="bi bi-check-circle-fill" style="font-size:2rem;color:var(--success);"></i>
+        </div>
+        <h4 style="font-family:var(--font-display);">Booking Confirmed!</h4>
+        <p style="color:var(--text-muted);font-size:.85rem;max-width:400px;margin:.5rem auto 1.5rem;">
+          Your ticket has been logged. Save your reference ID to track real-time technician progress.
+        </p>
+        <div class="ref-id-box mb-4" id="createdRefId">—</div>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <button class="btn-primary-jc" id="trackNowBtn"><i class="bi bi-search me-2"></i>Track Status Now</button>
+          <button class="btn-outline-jc" id="copyRefBtn"><i class="bi bi-clipboard me-2"></i>Copy ID</button>
+          <button class="btn-outline-jc" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+      <!-- Form View -->
+      <form id="bookingForm" class="d-block">
+        <div class="modal-body">
+
+          <!-- Error -->
+          <div id="bookingError" class="alert-jc danger mb-3 d-none">
+            <i class="bi bi-exclamation-triangle me-2"></i><span id="bookingErrorMsg"></span>
+          </div>
+
+          <!-- Service Type -->
+          <div class="mb-3">
+            <label class="form-label-jc">Service Delivery Mode</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <button type="button" class="mode-btn active" id="modeDropOff" onclick="setMode('drop_off')">
+                  <span style="font-size:1.1rem;"><i class="bi bi-shop"></i></span>
+                  <span class="mode-title">Drop-Off at Shop</span>
+                  <span class="mode-desc">Bring your device to JC Tech Zone</span>
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button" class="mode-btn" id="modeHome" onclick="setMode('home_service')">
+                  <span style="font-size:1.1rem;"><i class="bi bi-house-door"></i></span>
+                  <span class="mode-title">Home / On-Site Service</span>
+                  <span class="mode-desc">Technician visits your address</span>
+                </button>
+              </div>
+            </div>
+            <input type="hidden" id="serviceTypeInput" value="drop_off" />
+          </div>
+
+          <!-- Service Category -->
+          <div class="mb-3">
+            <label class="form-label-jc">Service Category</label>
+            <select id="serviceCategorySelect" class="form-select-jc">
+              <option value="Laptop Repair">Laptop Repair</option>
+              <option value="Desktop Repair">Desktop Repair</option>
+              <option value="Data Recovery">Data Recovery</option>
+              <option value="Network Setup">Network Setup</option>
+              <option value="Hardware Upgrade">Hardware Upgrade</option>
+              <option value="Virus & Malware Removal">Virus &amp; Malware Removal</option>
+              <option value="CCTV Installation">CCTV Installation</option>
+              <option value="General Diagnostics">General Diagnostics</option>
+            </select>
+          </div>
+
+          <!-- Customer Info -->
+          <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label-jc">Full Name *</label>
+              <input type="text" id="custName" class="form-control-jc" placeholder="e.g. Maria Santos" required />
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label-jc">Contact Number *</label>
+              <input type="tel" id="custPhone" class="form-control-jc" placeholder="09XX-XXX-XXXX" required />
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label-jc">Email Address</label>
+              <input type="email" id="custEmail" class="form-control-jc" placeholder="you@example.com" />
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label-jc">Device Type</label>
+              <input type="text" id="deviceType" class="form-control-jc" placeholder="e.g. Laptop, Desktop, Printer" />
+            </div>
+          </div>
+
+          <!-- Issue Description -->
+          <div class="mb-3">
+            <label class="form-label-jc">Issue Description / Symptoms *</label>
+            <textarea id="issueDesc" class="form-control-jc" rows="3"
+              placeholder="Describe what's happening (e.g. screen blank, blue screen error, liquid spill, slow performance...)" required></textarea>
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="mb-3">
+            <label class="form-label-jc">Attach Screenshot / Photo <span style="color:var(--text-muted);">(optional)</span></label>
+            <input type="file" id="photoUpload" class="form-control-jc" accept="image/*" style="padding:.45rem .85rem;" />
+            <p style="font-size:.7rem;color:var(--text-muted);margin-top:.3rem;">
+              <i class="bi bi-info-circle me-1"></i>Upload an error screenshot or photo of the issue.
+            </p>
+          </div>
+
+          <!-- Home Service Fields (hidden by default) -->
+          <div id="homeServiceFields" class="d-none">
+            <div class="mb-3">
+              <label class="form-label-jc">Home / Service Address *</label>
+              <input type="text" id="serviceAddress" class="form-control-jc"
+                     placeholder="Full address (house no., street, barangay, city)" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label-jc">Preferred Date &amp; Time</label>
+              <input type="datetime-local" id="preferredSchedule" class="form-control-jc" />
+            </div>
+          <!-- Dynamic Fee Summary -->
+          <div class="card-jc p-3 mb-2" id="feeSummaryCard" style="background:#00d8ff08;border-color:#00d8ff33;">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="font-mono text-muted" style="font-size:.7rem;text-transform:uppercase;">Estimated Base Fee</span>
+                <div id="feeSummaryLabel" style="font-size:.85rem;font-weight:600;color:var(--text);">Drop-Off In-Shop Inspection</div>
+              </div>
+              <div class="text-end">
+                <div id="feeSummaryAmount" class="font-mono" style="font-size:1.25rem;font-weight:700;color:var(--primary);">₱0.00</div>
+                <span id="feeSummaryNote" style="font-size:.68rem;color:var(--text-muted);">Free bench diagnostics</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /modal-body -->
+
+        <div class="modal-footer gap-2">
+          <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn-primary-jc" id="submitBookingBtn">
+            <span id="submitBtnSpinner" class="spinner-jc me-2 d-none" style="width:14px;height:14px;border-width:2px;"></span>
+            <i class="bi bi-send me-1"></i>Submit Service Request
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS, jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────
+let serviceMode = 'drop_off';
+let currentRefId = null;
+
+// ── Service Categories ─────────────────────────────────────
+const SERVICE_CATEGORIES = [
+  { icon: 'bi-laptop',        label: 'Laptop Repair',     desc: 'Screen, keyboard, battery, motherboard' },
+  { icon: 'bi-display',       label: 'Desktop Repair',    desc: 'Towers, all-in-ones, power & boot issues' },
+  { icon: 'bi-hdd',           label: 'Data Recovery',     desc: 'Failed drives, deleted files, migration' },
+  { icon: 'bi-wifi',          label: 'Network Setup',     desc: 'Routers, Wi-Fi, cabling, configuration' },
+  { icon: 'bi-cpu',           label: 'Hardware Upgrade',  desc: 'RAM, SSD, GPU, cooling & tuning' },
+  { icon: 'bi-shield-check',  label: 'Virus Removal',     desc: 'Malware, ransomware, system hardening' },
+  { icon: 'bi-camera-video',  label: 'CCTV Installation', desc: 'IP cameras, DVR setup, remote access' },
+  { icon: 'bi-wrench',        label: 'General Diagnostics', desc: "Not sure what's wrong? We'll find out" },
+];
+
+function renderCategories() {
+  const $grid = $('#serviceCategoryGrid');
+  $grid.empty();
+  SERVICE_CATEGORIES.forEach(cat => {
+    $grid.append(`
+      <div class="col-6 col-sm-4 col-md-3">
+        <div class="product-card text-center p-3" style="cursor:pointer;min-height:auto;"
+             onclick="openBookingWithCategory('${cat.label}')">
+          <i class="${cat.icon} mb-2" style="font-size:1.6rem;color:var(--primary);display:block;"></i>
+          <div style="font-family:var(--font-display);font-size:.82rem;font-weight:700;color:var(--text);">${cat.label}</div>
+          <div style="font-size:.7rem;color:var(--text-muted);margin-top:.2rem;">${cat.desc}</div>
+        </div>
+      </div>`);
+  });
+}
+
+function openBookingWithCategory(cat) {
+  $('#serviceCategorySelect').val(cat);
+  new bootstrap.Modal('#bookingModal').show();
+}
+
+// ── Catalog Preview ────────────────────────────────────────
+function loadCatalogPreview() {
+  API.getProducts({ available: 'true' }).then(items => {
+    const $grid = $('#catalogPreviewGrid');
+    $grid.empty();
+    items.slice(0, 4).forEach(item => {
+      const stock = item.stock_qty > 0
+        ? `<span class="stock-badge stock-in"><i class="bi bi-check-circle me-1"></i>In Stock (${item.stock_qty})</span>`
+        : `<span class="stock-badge stock-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>`;
+      $grid.append(`
+        <div class="col-sm-6 col-lg-3">
+          <div class="product-card">
+            <div>
+              <div class="product-cat">${item.category}</div>
+              <div class="product-name">${item.item_name}</div>
+              <div style="font-size:.75rem;color:var(--text-muted);margin:.3rem 0;">${(item.description||'').substring(0,80)}${(item.description||'').length>80?'…':''}</div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-2" style="border-top:1px solid var(--border);">
+              <div class="product-price">₱${Number(item.price).toLocaleString('en-PH',{minimumFractionDigits:2})}</div>
+              ${stock}
+            </div>
+          </div>
+        </div>`);
+    });
+    if (items.length === 0) {
+      $grid.html('<div class="col-12 text-center py-3" style="color:var(--text-muted);">No products found.</div>');
+    }
+  }).catch(() => {
+    $('#catalogPreviewGrid').html('<div class="col-12 text-center py-3" style="color:var(--text-muted);">Could not load catalog.</div>');
+  });
+}
+
+// ── Mode Toggle ────────────────────────────────────────────
+function setMode(mode) {
+  serviceMode = mode;
+  $('#serviceTypeInput').val(mode);
+  if (mode === 'drop_off') {
+    $('#modeDropOff').addClass('active');
+    $('#modeHome').removeClass('active');
+    $('#homeServiceFields').addClass('d-none');
+    $('#serviceAddress').prop('required', false);
+    $('#feeSummaryLabel').text('Drop-Off In-Shop Inspection');
+    $('#feeSummaryAmount').text('₱0.00');
+    $('#feeSummaryNote').text('Free bench diagnostics');
+  } else {
+    $('#modeHome').addClass('active');
+    $('#modeDropOff').removeClass('active');
+    $('#homeServiceFields').removeClass('d-none');
+    $('#serviceAddress').prop('required', true);
+    $('#feeSummaryLabel').text('Fixed Home Service Mobilization Fee');
+    $('#feeSummaryAmount').text('₱800.00');
+    $('#feeSummaryNote').text('Fixed dispatch & on-site diagnostics');
+  }
+}
+
+// ── Booking Form Submit ────────────────────────────────────
+$('#bookingForm').on('submit', function(e) {
+  e.preventDefault();
+  const $btn = $('#submitBookingBtn');
+  const $spinner = $('#submitBtnSpinner');
+
+  const name  = $('#custName').val().trim();
+  const phone = $('#custPhone').val().trim();
+  const issue = $('#issueDesc').val().trim();
+  const addr  = $('#serviceAddress').val().trim();
+
+  if (!name || !phone || !issue) {
+    showBookingError('Please fill in all required fields (name, phone, issue description).');
+    return;
+  }
+  if (serviceMode === 'home_service' && !addr) {
+    showBookingError('Please enter your address for home service booking.');
+    return;
+  }
+
+  $btn.prop('disabled', true);
+  $spinner.removeClass('d-none');
+  $('#bookingError').addClass('d-none');
+
+  const payload = {
+    customer_name:      name,
+    contact_number:     phone,
+    email:              $('#custEmail').val().trim() || null,
+    service_type:       serviceMode,
+    device_type:        $('#deviceType').val().trim() || null,
+    issue_description:  issue,
+    address:            addr || null,
+    preferred_schedule: $('#preferredSchedule').val() || null,
+    estimated_cost:     serviceMode === 'home_service' ? 800 : 0,
+  };
+
+  API.createTicket(payload)
+    .then(res => {
+      currentRefId = res.ticket_reference_id;
+      $('#createdRefId').text(currentRefId);
+      $('#bookingForm').addClass('d-none');
+      $('#bookingSuccess').removeClass('d-none');
+    })
+    .catch(err => showBookingError(err.message))
+    .finally(() => {
+      $btn.prop('disabled', false);
+      $spinner.addClass('d-none');
+    });
+});
+
+function showBookingError(msg) {
+  $('#bookingErrorMsg').text(msg);
+  $('#bookingError').removeClass('d-none');
+}
+
+$('#trackNowBtn').on('click', () => {
+  bootstrap.Modal.getInstance('#bookingModal').hide();
+  window.location.href = `track.html?ref=${encodeURIComponent(currentRefId)}`;
+});
+
+$('#copyRefBtn').on('click', () => {
+  if (currentRefId) {
+    navigator.clipboard.writeText(currentRefId).then(() => {
+      $('#copyRefBtn').html('<i class="bi bi-check me-2"></i>Copied!');
+      setTimeout(() => $('#copyRefBtn').html('<i class="bi bi-clipboard me-2"></i>Copy ID'), 2000);
+    });
+  }
+});
+
+// Reset modal on close
+$('#bookingModal').on('hidden.bs.modal', () => {
+  $('#bookingForm')[0].reset();
+  $('#bookingForm').removeClass('d-none');
+  $('#bookingSuccess').addClass('d-none');
+  $('#bookingError').addClass('d-none');
+  setMode('drop_off');
+  currentRefId = null;
+});
+
+// ── Quick Tracker ──────────────────────────────────────────
+$('#quickTrackForm').on('submit', function(e) {
+  e.preventDefault();
+  const ref = $('#quickTrackInput').val().trim().toUpperCase();
+  if (ref) window.location.href = `track.html?ref=${encodeURIComponent(ref)}`;
+});
+
+// ── Navbar active ──────────────────────────────────────────
+$(document).ready(() => {
+  renderCategories();
+  loadCatalogPreview();
+  const page = location.pathname.split('/').pop() || 'index.html';
+  $(`.navbar-nav .nav-link[href="${page}"]`).addClass('active').attr('aria-current', 'page');
+  $(`.navbar-nav .nav-link[href!="${page}"]`).removeClass('active');
+});
+</script>
+</body>
+</html>
