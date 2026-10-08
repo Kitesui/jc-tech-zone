@@ -654,6 +654,28 @@ main { animation: fadeIn 0.3s ease; }
   background: var(--primary-dim) !important;
 }
 
+/* ── Modal Scrollable Fix ────────────────────────────────── */
+.modal-dialog-scrollable {
+  max-height: calc(100vh - 3.5rem);
+}
+.modal-dialog-scrollable .modal-content {
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-dialog-scrollable form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.modal-dialog-scrollable .modal-body {
+  overflow-y: auto !important;
+  max-height: calc(88vh - 130px);
+}
+
 /* ── Print Styles for Job Orders / Slips ─────────────────── */
 @media print {
   body::before, .navbar-jc, .footer-jc, #trackForm, .no-print, button, .modal, #feedbackSection {

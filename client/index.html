@@ -245,8 +245,8 @@
       </div>
 
       <!-- Form View -->
-      <form id="bookingForm" class="d-block">
-        <div class="modal-body">
+      <form id="bookingForm" class="d-flex flex-column flex-grow-1 overflow-hidden" style="min-height:0;">
+        <div class="modal-body" style="overflow-y:auto;max-height:calc(85vh - 130px);">
 
           <!-- Error -->
           <div id="bookingError" class="alert-jc danger mb-3 d-none">
@@ -302,15 +302,9 @@
             </div>
           </div>
 
-          <div class="row g-2 mb-3">
-            <div class="col-sm-6">
-              <label class="form-label-jc">Email Address</label>
-              <input type="email" id="custEmail" class="form-control-jc" placeholder="you@example.com" />
-            </div>
-            <div class="col-sm-6">
-              <label class="form-label-jc">Device Type</label>
-              <input type="text" id="deviceType" class="form-control-jc" placeholder="e.g. Laptop, Desktop, Printer" />
-            </div>
+          <div class="mb-3">
+            <label class="form-label-jc">Device Type</label>
+            <input type="text" id="deviceType" class="form-control-jc" placeholder="e.g. Laptop, Desktop, Printer" />
           </div>
 
           <!-- Issue Description -->
@@ -340,6 +334,8 @@
               <label class="form-label-jc">Preferred Date &amp; Time</label>
               <input type="datetime-local" id="preferredSchedule" class="form-control-jc" />
             </div>
+          </div>
+
           <!-- Dynamic Fee Summary -->
           <div class="card-jc p-3 mb-2" id="feeSummaryCard" style="background:#00d8ff08;border-color:#00d8ff33;">
             <div class="d-flex justify-content-between align-items-center">
@@ -493,7 +489,7 @@ $('#bookingForm').on('submit', function(e) {
   const payload = {
     customer_name:      name,
     contact_number:     phone,
-    email:              $('#custEmail').val().trim() || null,
+    email:              null,
     service_type:       serviceMode,
     device_type:        $('#deviceType').val().trim() || null,
     issue_description:  issue,
