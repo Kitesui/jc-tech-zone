@@ -5,7 +5,7 @@ import { requireAuth } from '../auth.js';
 
 const router = express.Router();
 
-const generateReferenceId = () => `JCT-${new Date().getFullYear()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+const generateReferenceId = () => `JCT-${new Date().getFullYear()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 
 function normalizeTicket(t) {
   if (!t) return t;
@@ -35,6 +35,7 @@ router.post('/', async (req, res) => {
     estimated_cost,
     attachment_url,
     photo_url,
+    assigned_technician_id,
   } = req.body;
 
   const finalName = (customer_name || '').trim();
@@ -54,31 +55,44 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'address is required for home_service bookings' });
   }
 
-  const ticket_reference_id = generateReferenceId();
-
   const baseFee = service_type === 'home_service' ? 800.00 : 0.00;
-  const initialCost = estimated_cost ? Math.max(parseFloat(estimated_cost), baseFee) : baseFee;
+  const parsedCost = parseFloat(estimated_cost);
+  const initialCost = !isNaN(parsedCost) ? Math.max(parsedCost, baseFee) : baseFee;
 
-  const { data, error } = await supabase
-    .from('tickets')
-    .insert([{
-      ticket_reference_id,
-      customer_name: finalName,
-      contact_number: finalContact,
-      email: finalEmail,
-      service_type,
-      device_type: finalDevice,
-      issue_description: finalIssue,
-      address: address ? address.trim() : null,
-      preferred_schedule: preferred_schedule || null,
-      estimated_cost: initialCost,
-      attachment_url: finalAttachment,
-      status: 'Received',
-    }])
-    .select()
-    .single();
+  let createdTicket = null;
+  let insertErr = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const ticket_reference_id = generateReferenceId();
+    const { data, error } = await supabase
+      .from('tickets')
+      .insert([{
+        ticket_reference_id,
+        customer_name: finalName,
+        contact_number: finalContact,
+        email: finalEmail,
+        service_type,
+        device_type: finalDevice,
+        issue_description: finalIssue,
+        address: address ? address.trim() : null,
+        preferred_schedule: preferred_schedule || null,
+        estimated_cost: initialCost,
+        attachment_url: finalAttachment,
+        assigned_technician_id: assigned_technician_id || null,
+        status: 'Received',
+      }])
+      .select()
+      .single();
 
-  if (error) return res.status(400).json({ error: error.message });
+    if (!error) {
+      createdTicket = data;
+      insertErr = null;
+      break;
+    }
+    insertErr = error;
+    if (error.code !== '23505') break;
+  }
+
+  if (insertErr || !createdTicket) return res.status(400).json({ error: insertErr ? insertErr.message : 'Failed to create ticket' });
 
   // Insert initial log
   const initialNote = service_type === 'home_service'
@@ -86,12 +100,12 @@ router.post('/', async (req, res) => {
     : 'Drop-off booking received via online portal. Ticket dispatched.';
 
   await supabase.from('ticket_logs').insert([{
-    ticket_id: data.id,
+    ticket_id: createdTicket.id,
     work_notes: initialNote,
     status_change: 'Received',
   }]);
 
-  const normalized = normalizeTicket(data);
+  const normalized = normalizeTicket(createdTicket);
   res.status(201).json({
     message: 'Ticket created',
     ...normalized,
@@ -104,7 +118,7 @@ router.get('/track/:ref', async (req, res) => {
 
   const { data: ticket, error } = await supabase
     .from('tickets')
-    .select('*, technicians(id, full_name, role, phone)')
+    .select('*, technicians(id, full_name, role)')
     .eq('ticket_reference_id', ref)
     .single();
 
@@ -141,9 +155,12 @@ router.get('/', requireAuth(['admin', 'technician']), async (req, res) => {
   if (status && status !== 'all') query = query.eq('status', status);
   if (technician_id) query = query.eq('assigned_technician_id', technician_id);
   if (search) {
-    query = query.or(
-      `ticket_reference_id.ilike.%${search}%,customer_name.ilike.%${search}%,contact_number.ilike.%${search}%,device_type.ilike.%${search}%`
-    );
+    const cleanSearch = search.replace(/[,()]/g, ' ').trim();
+    if (cleanSearch) {
+      query = query.or(
+        `ticket_reference_id.ilike.%${cleanSearch}%,customer_name.ilike.%${cleanSearch}%,contact_number.ilike.%${cleanSearch}%,device_type.ilike.%${cleanSearch}%`
+      );
+    }
   }
 
   const { data, error } = await query;
@@ -265,7 +282,7 @@ router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) 
     .from('ticket_logs')
     .insert([{
       ticket_id: req.params.id,
-      technician_id: technician_id || null,
+      technician_id: effectiveTech || ticket.assigned_technician_id || null,
       work_notes: noteText,
       parts_used: partsStr || null,
       labor_cost: labor_cost ? parseFloat(labor_cost) : 0,

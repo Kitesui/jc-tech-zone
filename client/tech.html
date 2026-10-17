@@ -673,11 +673,11 @@ function renderJobQueue(jobs) {
           <div class="font-mono" style="font-size:.72rem;color:var(--primary);">${job.ticket_reference_id}</div>
           <span class="badge-status ${cls}" style="font-size:.58rem;">${job.status}</span>
         </div>
-        <div style="font-weight:600;font-size:.85rem;margin-top:.3rem;">${job.customer_name}</div>
-        <div style="font-size:.75rem;color:var(--text-muted);">${job.device_type || '—'}</div>
+        <div style="font-weight:600;font-size:.85rem;margin-top:.3rem;">${escapeHtml(job.customer_name)}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);">${escapeHtml(job.device_type || '—')}</div>
         <div class="d-flex justify-content-between align-items-center mt-2">
           <span style="font-size:.7rem;color:var(--text-muted);">${job.service_type === 'home_service' ? '🏡 Home':'🏬 Drop-Off'} · ${dt}</span>
-          ${job.technicians ? `<span style="font-size:.68rem;color:var(--primary);"><i class="bi bi-person-badge me-1"></i>${job.technicians.full_name}</span>` : `<span style="font-size:.68rem;color:var(--warning);"><i class="bi bi-person-dash me-1"></i>Unassigned</span>`}
+          ${job.technicians ? `<span style="font-size:.68rem;color:var(--primary);"><i class="bi bi-person-badge me-1"></i>${escapeHtml(job.technicians.full_name)}</span>` : `<span style="font-size:.68rem;color:var(--warning);"><i class="bi bi-person-dash me-1"></i>Unassigned</span>`}
         </div>
       </div>`);
   });
@@ -734,14 +734,14 @@ function selectJob(id) {
     const techColor = selectedTicket.technicians ? 'var(--primary)' : 'var(--warning)';
 
     const fields = [
-      { label:'Customer', value: selectedTicket.customer_name },
+      { label:'Customer', value: escapeHtml(selectedTicket.customer_name) },
       { label:'Contact',  value: contactHtml },
-      { label:'Device',   value: selectedTicket.device_type || '—' },
+      { label:'Device',   value: escapeHtml(selectedTicket.device_type || '—') },
       { label:'Type',     value: selectedTicket.service_type === 'home_service' ? '🏡 Home Service':'🏬 Drop-Off' },
-      { label:'Assigned Tech', value: `<span style="color:${techColor};"><i class="bi bi-person-badge me-1"></i>${techName}</span>` },
+      { label:'Assigned Tech', value: `<span style="color:${techColor};"><i class="bi bi-person-badge me-1"></i>${escapeHtml(techName)}</span>` },
     ];
-    if (selectedTicket.address) fields.push({ label:'Address', value: selectedTicket.address, full: true });
-    fields.push({ label:'Issue', value: `<span style="color:var(--text-dim);font-size:.8rem;">${selectedTicket.issue_description}</span>`, full: true });
+    if (selectedTicket.address) fields.push({ label:'Address', value: escapeHtml(selectedTicket.address), full: true });
+    fields.push({ label:'Issue', value: `<span style="color:var(--text-dim);font-size:.8rem;">${escapeHtml(selectedTicket.issue_description)}</span>`, full: true });
     if (selectedTicket.estimated_cost > 0) {
       fields.push({ label:'Est. Cost', value: `<span style="color:var(--success);" class="font-mono">₱${Number(selectedTicket.estimated_cost).toFixed(2)}</span>` });
     }
@@ -844,14 +844,14 @@ function renderTechLogs(logs) {
   logs.forEach(log => {
     const tech = log.technicians?.full_name || 'System';
     const dt = new Date(log.created_at).toLocaleString('en-PH', { dateStyle:'medium', timeStyle:'short' });
-    const parts = log.parts_used ? `<div style="font-size:.73rem;color:var(--text-muted);margin-top:.3rem;"><i class="bi bi-box me-1"></i>${log.parts_used}</div>` : '';
+    const parts = log.parts_used ? `<div style="font-size:.73rem;color:var(--text-muted);margin-top:.3rem;"><i class="bi bi-box me-1"></i>${escapeHtml(log.parts_used)}</div>` : '';
     const labor = log.labor_cost > 0 ? `<div style="font-size:.73rem;color:var(--success);margin-top:.2rem;"><i class="bi bi-currency-dollar me-1"></i>₱${Number(log.labor_cost).toFixed(2)}</div>` : '';
     $tl.append(`
       <div class="log-entry">
         <div class="log-dot"><i class="bi bi-wrench"></i></div>
         <div class="log-content">
-          <div class="log-meta">${dt} · <strong>${tech}</strong></div>
-          <div class="log-text">${log.work_notes}</div>
+          <div class="log-meta">${dt} · <strong>${escapeHtml(tech)}</strong></div>
+          <div class="log-text">${escapeHtml(log.work_notes)}</div>
           ${parts}${labor}
         </div>
       </div>`);
@@ -883,7 +883,7 @@ function promptClaimTicketModal(targetStatus) {
     const $sel = $('#claimModalTechSelect');
     $sel.empty().append('<option value="">— Select Your Technician Name —</option>');
     (allTechnicians || []).forEach(t => {
-      $sel.append(`<option value="${t.id}">${t.full_name} (${t.role})</option>`);
+      $sel.append(`<option value="${t.id}">${escapeHtml(t.full_name)} (${escapeHtml(t.role || '')})</option>`);
     });
 
     const lastTechId = localStorage.getItem('jc_last_claim_tech_id');
@@ -937,7 +937,7 @@ async function confirmCancelJob() {
 
   const ok = await UI.confirm({
     title: 'Cancel Booking',
-    message: `Are you sure you want to cancel booking <strong class="text-primary-jc">${selectedTicket.ticket_reference_id}</strong> for <strong>${selectedTicket.customer_name}</strong>?<div style="color:#cbd5e1;font-size:0.84rem;margin-top:0.45rem;line-height:1.45;">This will mark the ticket status as Cancelled.</div>`,
+    message: `Are you sure you want to cancel booking <strong class="text-primary-jc">${escapeHtml(selectedTicket.ticket_reference_id)}</strong> for <strong>${escapeHtml(selectedTicket.customer_name)}</strong>?<div style="color:#cbd5e1;font-size:0.84rem;margin-top:0.45rem;line-height:1.45;">This will mark the ticket status as Cancelled.</div>`,
     confirmText: 'Yes, Cancel Booking',
     cancelText: 'Keep Active',
     danger: true

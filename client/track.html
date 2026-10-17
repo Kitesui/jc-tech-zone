@@ -339,7 +339,7 @@ function renderWorkLogs(logs) {
       ? `<span class="badge-status ${STATUS_BADGE_MAP[log.status_change] || 'badge-received'} ms-2">${log.status_change}</span>`
       : '';
     const parts = log.parts_used
-      ? `<div style="font-size:.75rem;color:var(--text-muted);margin-top:.4rem;"><i class="bi bi-box me-1"></i>Parts: ${log.parts_used}</div>`
+      ? `<div style="font-size:.75rem;color:var(--text-muted);margin-top:.4rem;"><i class="bi bi-box me-1"></i>Parts: ${escapeHtml(log.parts_used)}</div>`
       : '';
     const labor = (log.labor_cost > 0)
       ? `<div style="font-size:.75rem;color:var(--success);margin-top:.2rem;"><i class="bi bi-currency-dollar me-1"></i>Labor: ₱${Number(log.labor_cost).toFixed(2)}</div>`
@@ -348,8 +348,8 @@ function renderWorkLogs(logs) {
       <div class="log-entry">
         <div class="log-dot"><i class="bi bi-wrench"></i></div>
         <div class="log-content">
-          <div class="log-meta">${dt} · <strong style="color:var(--text-dim);">${techName}</strong>${badge}</div>
-          <div class="log-text">${log.work_notes}</div>
+          <div class="log-meta">${dt} · <strong style="color:var(--text-dim);">${escapeHtml(techName)}</strong>${badge}</div>
+          <div class="log-text">${escapeHtml(log.work_notes)}</div>
           ${parts}${labor}
         </div>
       </div>`);
@@ -466,8 +466,8 @@ function doTrack(ref) {
           <i class="bi bi-person-badge" style="color:var(--primary);"></i>
           <div>
             <div class="form-label-jc">Assigned Technician</div>
-            <div style="font-size:.85rem;font-weight:600;">${ticket.technicians.full_name}</div>
-            <div style="font-size:.75rem;color:var(--text-muted);">${ticket.technicians.role}</div>
+            <div style="font-size:.85rem;font-weight:600;">${escapeHtml(ticket.technicians.full_name)}</div>
+            <div style="font-size:.75rem;color:var(--text-muted);">${escapeHtml(ticket.technicians.role || '')}</div>
           </div>
         </div>`);
     } else {
@@ -485,6 +485,14 @@ function doTrack(ref) {
         $('#existingFeedbackDisplay').html(`
           <div style="font-size:1.4rem;color:#f59e0b;">${stars}</div>
           ${feedback.comments ? `<p style="color:var(--text-dim);font-size:.85rem;margin-top:.5rem;">"${escapeHtml(feedback.comments)}"</p>` : ''}`);
+      } else {
+        $('#feedbackForm').removeClass('d-none');
+        $('#existingFeedback').addClass('d-none');
+        $('#feedbackComments').val('');
+        $('#ratingValue').val('0');
+        starSelected = 0;
+        $('#starRating .star').removeClass('active');
+        $('#feedbackError').addClass('d-none');
       }
     } else {
       $('#feedbackSection').addClass('d-none');

@@ -1037,25 +1037,41 @@ $(document).on('click', '.admin-tab', function() {
   if (tab === 'calendar') renderCalendar();
 });
 
+let allTickets = [];
+
 function loadTickets(showToast = false) {
   const $icon = $('.admin-tickets-refresh i');
   $icon.addClass('spin-anim');
   setTimeout(() => $icon.removeClass('spin-anim'), 650);
 
-  const status = $('#statusFilter').val();
-  const search = $('#ticketSearch').val().trim();
-  const params = {};
-  if (status) params.status = status;
-  if (search)  params.search = search;
-
-  API.getTickets(params).then(tickets => {
-    updateMetrics(tickets);
-    homeServiceTickets = tickets.filter(t => t.service_type === 'home_service' && t.preferred_schedule);
-    renderTicketsTable(tickets);
+  API.getTickets().then(tickets => {
+    allTickets = tickets || [];
+    updateMetrics(allTickets);
+    homeServiceTickets = allTickets.filter(t => t.service_type === 'home_service' && t.preferred_schedule);
+    applyTicketsFilter();
     if (showToast) UI.toast('Tickets refreshed', 'info', 1800);
   }).catch(err => {
     if (showToast) UI.toast('Failed to refresh tickets: ' + err.message, 'error');
   });
+}
+
+function applyTicketsFilter() {
+  const status = $('#statusFilter').val();
+  const search = $('#ticketSearch').val().trim().toLowerCase();
+
+  let filtered = allTickets;
+  if (status && status !== 'all') {
+    filtered = filtered.filter(t => t.status === status);
+  }
+  if (search) {
+    filtered = filtered.filter(t =>
+      (t.ticket_reference_id || '').toLowerCase().includes(search) ||
+      (t.customer_name || '').toLowerCase().includes(search) ||
+      (t.contact_number || '').toLowerCase().includes(search) ||
+      (t.device_type || '').toLowerCase().includes(search)
+    );
+  }
+  renderTicketsTable(filtered);
 }
 
 function updateMetrics(tickets) {
@@ -1073,7 +1089,7 @@ function renderTicketsTable(tickets) {
       ? 'No tickets match the selected status or search filter.'
       : 'No service tickets registered in the system.';
     const actionBtn = isFiltered
-      ? `<button class="btn-outline-jc btn-sm-jc mt-2" onclick="$('#statusFilter').val('');$('#ticketSearch').val('');loadTickets();">
+      ? `<button class="btn-outline-jc btn-sm-jc mt-2" onclick="$('#statusFilter').val('');$('#ticketSearch').val('');applyTicketsFilter();">
            <i class="bi bi-x-circle me-1"></i>Clear Filters
          </button>`
       : `<button class="btn-primary-jc btn-sm-jc mt-2" data-bs-toggle="modal" data-bs-target="#walkinModal">
@@ -1092,7 +1108,7 @@ function renderTicketsTable(tickets) {
   $tbody.empty();
   tickets.forEach(t => {
     const badgeCls = STATUS_BADGE[t.status] || 'badge-received';
-    const tech = t.technicians ? t.technicians.full_name : '<span style="color:var(--text-muted);">Unassigned</span>';
+    const tech = t.technicians ? escapeHtml(t.technicians.full_name) : '<span style="color:var(--text-muted);">Unassigned</span>';
     const dt = new Date(t.created_at).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
     const serviceName = t.service_type === 'home_service' ? 'Home Service' : 'Drop-Off';
 
@@ -1103,18 +1119,18 @@ function renderTicketsTable(tickets) {
              class="ticket-link font-mono"
              onclick="event.stopPropagation();"
              title="Track Repair">
-            ${t.ticket_reference_id}
+            ${escapeHtml(t.ticket_reference_id)}
           </a>
         </td>
         <td>
-          <div style="font-weight:600;">${t.customer_name}</div>
-          <div style="font-size:.72rem;color:var(--text-muted);">${t.contact_number}</div>
+          <div style="font-weight:600;">${escapeHtml(t.customer_name)}</div>
+          <div style="font-size:.72rem;color:var(--text-muted);">${escapeHtml(t.contact_number)}</div>
         </td>
         <td>
-          <div style="font-size:.8rem;font-weight:600;">${t.device_type || '—'}</div>
+          <div style="font-size:.8rem;font-weight:600;">${escapeHtml(t.device_type || '—')}</div>
           <div style="font-size:.72rem;color:var(--text-muted);font-weight:500;">${serviceName}</div>
         </td>
-        <td><span class="badge-status ${badgeCls}">${t.status}</span></td>
+        <td><span class="badge-status ${badgeCls}">${escapeHtml(t.status)}</span></td>
         <td style="font-size:.8rem;">${tech}</td>
         <td class="font-mono" style="color:var(--success);font-size:.82rem;">₱${Number(t.estimated_cost||0).toFixed(2)}</td>
         <td style="font-size:.75rem;color:var(--text-muted);">${dt}</td>
@@ -1204,6 +1220,7 @@ $('#walkinForm').on('submit', function(e) {
     address:           $('#wkAddress').val().trim() || null,
     preferred_schedule:$('#wkSchedule').val() || null,
     estimated_cost:    parseFloat($('#wkCost').val()) || 0,
+    assigned_technician_id: $('#wkTech').val() || null,
   };
   API.createTicket(payload).then(res => {
     UI.toast(`Ticket created successfully! Ref: ${res.ticket_reference_id}`, 'success');
@@ -1381,7 +1398,7 @@ function renderCalScheduledList() {
     const dateFormatted = new Date(t.preferred_schedule).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
     const badgeCls = STATUS_BADGE[t.status] || 'badge-received';
     const theme = getStatusTheme(t.status);
-    const techName = t.technicians ? t.technicians.full_name : 'Unassigned';
+    const techName = t.technicians ? escapeHtml(t.technicians.full_name) : 'Unassigned';
 
     rows += `
       <div class="gcal-agenda-card" onclick="openEditTicket('${t.id}')" title="Click to view or edit ticket">
@@ -1392,17 +1409,17 @@ function renderCalScheduledList() {
         <div class="gcal-divider-bar" style="background:${theme.bar};"></div>
         <div class="gcal-content-col">
           <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-            <div class="gcal-event-title">${t.device_type || 'Home Service'}</div>
-            <span class="badge-status ${badgeCls}">${t.status}</span>
+            <div class="gcal-event-title">${escapeHtml(t.device_type || 'Home Service')}</div>
+            <span class="badge-status ${badgeCls}">${escapeHtml(t.status)}</span>
           </div>
           <div class="gcal-meta-line">
-            <span><strong>Customer:</strong> ${t.customer_name} (${t.contact_number})</span>
-            ${t.address ? `<span class="mx-1">·</span><span><strong>Address:</strong> ${t.address}</span>` : ''}
+            <span><strong>Customer:</strong> ${escapeHtml(t.customer_name)} (${escapeHtml(t.contact_number)})</span>
+            ${t.address ? `<span class="mx-1">·</span><span><strong>Address:</strong> ${escapeHtml(t.address)}</span>` : ''}
           </div>
           <div class="gcal-meta-line" style="font-size:.72rem;">
             <span><strong>Technician:</strong> ${techName}</span>
             <span class="mx-1">·</span>
-            <span class="font-mono" style="color:var(--primary);">${t.ticket_reference_id}</span>
+            <span class="font-mono" style="color:var(--primary);">${escapeHtml(t.ticket_reference_id)}</span>
           </div>
         </div>
       </div>`;
@@ -1452,8 +1469,8 @@ function loadInventory(showToast = false) {
         : '<span style="color:var(--text-muted);font-size:.8rem;">○ Hidden</span>';
       $tbody.append(`
         <tr class="ticket-row" onclick="openProductModal('${item.id}')" title="Click to edit product">
-          <td style="font-weight:600;max-width:220px;">${item.item_name}</td>
-          <td class="font-mono" style="font-size:.75rem;color:var(--primary);">${item.category}</td>
+          <td style="font-weight:600;max-width:220px;">${escapeHtml(item.item_name)}</td>
+          <td class="font-mono" style="font-size:.75rem;color:var(--primary);">${escapeHtml(item.category)}</td>
           <td class="font-mono" style="color:var(--success);">₱${Number(item.price).toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
           <td>${stock}</td>
           <td>${avail}</td>
@@ -1556,17 +1573,17 @@ function loadTechnicians(showToast = false) {
         : '<span class="stock-badge stock-out">○ Inactive</span>';
       $tbody.append(`
         <tr class="ticket-row" onclick="openTechModal('${t.id}')" title="Click to edit technician">
-          <td style="font-weight:600;">${t.full_name}</td>
-          <td style="font-size:.8rem;color:var(--primary);">${t.role || '—'}</td>
-          <td style="font-size:.8rem;color:var(--text-muted);">${t.email || '—'}</td>
-          <td style="font-size:.8rem;">${t.phone}</td>
+          <td style="font-weight:600;">${escapeHtml(t.full_name)}</td>
+          <td style="font-size:.8rem;color:var(--primary);">${escapeHtml(t.role || '—')}</td>
+          <td style="font-size:.8rem;color:var(--text-muted);">${escapeHtml(t.email || '—')}</td>
+          <td style="font-size:.8rem;">${escapeHtml(t.phone)}</td>
           <td>${active}</td>
         </tr>`);
     });
 
     // Populate walk-in tech dropdown
     const $sel = $('#wkTech').find('option:not(:first)').remove().end();
-    techs.forEach(t => $sel.append(`<option value="${t.id}">${t.full_name} (${t.role})</option>`));
+    techs.forEach(t => $sel.append(`<option value="${t.id}">${escapeHtml(t.full_name)} (${escapeHtml(t.role || '')})</option>`));
     if (showToast) UI.toast('Technician roster refreshed', 'info', 1800);
   }).catch(err => {
     if (showToast) UI.toast('Failed to refresh technicians: ' + err.message, 'error');
@@ -1632,12 +1649,8 @@ $('#techForm').on('submit', function(e) {
   }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 });
 
-$('#statusFilter').on('change', loadTickets);
-let searchTimer;
-$('#ticketSearch').on('input', () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(loadTickets, 400);
-});
+$('#statusFilter').on('change', applyTicketsFilter);
+$('#ticketSearch').on('input', applyTicketsFilter);
 
 $(document).ready(() => {
   loadTechnicians();

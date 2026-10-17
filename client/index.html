@@ -480,9 +480,9 @@ function loadCatalogPreview() {
         <div class="col-sm-6 col-lg-3">
           <div class="product-card">
             <div>
-              <div class="product-cat">${item.category}</div>
-              <div class="product-name">${item.item_name}</div>
-              <div style="font-size:.75rem;color:var(--text-muted);margin:.3rem 0;">${(item.description||'').substring(0,80)}${(item.description||'').length>80?'…':''}</div>
+              <div class="product-cat">${escapeHtml(item.category)}</div>
+              <div class="product-name">${escapeHtml(item.item_name)}</div>
+              <div style="font-size:.75rem;color:var(--text-muted);margin:.3rem 0;">${escapeHtml((item.description||'').substring(0,80))}${(item.description||'').length>80?'…':''}</div>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3 pt-2" style="border-top:1px solid var(--border);">
               <div class="product-price">₱${Number(item.price).toLocaleString('en-PH',{minimumFractionDigits:2})}</div>
@@ -544,12 +544,16 @@ $('#bookingForm').on('submit', function(e) {
   $spinner.removeClass('d-none');
   $('#bookingError').addClass('d-none');
 
+  const category = $('#serviceCategorySelect').val();
+  const dev = $('#deviceType').val().trim();
+  const fullDevice = category ? (dev ? `${category} — ${dev}` : category) : (dev || 'General IT Service');
+
   const payload = {
     customer_name:      name,
     contact_number:     phone,
     email:              null,
     service_type:       serviceMode,
-    device_type:        $('#deviceType').val().trim() || null,
+    device_type:        fullDevice,
     issue_description:  issue,
     address:            addr || null,
     preferred_schedule: $('#preferredDate').val() ? `${$('#preferredDate').val()}T${$('#preferredTime').val() || '09:00'}` : null,

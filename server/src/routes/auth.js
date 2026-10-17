@@ -48,11 +48,27 @@ router.post('/login', async (req, res) => {
     return res.json({ message: 'Login successful', token, user });
   }
 
+  const safeUser = cleanUser.replace(/[,()]/g, '').trim();
+  if (!safeUser) {
+    return res.status(401).json({ error: 'Invalid username or password' });
+  }
+
+  const phoneDigits = safeUser.replace(/\D/g, '');
+  const orParts = [
+    `email.ilike.${safeUser}`,
+    `full_name.ilike.%${safeUser}%`,
+    `phone.ilike.%${safeUser}%`
+  ];
+  if (phoneDigits.length >= 7) {
+    orParts.push(`phone.ilike.%${phoneDigits.slice(-7)}%`);
+  }
+
   const { data: tech } = await supabase
     .from('technicians')
     .select('*')
-    .or(`email.ilike.${cleanUser},phone.eq.${cleanUser}`)
+    .or(orParts.join(','))
     .eq('is_active', true)
+    .limit(1)
     .maybeSingle();
 
   if (tech) {

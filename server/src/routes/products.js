@@ -15,7 +15,10 @@ router.get('/', async (req, res) => {
   if (category && category !== 'all') query = query.eq('category', category);
   if (available === 'true') query = query.eq('is_available', true);
   if (search) {
-    query = query.or(`item_name.ilike.%${search}%,category.ilike.%${search}%,description.ilike.%${search}%`);
+    const cleanSearch = search.replace(/[,()]/g, ' ').trim();
+    if (cleanSearch) {
+      query = query.or(`item_name.ilike.%${cleanSearch}%,category.ilike.%${cleanSearch}%,description.ilike.%${cleanSearch}%`);
+    }
   }
 
   const { data, error } = await query;
@@ -51,14 +54,21 @@ router.post('/', requireAuth(['admin']), async (req, res) => {
     return res.status(400).json({ error: 'item_name, category, and price are required' });
   }
 
+  const numPrice = parseFloat(price);
+  if (isNaN(numPrice) || numPrice < 0) {
+    return res.status(400).json({ error: 'price must be a valid non-negative number' });
+  }
+  const numStock = parseInt(stock_qty);
+  const finalStock = !isNaN(numStock) && numStock >= 0 ? numStock : 0;
+
   const { data, error } = await supabase
     .from('products')
     .insert([{
       item_name: item_name.trim(),
       category: category.trim(),
       description: description?.trim() || null,
-      price: parseFloat(price),
-      stock_qty: parseInt(stock_qty) || 0,
+      price: numPrice,
+      stock_qty: finalStock,
       image_url: image_url || null,
       is_available: true,
     }])
@@ -72,18 +82,34 @@ router.post('/', requireAuth(['admin']), async (req, res) => {
 router.put('/:id', requireAuth(['admin']), async (req, res) => {
   const { item_name, category, description, price, stock_qty, image_url, is_available } = req.body;
 
+  const updates = { updated_at: new Date().toISOString() };
+  if (item_name !== undefined) {
+    const clean = item_name?.trim();
+    if (!clean) return res.status(400).json({ error: 'item_name cannot be empty' });
+    updates.item_name = clean;
+  }
+  if (category !== undefined) {
+    const clean = category?.trim();
+    if (!clean) return res.status(400).json({ error: 'category cannot be empty' });
+    updates.category = clean;
+  }
+  if (description !== undefined) updates.description = description?.trim() || null;
+  if (price !== undefined) {
+    const numPrice = parseFloat(price);
+    if (isNaN(numPrice) || numPrice < 0) return res.status(400).json({ error: 'price must be a valid non-negative number' });
+    updates.price = numPrice;
+  }
+  if (stock_qty !== undefined) {
+    const numStock = parseInt(stock_qty);
+    if (isNaN(numStock) || numStock < 0) return res.status(400).json({ error: 'stock_qty must be a valid non-negative integer' });
+    updates.stock_qty = numStock;
+  }
+  if (image_url !== undefined) updates.image_url = image_url;
+  if (is_available !== undefined) updates.is_available = Boolean(is_available);
+
   const { data, error } = await supabase
     .from('products')
-    .update({
-      item_name: item_name?.trim(),
-      category: category?.trim(),
-      description: description?.trim(),
-      price: price != null ? parseFloat(price) : undefined,
-      stock_qty: stock_qty != null ? parseInt(stock_qty) : undefined,
-      image_url,
-      is_available,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq('id', req.params.id)
     .select()
     .single();

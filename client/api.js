@@ -231,4 +231,13 @@ if (typeof window !== 'undefined') {
       console.log('[Alert]', msg);
     }
   };
+
+  window.escapeHtml = function(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
 }

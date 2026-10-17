@@ -53,9 +53,24 @@ router.post('/', requireAuth(['admin']), async (req, res) => {
 router.put('/:id', requireAuth(['admin']), async (req, res) => {
   const { full_name, email, phone, role, is_active } = req.body;
 
+  const updates = {};
+  if (full_name !== undefined) {
+    const cleanName = full_name?.trim();
+    if (!cleanName) return res.status(400).json({ error: 'full_name cannot be empty' });
+    updates.full_name = cleanName;
+  }
+  if (phone !== undefined) {
+    const cleanPhone = phone?.trim();
+    if (!cleanPhone) return res.status(400).json({ error: 'phone cannot be empty' });
+    updates.phone = cleanPhone;
+  }
+  if (email !== undefined) updates.email = email?.trim() || null;
+  if (role !== undefined) updates.role = role?.trim() || 'Technician';
+  if (is_active !== undefined) updates.is_active = Boolean(is_active);
+
   const { data, error } = await supabase
     .from('technicians')
-    .update({ full_name, email, phone, role, is_active })
+    .update(updates)
     .eq('id', req.params.id)
     .select()
     .single();
@@ -70,6 +85,12 @@ router.delete('/:id', requireAuth(['admin']), async (req, res) => {
     .from('tickets')
     .update({ assigned_technician_id: null })
     .eq('assigned_technician_id', req.params.id);
+
+  // Nullify technician reference in work logs so audit logs are preserved without foreign key violation
+  await supabase
+    .from('ticket_logs')
+    .update({ technician_id: null })
+    .eq('technician_id', req.params.id);
 
   const { error } = await supabase
     .from('technicians')

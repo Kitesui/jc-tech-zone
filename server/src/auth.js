@@ -24,10 +24,13 @@ export function verifyToken(token) {
   if (!token || typeof token !== 'string') return null;
   const parts = token.split('.');
   if (parts.length !== 2) return null;
-
   const [body, sig] = parts;
   const expectedSig = crypto.createHmac('sha256', SECRET).update(body).digest('base64url');
-  if (sig !== expectedSig) return null;
+  const sigBuf = Buffer.from(sig);
+  const expectedBuf = Buffer.from(expectedSig);
+  if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+    return null;
+  }
 
   try {
     const data = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));

@@ -95,6 +95,11 @@ app.use('/api/products', productsRoutes);
 app.use('/api/technicians', techniciansRoutes);
 app.use('/api/feedback', feedbackRoutes);
 
+// Return JSON 404 for unhandled API routes to prevent HTML response crashing JSON clients
+app.all('/api/*', (req, res) => {
+  res.status(404).json({ error: `API route ${req.method} ${req.path} not found` });
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(clientDir, 'index.html'));
 });
