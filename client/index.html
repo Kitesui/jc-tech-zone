@@ -14,7 +14,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-jc">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/customer">
       <img src="assets/logo.jpg" alt="JC Tech Zone" width="34" height="34" class="rounded-circle" style="object-fit:cover;border:1px solid var(--border);" />
       <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
       <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
@@ -30,9 +30,9 @@
     <!-- Desktop Nav Links -->
     <div class="collapse navbar-collapse d-none d-lg-flex" id="desktopNav">
       <ul class="navbar-nav ms-auto gap-1 align-items-lg-center py-2 py-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="track.html"><i class="bi bi-search me-1"></i>Track Repair</a></li>
-        <li class="nav-item"><a class="nav-link" href="catalog.html"><i class="bi bi-hdd-stack me-1"></i>Hardware Catalog</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/customer"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/track"><i class="bi bi-search me-1"></i>Track Repair</a></li>
+        <li class="nav-item"><a class="nav-link" href="/catalog"><i class="bi bi-hdd-stack me-1"></i>Hardware Catalog</a></li>
       </ul>
       <button class="btn-primary-jc ms-lg-3 mt-2 mt-lg-0" data-bs-toggle="modal" data-bs-target="#bookingModal" id="navBookBtn">
         <i class="bi bi-wrench me-1"></i>Book Repair
@@ -58,15 +58,15 @@
     </button>
 
     <!-- Navigation links (NOT HIGHLIGHTED) -->
-    <a class="drawer-nav-item" href="index.html">
+    <a class="drawer-nav-item" href="/customer">
       <span class="nav-icon-box"><i class="bi bi-house"></i></span>
       <span>Home</span>
     </a>
-    <a class="drawer-nav-item" href="track.html">
+    <a class="drawer-nav-item" href="/track">
       <span class="nav-icon-box"><i class="bi bi-search"></i></span>
       <span>Track Repair</span>
     </a>
-    <a class="drawer-nav-item" href="catalog.html">
+    <a class="drawer-nav-item" href="/catalog">
       <span class="nav-icon-box"><i class="bi bi-hdd-stack"></i></span>
       <span>Hardware Catalog</span>
     </a>
@@ -92,10 +92,10 @@
           <button class="btn-primary-jc" data-bs-toggle="modal" data-bs-target="#bookingModal">
             <i class="bi bi-wrench me-2"></i>Book New Repair
           </button>
-          <a href="track.html" class="btn-outline-jc">
+          <a href="/track" class="btn-outline-jc">
             <i class="bi bi-search me-2"></i>Track My Ticket
           </a>
-          <a href="catalog.html" class="btn-outline-jc">
+          <a href="/catalog" class="btn-outline-jc">
             <i class="bi bi-cpu me-2"></i>Browse Hardware
           </a>
         </div>
@@ -209,7 +209,7 @@
         <p style="font-size:.8rem;line-height:1.7;">
           3 E. Santos Street, Concepcion Uno,<br>Marikina City
         </p>
-        <a href="track.html" style="font-size:.8rem;"><i class="bi bi-search me-1"></i>Track a Ticket</a>
+        <a href="/track" style="font-size:.8rem;"><i class="bi bi-search me-1"></i>Track a Ticket</a>
       </div>
       <div class="col-md-4">
         <p class="font-mono mb-1" style="font-size:.68rem;color:var(--primary);text-transform:uppercase;letter-spacing:.07em;">Project Credits</p>
@@ -229,7 +229,7 @@
         © 2026 JC TECH ZONE · September 28, 2026
       </span>
       <div class="d-flex align-items-center gap-3">
-        <a href="login.html" style="font-size:.72rem;color:var(--text-muted);text-decoration:none;">
+        <a href="/login" style="font-size:.72rem;color:var(--text-muted);text-decoration:none;">
           <i class="bi bi-shield-lock me-1"></i>Staff Portal
         </a>
         <span class="font-mono" style="font-size:.65rem;color:var(--text-muted);">
@@ -596,7 +596,7 @@ function showBookingError(msg) {
 
 $('#trackNowBtn').on('click', () => {
   bootstrap.Modal.getOrCreateInstance('#bookingModal').hide();
-  window.location.href = `track.html?ref=${encodeURIComponent(currentRefId)}`;
+  window.location.href = `/track?ref=${encodeURIComponent(currentRefId)}`;
 });
 
 $('#copyRefBtn').on('click', () => {
@@ -621,7 +621,7 @@ $('#bookingModal').on('hidden.bs.modal', () => {
 $('#quickTrackForm').on('submit', function(e) {
   e.preventDefault();
   const ref = $('#quickTrackInput').val().trim().toUpperCase();
-  if (ref) window.location.href = `track.html?ref=${encodeURIComponent(ref)}`;
+  if (ref) window.location.href = `/track?ref=${encodeURIComponent(ref)}`;
 });
 
 $(document).ready(() => {
@@ -629,9 +629,15 @@ $(document).ready(() => {
   loadCatalogPreview();
   const todayStr = new Date().toISOString().split('T')[0];
   $('#preferredDate').attr('min', todayStr);
-  const page = location.pathname.split('/').pop() || 'index.html';
-  $(`.navbar-nav .nav-link[href="${page}"]`).addClass('active').attr('aria-current', 'page');
-  $(`.navbar-nav .nav-link[href!="${page}"]`).removeClass('active');
+  const currentPath = location.pathname.replace(/\/+$/, '') || '/customer';
+  $('.navbar-nav .nav-link').each(function() {
+    const h = $(this).attr('href');
+    if (h === currentPath || (currentPath === '/customer' && (h === '/' || h === '/customer'))) {
+      $(this).addClass('active').attr('aria-current', 'page');
+    } else {
+      $(this).removeClass('active').removeAttr('aria-current');
+    }
+  });
 
   // Auto-open booking modal if arriving via #booking link
   if (location.hash === '#booking') {

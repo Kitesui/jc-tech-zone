@@ -32,7 +32,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-jc">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/customer">
       <img src="assets/logo.jpg" alt="JC Tech Zone" width="34" height="34" class="rounded-circle" style="object-fit:cover;border:1px solid var(--border);" />
       <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
       <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
@@ -55,10 +55,10 @@
           </span>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a>
+          <a class="nav-link" href="/customer"><i class="bi bi-house me-1"></i>Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="admin.html"><i class="bi bi-shield-check me-1"></i>Admin</a>
+          <a class="nav-link" href="/admin"><i class="bi bi-shield-check me-1"></i>Admin</a>
         </li>
         <li class="nav-item ms-2">
           <button class="btn-outline-jc btn-sm-jc" onclick="API.logout()" style="font-size:.72rem;padding:.35rem .75rem;">
@@ -92,15 +92,15 @@
     </div>
 
     <!-- Navigation links with pixel-perfect alignment (NOT HIGHLIGHTED) -->
-    <a class="drawer-nav-item" href="index.html">
+    <a class="drawer-nav-item" href="/customer">
       <span class="nav-icon-box"><i class="bi bi-house"></i></span>
       <span>Home</span>
     </a>
-    <a class="drawer-nav-item" href="tech.html">
+    <a class="drawer-nav-item" href="/tech">
       <span class="nav-icon-box"><i class="bi bi-terminal"></i></span>
       <span>Tech Portal</span>
     </a>
-    <a class="drawer-nav-item" href="admin.html">
+    <a class="drawer-nav-item" href="/admin">
       <span class="nav-icon-box"><i class="bi bi-shield-check"></i></span>
       <span>Admin</span>
     </a>
@@ -585,7 +585,7 @@
 <script>
 const currentUser = API.getUser();
 if (!currentUser || (currentUser.role !== 'technician' && currentUser.role !== 'admin')) {
-  window.location.href = 'login.html';
+  window.location.href = '/login';
 } else {
   $('.techUserNameText, #techUserName').text(currentUser.name || 'Technician');
 }

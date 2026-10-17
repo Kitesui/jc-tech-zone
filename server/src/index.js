@@ -23,8 +23,50 @@ app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
-// Serve static frontend from client directory with no-cache for instant live updates.
-app.use(express.static(path.join(__dirname, '../../client'), {
+const clientDir = path.join(__dirname, '../../client');
+
+// Clean URLs: Redirect any direct *.html or root requests to clean professional route paths
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path === '/index.html') {
+    const query = req.url.slice(req.path.length);
+    return res.redirect(301, '/customer' + query);
+  }
+  if (req.path.endsWith('.html')) {
+    const cleanPath = req.path.slice(0, -5);
+    const query = req.url.slice(req.path.length);
+    return res.redirect(301, cleanPath + query);
+  }
+  next();
+});
+
+// Professional Clean Route Handlers
+app.get(['/customer', '/home'], (req, res) => {
+  res.sendFile(path.join(clientDir, 'index.html'));
+});
+
+app.get(['/track', '/tracking'], (req, res) => {
+  res.sendFile(path.join(clientDir, 'track.html'));
+});
+
+app.get('/catalog', (req, res) => {
+  res.sendFile(path.join(clientDir, 'catalog.html'));
+});
+
+app.get('/tech', (req, res) => {
+  res.sendFile(path.join(clientDir, 'tech.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(clientDir, 'admin.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(clientDir, 'login.html'));
+});
+
+// Serve static frontend assets (css, js, images) from client directory
+app.use(express.static(clientDir, {
+  index: false,
   setHeaders: (res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
   }
@@ -54,7 +96,7 @@ app.use('/api/technicians', techniciansRoutes);
 app.use('/api/feedback', feedbackRoutes);
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../client/index.html'));
+  res.sendFile(path.join(clientDir, 'index.html'));
 });
 
 app.use((err, req, res, next) => {

@@ -43,8 +43,8 @@ const API = (() => {
         error: (xhr) => {
           if (xhr.status === 401 && !endpoint.startsWith('/auth')) {
             clearAuth();
-            if (location.pathname.endsWith('admin.html') || location.pathname.endsWith('tech.html')) {
-              window.location.href = 'login.html';
+            if (location.pathname.includes('admin') || location.pathname.includes('tech')) {
+              window.location.href = '/login';
               return;
             }
           }
@@ -65,7 +65,7 @@ const API = (() => {
       }),
     logout: () => {
       clearAuth();
-      window.location.href = 'login.html';
+      window.location.href = '/login';
     },
     getMe: () => request('GET', '/auth/me'),
     getUser,

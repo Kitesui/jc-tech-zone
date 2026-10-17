@@ -35,7 +35,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-jc">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/customer">
       <img src="assets/logo.jpg" alt="JC Tech Zone" width="34" height="34" class="rounded-circle" style="object-fit:cover;border:1px solid var(--border);" />
       <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
       <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
@@ -44,7 +44,7 @@
       </span>
     </a>
     <div class="d-flex gap-2">
-      <a href="index.html" class="btn-outline-jc btn-sm-jc">
+      <a href="/customer" class="btn-outline-jc btn-sm-jc">
         <i class="bi bi-arrow-left me-1"></i>Back to Customer Portal
       </a>
     </div>
@@ -145,10 +145,10 @@ $(document).ready(function() {
     const user = API.getUser();
     if (user && API.getToken()) {
       if (user.role === 'admin') {
-        window.location.href = 'admin.html';
+        window.location.href = '/admin';
         return;
       } else if (user.role === 'technician') {
-        window.location.href = 'tech.html';
+        window.location.href = '/tech';
         return;
       }
     }
@@ -172,9 +172,9 @@ $(document).ready(function() {
     API.login(userVal, passVal)
       .then(res => {
         if (res.user.role === 'admin') {
-          window.location.href = 'admin.html';
+          window.location.href = '/admin';
         } else {
-          window.location.href = 'tech.html';
+          window.location.href = '/tech';
         }
       })
       .catch(err => {
