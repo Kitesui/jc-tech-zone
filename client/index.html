@@ -5,49 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JC TECH ZONE — IT Service Ticketing & Booking Portal</title>
   <meta name="description" content="JC TECH ZONE Marikina — Guest service ticketing, home-service booking, live ticket tracking, and hardware price catalog. No account needed." />
-  <!-- Bootstrap 5 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <!-- Custom styles -->
   <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
 </head>
 <body>
 
-<!-- ════════════ NAVBAR ════════════ -->
 <nav class="navbar navbar-expand-lg navbar-jc">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-      <i class="bi bi-cpu-fill text-primary-jc"></i>
-      JC TECH ZONE
+      <img src="assets/logo.jpg" alt="JC Tech Zone" width="34" height="34" class="rounded-circle" style="object-fit:cover;border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
       <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
-            style="background:#00d8ff12;border:1px solid #00d8ff33;font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
-        <span class="status-dot"></span> SYS-ONLINE
+            style="background:var(--primary-dim);border:1px solid var(--primary-mid);font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
+        <span class="status-dot"></span> MARIKINA
       </span>
     </a>
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
-            style="color:var(--text-muted);">
+    <!-- Hamburger toggler: opens right-to-left offcanvas drawer on mobile -->
+    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#customerDrawer" aria-controls="customerDrawer" aria-label="Toggle navigation">
       <i class="bi bi-list" style="font-size:1.4rem;"></i>
     </button>
-    <div class="collapse navbar-collapse" id="navMenu">
+
+    <!-- Desktop Nav Links -->
+    <div class="collapse navbar-collapse d-none d-lg-flex" id="desktopNav">
       <ul class="navbar-nav ms-auto gap-1 align-items-lg-center py-2 py-lg-0">
         <li class="nav-item"><a class="nav-link active" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
         <li class="nav-item"><a class="nav-link" href="track.html"><i class="bi bi-search me-1"></i>Track Repair</a></li>
         <li class="nav-item"><a class="nav-link" href="catalog.html"><i class="bi bi-hdd-stack me-1"></i>Hardware Catalog</a></li>
-        <li class="nav-item"><a class="nav-link" href="admin.html"><i class="bi bi-shield-check me-1"></i>Admin</a></li>
-        <li class="nav-item"><a class="nav-link" href="tech.html"><i class="bi bi-terminal me-1"></i>Tech Portal</a></li>
       </ul>
       <button class="btn-primary-jc ms-lg-3 mt-2 mt-lg-0" data-bs-toggle="modal" data-bs-target="#bookingModal" id="navBookBtn">
-        <i class="bi bi-wrench me-1"></i> Book Repair
+        <i class="bi bi-wrench me-1"></i>Book Repair
       </button>
     </div>
   </div>
 </nav>
 
-<!-- ════════════ MAIN ════════════ -->
+<!-- Right-to-Left Offcanvas Mobile Drawer (Customer) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="customerDrawer" aria-labelledby="customerDrawerLabel">
+  <div class="offcanvas-header" style="border-bottom: 1px solid var(--border); padding: 1rem 1.25rem;">
+    <h5 class="offcanvas-title d-flex align-items-center gap-2 mb-0" id="customerDrawerLabel" style="font-family:var(--font-display);font-size:1rem;">
+      <img src="assets/logo.jpg" alt="Logo" width="28" height="28" class="rounded-circle" style="border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column gap-2 p-3">
+    <!-- BOOK REPAIR (HIGHLIGHTED) -->
+    <button class="btn-primary-jc w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+            data-bs-dismiss="offcanvas" data-bs-toggle="modal" data-bs-target="#bookingModal">
+      <i class="bi bi-wrench"></i> Book Repair
+    </button>
+
+    <!-- Navigation links (NOT HIGHLIGHTED) -->
+    <a class="drawer-nav-item" href="index.html">
+      <span class="nav-icon-box"><i class="bi bi-house"></i></span>
+      <span>Home</span>
+    </a>
+    <a class="drawer-nav-item" href="track.html">
+      <span class="nav-icon-box"><i class="bi bi-search"></i></span>
+      <span>Track Repair</span>
+    </a>
+    <a class="drawer-nav-item" href="catalog.html">
+      <span class="nav-icon-box"><i class="bi bi-hdd-stack"></i></span>
+      <span>Hardware Catalog</span>
+    </a>
+  </div>
+</div>
+
 <main class="container py-4">
 
-  <!-- Hero -->
   <section class="hero-section mb-4">
     <div class="row align-items-center">
       <div class="col-lg-8">
@@ -74,21 +101,20 @@
         </div>
       </div>
       <div class="col-lg-4 d-none d-lg-flex justify-content-end align-items-center pt-4 pt-lg-0">
-        <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted);line-height:2;text-align:right;">
-          <div><span style="color:var(--primary);">SERVICES:</span> Drop-Off | Home-Visit</div>
-          <div><span style="color:var(--primary);">TURN-AROUND:</span> 24–48 hrs</div>
-          <div><span style="color:var(--primary);">ADDRESS:</span> Marikina City</div>
-          <div><span style="color:var(--primary);">CONTACT:</span> (02) 8XXX-XXXX</div>
-          <div><span style="color:var(--primary);">STATUS:</span> <span class="status-dot me-1"></span>ACCEPTING TICKETS</div>
+        <div class="d-flex align-items-center gap-3 p-3 rounded" style="background:var(--bg-card2);border:1px solid var(--border);max-width:320px;">
+          <img src="assets/logo.jpg" alt="Official Logo" width="80" height="80" class="rounded-circle flex-shrink-0" style="border:2px solid var(--primary);object-fit:cover;" />
+          <div style="font-family:var(--font-mono);font-size:.72rem;line-height:1.7;">
+            <div style="color:var(--text);font-weight:700;font-size:.85rem;">Concepcion Branch</div>
+            <div style="color:var(--text-muted);">Since 2020 · Marikina City</div>
+            <div style="color:var(--primary);margin-top:.2rem;"><span class="status-dot me-1"></span>Shop Open &amp; Accepting</div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Service Categories + Quick Tracker row -->
   <div class="row g-4 mb-4">
 
-    <!-- Services Grid -->
     <div class="col-lg-8">
       <div class="card-jc h-100">
         <div class="card-header-jc">
@@ -96,14 +122,12 @@
         </div>
         <div class="p-4">
           <div class="row g-3" id="serviceCategoryGrid">
-            <!-- Populated by JS -->
             <div class="col-12 text-center py-4"><div class="spinner-jc"></div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Quick Tracker -->
     <div class="col-lg-4">
       <div class="card-jc h-100">
         <div class="card-header-jc">
@@ -122,7 +146,6 @@
             </div>
           </form>
 
-          <!-- Status Steps Preview -->
           <div class="mt-4">
             <p class="font-mono mb-2" style="font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Ticket Stages</p>
             <div class="d-flex flex-column gap-2">
@@ -153,7 +176,6 @@
     </div>
   </div>
 
-  <!-- Hardware Catalog Preview -->
   <section class="card-jc mb-4">
     <div class="card-header-jc d-flex justify-content-between align-items-center">
       <span><i class="bi bi-cpu me-1"></i> Hardware Catalog Preview</span>
@@ -170,12 +192,14 @@
 
 </main>
 
-<!-- ════════════ FOOTER ════════════ -->
 <footer class="footer-jc">
   <div class="container">
     <div class="row g-4 mb-3">
       <div class="col-md-4">
-        <div class="footer-brand mb-1"><i class="bi bi-cpu-fill me-2" style="color:var(--primary);"></i>JC TECH ZONE</div>
+        <div class="footer-brand mb-2 d-flex align-items-center gap-2">
+          <img src="assets/logo.jpg" alt="Logo" width="28" height="28" class="rounded-circle" style="border:1px solid var(--border);object-fit:cover;" />
+          <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
+        </div>
         <p style="font-size:.78rem;color:var(--text-muted);line-height:1.7;">
           Web-Based IT Service Ticketing, Home-Service Booking, and Management System with Product Catalog.
         </p>
@@ -204,14 +228,18 @@
       <span style="font-size:.72rem;color:var(--text-muted);">
         © 2026 JC TECH ZONE · September 28, 2026
       </span>
-      <span class="font-mono" style="font-size:.65rem;color:var(--text-muted);">
-        Stack: Express.js · Supabase (PostgreSQL) · Bootstrap 5 · jQuery
-      </span>
+      <div class="d-flex align-items-center gap-3">
+        <a href="login.html" style="font-size:.72rem;color:var(--text-muted);text-decoration:none;">
+          <i class="bi bi-shield-lock me-1"></i>Staff Portal
+        </a>
+        <span class="font-mono" style="font-size:.65rem;color:var(--text-muted);">
+          Stack: Express.js · Supabase · Bootstrap 5 · jQuery
+        </span>
+      </div>
     </div>
   </div>
 </footer>
 
-<!-- ════════════ BOOKING MODAL ════════════ -->
 <div class="modal fade modal-jc" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
     <div class="modal-content">
@@ -226,7 +254,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <!-- Success View (hidden initially) -->
       <div id="bookingSuccess" class="modal-body text-center py-5 d-none">
         <div style="width:64px;height:64px;border-radius:50%;background:#10b98115;border:2px solid #10b98140;
                     display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
@@ -237,45 +264,41 @@
           Your ticket has been logged. Save your reference ID to track real-time technician progress.
         </p>
         <div class="ref-id-box mb-4" id="createdRefId">—</div>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
           <button class="btn-primary-jc" id="trackNowBtn"><i class="bi bi-search me-2"></i>Track Status Now</button>
           <button class="btn-outline-jc" id="copyRefBtn"><i class="bi bi-clipboard me-2"></i>Copy ID</button>
           <button class="btn-outline-jc" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
 
-      <!-- Form View -->
       <form id="bookingForm" class="d-flex flex-column flex-grow-1 overflow-hidden" style="min-height:0;">
         <div class="modal-body" style="overflow-y:auto;max-height:calc(85vh - 130px);">
 
-          <!-- Error -->
           <div id="bookingError" class="alert-jc danger mb-3 d-none">
             <i class="bi bi-exclamation-triangle me-2"></i><span id="bookingErrorMsg"></span>
           </div>
 
-          <!-- Service Type -->
           <div class="mb-3">
             <label class="form-label-jc">Service Delivery Mode</label>
-            <div class="row g-2">
-              <div class="col-6">
+            <div class="row g-2 align-items-stretch">
+              <div class="col-6 d-flex">
                 <button type="button" class="mode-btn active" id="modeDropOff" onclick="setMode('drop_off')">
-                  <span style="font-size:1.1rem;"><i class="bi bi-shop"></i></span>
+                  <span class="mode-icon"><i class="bi bi-shop"></i></span>
                   <span class="mode-title">Drop-Off at Shop</span>
-                  <span class="mode-desc">Bring your device to JC Tech Zone</span>
+                  <span class="mode-desc">Bring to Marikina branch</span>
                 </button>
               </div>
-              <div class="col-6">
+              <div class="col-6 d-flex">
                 <button type="button" class="mode-btn" id="modeHome" onclick="setMode('home_service')">
-                  <span style="font-size:1.1rem;"><i class="bi bi-house-door"></i></span>
-                  <span class="mode-title">Home / On-Site Service</span>
-                  <span class="mode-desc">Technician visits your address</span>
+                  <span class="mode-icon"><i class="bi bi-house-door"></i></span>
+                  <span class="mode-title">Home Service</span>
+                  <span class="mode-desc">Technician visits on-site</span>
                 </button>
               </div>
             </div>
             <input type="hidden" id="serviceTypeInput" value="drop_off" />
           </div>
 
-          <!-- Service Category -->
           <div class="mb-3">
             <label class="form-label-jc">Service Category</label>
             <select id="serviceCategorySelect" class="form-select-jc">
@@ -284,13 +307,12 @@
               <option value="Data Recovery">Data Recovery</option>
               <option value="Network Setup">Network Setup</option>
               <option value="Hardware Upgrade">Hardware Upgrade</option>
-              <option value="Virus & Malware Removal">Virus &amp; Malware Removal</option>
+              <option value="Printer Repair">Printer Repair</option>
               <option value="CCTV Installation">CCTV Installation</option>
               <option value="General Diagnostics">General Diagnostics</option>
             </select>
           </div>
 
-          <!-- Customer Info -->
           <div class="row g-2 mb-3">
             <div class="col-sm-6">
               <label class="form-label-jc">Full Name *</label>
@@ -307,37 +329,49 @@
             <input type="text" id="deviceType" class="form-control-jc" placeholder="e.g. Laptop, Desktop, Printer" />
           </div>
 
-          <!-- Issue Description -->
           <div class="mb-3">
             <label class="form-label-jc">Issue Description / Symptoms *</label>
             <textarea id="issueDesc" class="form-control-jc" rows="3"
               placeholder="Describe what's happening (e.g. screen blank, blue screen error, liquid spill, slow performance...)" required></textarea>
           </div>
 
-          <!-- Photo Upload -->
           <div class="mb-3">
             <label class="form-label-jc">Attach Screenshot / Photo <span style="color:var(--text-muted);">(optional)</span></label>
-            <input type="file" id="photoUpload" class="form-control-jc" accept="image/*" style="padding:.45rem .85rem;" />
+            <input type="file" id="photoUpload" class="form-control-jc" accept="image/*" />
+            <div id="photoPreviewBox" class="mt-2 d-none align-items-center gap-2 p-2 rounded" style="background:var(--bg-card2);border:1px solid var(--border);">
+              <img id="photoPreviewImg" src="" style="height:60px;width:60px;border-radius:6px;object-fit:cover;border:1px solid var(--border);" />
+              <div style="flex:1;overflow:hidden;">
+                <div id="photoPreviewName" style="font-size:.78rem;font-weight:600;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;"></div>
+                <span class="badge" style="background:#10b98122;color:var(--success);font-size:.65rem;"><i class="bi bi-check-circle me-1"></i>Ready for diagnostics</span>
+              </div>
+              <button type="button" class="btn-outline-jc btn-sm-jc text-danger" id="removePhotoBtn" style="padding:.2rem .5rem;font-size:.75rem;" title="Remove photo">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
             <p style="font-size:.7rem;color:var(--text-muted);margin-top:.3rem;">
-              <i class="bi bi-info-circle me-1"></i>Upload an error screenshot or photo of the issue.
+              <i class="bi bi-info-circle me-1"></i>Upload an error screenshot or photo of damage. Technicians can zoom in for diagnostics.
             </p>
           </div>
 
-          <!-- Home Service Fields (hidden by default) -->
           <div id="homeServiceFields" class="d-none">
             <div class="mb-3">
               <label class="form-label-jc">Home / Service Address *</label>
               <input type="text" id="serviceAddress" class="form-control-jc"
                      placeholder="Full address (house no., street, barangay, city)" />
             </div>
-            <div class="mb-3">
-              <label class="form-label-jc">Preferred Date &amp; Time</label>
-              <input type="datetime-local" id="preferredSchedule" class="form-control-jc" />
+            <div class="row g-2 mb-3">
+              <div class="col-7">
+                <label class="form-label-jc">Preferred Date</label>
+                <input type="date" id="preferredDate" class="form-control-jc" />
+              </div>
+              <div class="col-5">
+                <label class="form-label-jc">Preferred Time</label>
+                <input type="time" id="preferredTime" class="form-control-jc" value="09:00" />
+              </div>
             </div>
           </div>
 
-          <!-- Dynamic Fee Summary -->
-          <div class="card-jc p-3 mb-2" id="feeSummaryCard" style="background:#00d8ff08;border-color:#00d8ff33;">
+          <div class="card-jc p-3 mb-2" id="feeSummaryCard" style="background:var(--primary-dim);border-color:var(--primary-mid);">
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <span class="font-mono text-muted" style="font-size:.7rem;text-transform:uppercase;">Estimated Base Fee</span>
@@ -350,13 +384,13 @@
             </div>
           </div>
 
-        </div><!-- /modal-body -->
+        </div>
 
         <div class="modal-footer gap-2">
-          <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn-outline-jc btn-sm-jc" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn-primary-jc" id="submitBookingBtn">
-            <span id="submitBtnSpinner" class="spinner-jc me-2 d-none" style="width:14px;height:14px;border-width:2px;"></span>
-            <i class="bi bi-send me-1"></i>Submit Service Request
+            <span id="submitBtnSpinner" class="spinner-jc me-2 d-none" style="width:13px;height:13px;border-width:2px;"></span>
+            <i class="bi bi-send me-1"></i>Submit Request
           </button>
         </div>
       </form>
@@ -365,23 +399,50 @@
   </div>
 </div>
 
-<!-- Bootstrap JS, jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="api.js"></script>
 <script>
-// ── State ──────────────────────────────────────────────────
 let serviceMode = 'drop_off';
 let currentRefId = null;
+let attachedPhotoDataUrl = null;
 
-// ── Service Categories ─────────────────────────────────────
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 1600;
+      let width = img.width;
+      let height = img.height;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 const SERVICE_CATEGORIES = [
   { icon: 'bi-laptop',        label: 'Laptop Repair',     desc: 'Screen, keyboard, battery, motherboard' },
   { icon: 'bi-display',       label: 'Desktop Repair',    desc: 'Towers, all-in-ones, power & boot issues' },
   { icon: 'bi-hdd',           label: 'Data Recovery',     desc: 'Failed drives, deleted files, migration' },
   { icon: 'bi-wifi',          label: 'Network Setup',     desc: 'Routers, Wi-Fi, cabling, configuration' },
   { icon: 'bi-cpu',           label: 'Hardware Upgrade',  desc: 'RAM, SSD, GPU, cooling & tuning' },
-  { icon: 'bi-shield-check',  label: 'Virus Removal',     desc: 'Malware, ransomware, system hardening' },
+  { icon: 'bi-printer',       label: 'Printer Repair',    desc: 'Paper jams, ink systems, hardware errors' },
   { icon: 'bi-camera-video',  label: 'CCTV Installation', desc: 'IP cameras, DVR setup, remote access' },
   { icon: 'bi-wrench',        label: 'General Diagnostics', desc: "Not sure what's wrong? We'll find out" },
 ];
@@ -404,10 +465,9 @@ function renderCategories() {
 
 function openBookingWithCategory(cat) {
   $('#serviceCategorySelect').val(cat);
-  new bootstrap.Modal('#bookingModal').show();
+  bootstrap.Modal.getOrCreateInstance('#bookingModal').show();
 }
 
-// ── Catalog Preview ────────────────────────────────────────
 function loadCatalogPreview() {
   API.getProducts({ available: 'true' }).then(items => {
     const $grid = $('#catalogPreviewGrid');
@@ -439,7 +499,6 @@ function loadCatalogPreview() {
   });
 }
 
-// ── Mode Toggle ────────────────────────────────────────────
 function setMode(mode) {
   serviceMode = mode;
   $('#serviceTypeInput').val(mode);
@@ -462,7 +521,6 @@ function setMode(mode) {
   }
 }
 
-// ── Booking Form Submit ────────────────────────────────────
 $('#bookingForm').on('submit', function(e) {
   e.preventDefault();
   const $btn = $('#submitBookingBtn');
@@ -494,14 +552,16 @@ $('#bookingForm').on('submit', function(e) {
     device_type:        $('#deviceType').val().trim() || null,
     issue_description:  issue,
     address:            addr || null,
-    preferred_schedule: $('#preferredSchedule').val() || null,
+    preferred_schedule: $('#preferredDate').val() ? `${$('#preferredDate').val()}T${$('#preferredTime').val() || '09:00'}` : null,
     estimated_cost:     serviceMode === 'home_service' ? 800 : 0,
+    attachment_url:     attachedPhotoDataUrl || null,
   };
 
   API.createTicket(payload)
     .then(res => {
       currentRefId = res.ticket_reference_id;
       $('#createdRefId').text(currentRefId);
+
       $('#bookingForm').addClass('d-none');
       $('#bookingSuccess').removeClass('d-none');
     })
@@ -512,13 +572,30 @@ $('#bookingForm').on('submit', function(e) {
     });
 });
 
+$('#photoUpload').on('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  compressImage(file, (dataUrl) => {
+    attachedPhotoDataUrl = dataUrl;
+    $('#photoPreviewImg').attr('src', dataUrl);
+    $('#photoPreviewName').text(file.name);
+    $('#photoPreviewBox').removeClass('d-none').addClass('d-flex');
+  });
+});
+
+$('#removePhotoBtn').on('click', function() {
+  $('#photoUpload').val('');
+  attachedPhotoDataUrl = null;
+  $('#photoPreviewBox').addClass('d-none').removeClass('d-flex');
+});
+
 function showBookingError(msg) {
   $('#bookingErrorMsg').text(msg);
   $('#bookingError').removeClass('d-none');
 }
 
 $('#trackNowBtn').on('click', () => {
-  bootstrap.Modal.getInstance('#bookingModal').hide();
+  bootstrap.Modal.getOrCreateInstance('#bookingModal').hide();
   window.location.href = `track.html?ref=${encodeURIComponent(currentRefId)}`;
 });
 
@@ -531,9 +608,9 @@ $('#copyRefBtn').on('click', () => {
   }
 });
 
-// Reset modal on close
 $('#bookingModal').on('hidden.bs.modal', () => {
   $('#bookingForm')[0].reset();
+  $('#removePhotoBtn').click();
   $('#bookingForm').removeClass('d-none');
   $('#bookingSuccess').addClass('d-none');
   $('#bookingError').addClass('d-none');
@@ -541,20 +618,30 @@ $('#bookingModal').on('hidden.bs.modal', () => {
   currentRefId = null;
 });
 
-// ── Quick Tracker ──────────────────────────────────────────
 $('#quickTrackForm').on('submit', function(e) {
   e.preventDefault();
   const ref = $('#quickTrackInput').val().trim().toUpperCase();
   if (ref) window.location.href = `track.html?ref=${encodeURIComponent(ref)}`;
 });
 
-// ── Navbar active ──────────────────────────────────────────
 $(document).ready(() => {
   renderCategories();
   loadCatalogPreview();
+  const todayStr = new Date().toISOString().split('T')[0];
+  $('#preferredDate').attr('min', todayStr);
   const page = location.pathname.split('/').pop() || 'index.html';
   $(`.navbar-nav .nav-link[href="${page}"]`).addClass('active').attr('aria-current', 'page');
   $(`.navbar-nav .nav-link[href!="${page}"]`).removeClass('active');
+
+  // Auto-open booking modal if arriving via #booking link
+  if (location.hash === '#booking') {
+    const bookingEl = document.getElementById('bookingModal');
+    if (bookingEl) {
+      setTimeout(() => {
+        bootstrap.Modal.getOrCreateInstance(bookingEl).show();
+      }, 100);
+    }
+  }
 });
 </script>
 </body>

@@ -8,34 +8,69 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-jc">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-      <i class="bi bi-cpu-fill text-primary-jc"></i> JC TECH ZONE
+      <img src="assets/logo.jpg" alt="JC Tech Zone" width="34" height="34" class="rounded-circle" style="object-fit:cover;border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
       <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
-            style="background:#00d8ff12;border:1px solid #00d8ff33;font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
-        <span class="status-dot"></span> SYS-ONLINE
+            style="background:var(--primary-dim);border:1px solid var(--primary-mid);font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
+        <span class="status-dot"></span> MARIKINA
       </span>
     </a>
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
-            style="color:var(--text-muted);"><i class="bi bi-list" style="font-size:1.4rem;"></i></button>
-    <div class="collapse navbar-collapse" id="navMenu">
+    <!-- Hamburger toggler: opens right-to-left offcanvas drawer on mobile -->
+    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#customerDrawer" aria-controls="customerDrawer" aria-label="Toggle navigation">
+      <i class="bi bi-list" style="font-size:1.4rem;"></i>
+    </button>
+
+    <!-- Desktop Nav Links -->
+    <div class="collapse navbar-collapse d-none d-lg-flex" id="desktopNav">
       <ul class="navbar-nav ms-auto gap-1 align-items-lg-center py-2 py-lg-0">
         <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
         <li class="nav-item"><a class="nav-link" href="track.html"><i class="bi bi-search me-1"></i>Track Repair</a></li>
         <li class="nav-item"><a class="nav-link active" href="catalog.html"><i class="bi bi-hdd-stack me-1"></i>Hardware Catalog</a></li>
-        <li class="nav-item"><a class="nav-link" href="admin.html"><i class="bi bi-shield-check me-1"></i>Admin</a></li>
-        <li class="nav-item"><a class="nav-link" href="tech.html"><i class="bi bi-terminal me-1"></i>Tech Portal</a></li>
       </ul>
-      <a href="index.html#booking" class="btn-primary-jc ms-lg-3 mt-2 mt-lg-0">
+      <a href="index.html#booking" class="btn-primary-jc ms-lg-3 mt-2 mt-lg-0" id="navBookBtn">
         <i class="bi bi-wrench me-1"></i>Book Repair
       </a>
     </div>
   </div>
 </nav>
+
+<!-- Right-to-Left Offcanvas Mobile Drawer (Customer) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="customerDrawer" aria-labelledby="customerDrawerLabel">
+  <div class="offcanvas-header" style="border-bottom: 1px solid var(--border); padding: 1rem 1.25rem;">
+    <h5 class="offcanvas-title d-flex align-items-center gap-2 mb-0" id="customerDrawerLabel" style="font-family:var(--font-display);font-size:1rem;">
+      <img src="assets/logo.jpg" alt="Logo" width="28" height="28" class="rounded-circle" style="border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column gap-2 p-3">
+    <!-- BOOK REPAIR (HIGHLIGHTED) -->
+    <a href="index.html#booking" class="btn-primary-jc w-100 py-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+      <i class="bi bi-wrench"></i> Book Repair
+    </a>
+
+    <!-- Navigation links (NOT HIGHLIGHTED) -->
+    <a class="drawer-nav-item" href="index.html">
+      <span class="nav-icon-box"><i class="bi bi-house"></i></span>
+      <span>Home</span>
+    </a>
+    <a class="drawer-nav-item" href="track.html">
+      <span class="nav-icon-box"><i class="bi bi-search"></i></span>
+      <span>Track Repair</span>
+    </a>
+    <a class="drawer-nav-item" href="catalog.html">
+      <span class="nav-icon-box"><i class="bi bi-hdd-stack"></i></span>
+      <span>Hardware Catalog</span>
+    </a>
+  </div>
+</div>
 
 <main class="container py-4">
 
@@ -51,13 +86,18 @@
           </p>
         </div>
         <div class="col-md-5">
-          <form id="searchForm" class="d-flex gap-2">
+          <form id="searchForm" class="d-flex gap-2" onsubmit="return false;">
             <div style="flex:1;position:relative;">
               <i class="bi bi-search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:.85rem;"></i>
-              <input type="text" id="searchInput" class="form-control-jc" style="padding-left:2.2rem;"
-                     placeholder="Search components, specs, brand..." />
+              <input type="text" id="searchInput" class="form-control-jc" style="padding-left:2.2rem;padding-right:2.2rem;"
+                     placeholder="Search components (live)..." autocomplete="off" />
+              <button type="button" id="clearSearchBtn" class="d-none"
+                      style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0;font-size:1rem;line-height:1;"
+                      title="Clear search">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
             </div>
-            <button type="submit" class="btn-primary-jc" style="white-space:nowrap;">Search</button>
+            <button type="submit" class="btn-primary-jc d-none d-sm-inline-flex" style="white-space:nowrap;"><i class="bi bi-search me-1"></i>Search</button>
           </form>
         </div>
       </div>
@@ -92,12 +132,19 @@
   <div class="container">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
       <div>
-        <div class="footer-brand"><i class="bi bi-cpu-fill me-2" style="color:var(--primary);"></i>JC TECH ZONE</div>
+        <div class="footer-brand d-flex align-items-center gap-2 mb-2">
+          <img src="assets/logo.jpg" alt="Logo" width="28" height="28" class="rounded-circle" style="border:1px solid var(--border);object-fit:cover;" />
+          <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
+        </div>
         <p style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem;">3 E. Santos Street, Concepcion Uno, Marikina City</p>
       </div>
-      <div style="font-size:.72rem;color:var(--text-muted);">
-        BSIT – LFSA411A034 · Busita · Ledesma · Macabingkil · Santos · Velsis<br>
-        Instructor: Mr. Carlos Jessneir D. Javier
+      <div class="d-flex flex-column align-items-md-end gap-1">
+        <a href="login.html" style="font-size:.72rem;color:var(--text-muted);text-decoration:none;">
+          <i class="bi bi-shield-lock me-1"></i>Staff Portal
+        </a>
+        <div style="font-size:.72rem;color:var(--text-muted);">
+          BSIT – LFSA411A034 · Busita · Ledesma · Macabingkil · Santos · Velsis
+        </div>
       </div>
     </div>
   </div>
@@ -107,39 +154,120 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="api.js"></script>
 <script>
-const CATEGORIES = ['RAM','Storage','Power Supply','PC Case','Keyboard','Networking','Cooling'];
 let activeCategory = 'all';
 let allItems = [];
 
-// ── Render category pills ──────────────────────────────────
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function matchesInitialSearch(item, query) {
+  if (!query) return true;
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+
+  const name = (item.item_name || '').trim().toLowerCase();
+
+  // If typing 1 or 2 initial characters (e.g. 'a', 'c', 'am'), match products whose title strictly begins with that initial letter/prefix
+  if (q.length <= 2) {
+    return name.startsWith(q);
+  }
+
+  // If the product title directly starts with the query (e.g. "adapter", "casing", "amd", "cable")
+  if (name.startsWith(q)) return true;
+
+  // For multi-word queries or keywords (e.g. "ssd", "ram", "dvi vga", "monitor")
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const words = name.split(/[\s\-/(,._+]+/).filter(Boolean);
+
+  return tokens.every(token => words.some(w => w.startsWith(token)));
+}
+
 function renderCategoryPills() {
   const $f = $('#categoryFilters');
-  CATEGORIES.forEach(cat => {
-    $f.append(`<button class="cat-pill" data-cat="${cat}">${cat}</button>`);
+  API.getCategories().then(cats => {
+    $f.find('button:not([data-cat="all"])').remove();
+    cats.forEach(cat => {
+      $f.append(`<button class="cat-pill" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`);
+    });
+  }).catch(() => {
+    const fallback = ['Accessories','Audio','Cables & Adapters','CCTV & Cameras','Cooling','Keyboard','Monitors','Motherboards','Mouse','Networking','PC Case','Peripherals','Power Supply','Printer Parts','Processors','RAM','Storage'];
+    $f.find('button:not([data-cat="all"])').remove();
+    fallback.forEach(cat => {
+      $f.append(`<button class="cat-pill" data-cat="${cat}">${cat}</button>`);
+    });
   });
 }
 
-// ── Load products ──────────────────────────────────────────
-function loadProducts(params = {}) {
+function applyCatalogFilter() {
+  const query = $('#searchInput').val().trim();
+
+  if (query.length > 0) {
+    $('#clearSearchBtn').removeClass('d-none');
+  } else {
+    $('#clearSearchBtn').addClass('d-none');
+  }
+
+  const filtered = allItems.filter(item => {
+    const matchCat = (activeCategory === 'all') || (item.category === activeCategory);
+    if (!matchCat) return false;
+    return matchesInitialSearch(item, query);
+  });
+
+  const q = query.trim().toLowerCase();
+  if (q) {
+    filtered.sort((a, b) => {
+      const aName = (a.item_name || '').toLowerCase();
+      const bName = (b.item_name || '').toLowerCase();
+      const aStarts = aName.startsWith(q);
+      const bStarts = bName.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      return aName.localeCompare(bName);
+    });
+  }
+
+  renderProducts(filtered, query);
+  $('#itemCount').text(filtered.length);
+  $('#inStockCount').text(filtered.filter(i => i.stock_qty > 0).length);
+}
+
+function resetSearch() {
+  $('#searchInput').val('').focus();
+  applyCatalogFilter();
+}
+
+function loadProducts() {
   const $grid = $('#productGrid');
   $grid.html('<div class="col-12 text-center py-5"><div class="spinner-jc"></div></div>');
 
-  API.getProducts(params).then(items => {
-    allItems = items;
-    renderProducts(items);
-    $('#itemCount').text(items.length);
-    $('#inStockCount').text(items.filter(i => i.stock_qty > 0).length);
+  API.getProducts().then(items => {
+    allItems = items || [];
+    applyCatalogFilter();
   }).catch(() => {
     $grid.html('<div class="col-12 text-center py-5" style="color:var(--text-muted);">Failed to load catalog.</div>');
   });
 }
 
-function renderProducts(items) {
+function renderProducts(items, query = '') {
   const $grid = $('#productGrid');
   $grid.empty();
 
   if (items.length === 0) {
-    $grid.html('<div class="col-12 text-center py-5" style="color:var(--text-muted);">No products match your search.</div>');
+    $grid.html(`
+      <div class="col-12 text-center py-5">
+        <i class="bi bi-search" style="font-size:2rem;color:var(--text-muted);display:block;margin-bottom:.5rem;"></i>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1rem;">
+          No hardware found matching "<strong>${escapeHtml(query)}</strong>"
+          ${activeCategory !== 'all' ? ` in ${escapeHtml(activeCategory)}` : ''}.
+        </p>
+        <button class="btn-outline-jc btn-sm-jc" onclick="resetSearch()"><i class="bi bi-arrow-counterclockwise me-1"></i>Clear Search</button>
+      </div>`);
     return;
   }
 
@@ -149,7 +277,7 @@ function renderProducts(items) {
       : `<span class="stock-badge stock-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>`;
 
     const unavailable = !item.is_available
-      ? `<div style="position:absolute;inset:0;background:rgba(8,13,20,.7);border-radius:10px;display:flex;align-items:center;
+      ? `<div style="position:absolute;inset:0;background:rgba(8,13,20,.75);border-radius:10px;display:flex;align-items:center;
                     justify-content:center;font-family:var(--font-mono);font-size:.75rem;color:var(--text-muted);letter-spacing:.05em;">
            UNAVAILABLE
          </div>` : '';
@@ -159,9 +287,9 @@ function renderProducts(items) {
         <div class="product-card" style="position:relative;">
           ${unavailable}
           <div>
-            <div class="product-cat">${item.category}</div>
-            <div class="product-name">${item.item_name}</div>
-            <div style="font-size:.76rem;color:var(--text-muted);margin:.35rem 0;line-height:1.55;">${item.description || ''}</div>
+            <div class="product-cat">${escapeHtml(item.category)}</div>
+            <div class="product-name">${escapeHtml(item.item_name)}</div>
+            <div style="font-size:.76rem;color:var(--text-muted);margin:.35rem 0;line-height:1.55;">${escapeHtml(item.description || '')}</div>
           </div>
           <div class="mt-3 pt-2" style="border-top:1px solid var(--border);">
             <div class="d-flex justify-content-between align-items-center">
@@ -174,17 +302,21 @@ function renderProducts(items) {
   });
 }
 
-// ── Events ─────────────────────────────────────────────────
 $(document).on('click', '.cat-pill', function() {
   $('.cat-pill').removeClass('active');
   $(this).addClass('active');
   activeCategory = $(this).data('cat');
-  loadProducts({ category: activeCategory, search: $('#searchInput').val().trim() });
+  applyCatalogFilter();
 });
 
+$('#searchInput').on('input', applyCatalogFilter);
+$('#searchInput').on('keydown', function(e) {
+  if (e.key === 'Escape') resetSearch();
+});
+$('#clearSearchBtn').on('click', resetSearch);
 $('#searchForm').on('submit', function(e) {
   e.preventDefault();
-  loadProducts({ category: activeCategory, search: $('#searchInput').val().trim() });
+  applyCatalogFilter();
 });
 
 $(document).ready(() => {

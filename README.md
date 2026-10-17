@@ -31,6 +31,12 @@ npm run seed
 npm test --prefix server
 ```
 
+### 4. Staff Portal Credentials
+* **Staff Login URL**: [http://localhost:5000/login.html](http://localhost:5000/login.html)
+* **Administrator**: `admin` / `admin123`
+* **Technician**: `tech` / `tech123` (or any active technician email with `tech123`)
+* **Customer Guest Access**: [http://localhost:5000/](http://localhost:5000/) (no credentials required)
+
 ---
 
 ## 📁 Project Structure

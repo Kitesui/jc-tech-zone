@@ -1,38 +1,50 @@
-// ============================================================
-// routes/tickets.js — Service Tickets REST API
-// POST /api/tickets                          — create guest ticket (no auth)
-// GET  /api/tickets                          — list all tickets (admin)
-// GET  /api/tickets/track/:ref               — track ticket by reference ID (public)
-// GET  /api/tickets/:id                      — get single ticket with logs
-// PUT  /api/tickets/:id                      — update ticket status/assignment/cost
-// DELETE /api/tickets/:id                    — delete ticket (admin only)
-// POST /api/tickets/:id/logs                 — add work log entry
-// ============================================================
 import express from 'express';
 import crypto from 'crypto';
 import supabase from '../db.js';
+import { requireAuth } from '../auth.js';
 
 const router = express.Router();
 
-// Generate unique reference ID, e.g. JCT-2026-A1B2
 const generateReferenceId = () => `JCT-${new Date().getFullYear()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
 
+function normalizeTicket(t) {
+  if (!t) return t;
+  return {
+    ...t,
+    reference_id: t.ticket_reference_id,
+    device_model: t.device_type,
+    photo_url: t.attachment_url,
+    total_cost: t.estimated_cost,
+  };
+}
 
-// ─── POST /api/tickets ────────────────────────────────────────────────────────
 router.post('/', async (req, res) => {
   const {
     customer_name,
     contact_number,
+    customer_phone,
+    phone,
     email,
+    customer_email,
     service_type,
     device_type,
+    device_model,
     issue_description,
     address,
     preferred_schedule,
     estimated_cost,
+    attachment_url,
+    photo_url,
   } = req.body;
 
-  if (!customer_name || !contact_number || !service_type || !issue_description) {
+  const finalName = (customer_name || '').trim();
+  const finalContact = (contact_number || customer_phone || phone || '').trim();
+  const finalEmail = (email || customer_email || '').trim() || null;
+  const finalDevice = (device_type || device_model || '').trim() || null;
+  const finalIssue = (issue_description || '').trim();
+  const finalAttachment = attachment_url || photo_url || null;
+
+  if (!finalName || !finalContact || !service_type || !finalIssue) {
     return res.status(400).json({ error: 'Missing required fields: customer_name, contact_number, service_type, issue_description' });
   }
   if (!['home_service', 'drop_off'].includes(service_type)) {
@@ -51,15 +63,16 @@ router.post('/', async (req, res) => {
     .from('tickets')
     .insert([{
       ticket_reference_id,
-      customer_name: customer_name.trim(),
-      contact_number: contact_number.trim(),
-      email: email ? email.trim() : null,
+      customer_name: finalName,
+      contact_number: finalContact,
+      email: finalEmail,
       service_type,
-      device_type: device_type ? device_type.trim() : null,
-      issue_description: issue_description.trim(),
+      device_type: finalDevice,
+      issue_description: finalIssue,
       address: address ? address.trim() : null,
       preferred_schedule: preferred_schedule || null,
       estimated_cost: initialCost,
+      attachment_url: finalAttachment,
       status: 'Received',
     }])
     .select()
@@ -78,10 +91,14 @@ router.post('/', async (req, res) => {
     status_change: 'Received',
   }]);
 
-  res.status(201).json({ message: 'Ticket created', ticket_reference_id, ticket: data });
+  const normalized = normalizeTicket(data);
+  res.status(201).json({
+    message: 'Ticket created',
+    ...normalized,
+    ticket: normalized
+  });
 });
 
-// ─── GET /api/tickets/track/:ref ──────────────────────────────────────────────
 router.get('/track/:ref', async (req, res) => {
   const ref = req.params.ref.trim().toUpperCase();
 
@@ -105,11 +122,15 @@ router.get('/track/:ref', async (req, res) => {
     .eq('ticket_id', ticket.id)
     .maybeSingle();
 
-  res.json({ ticket, logs: logs || [], feedback: feedback || null });
+  res.json({
+    ticket: normalizeTicket(ticket),
+    logs: logs || [],
+    work_logs: logs || [],
+    feedback: feedback || null
+  });
 });
 
-// ─── GET /api/tickets ─────────────────────────────────────────────────────────
-router.get('/', async (req, res) => {
+router.get('/', requireAuth(['admin', 'technician']), async (req, res) => {
   const { status, technician_id, search } = req.query;
 
   let query = supabase
@@ -127,11 +148,10 @@ router.get('/', async (req, res) => {
 
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  res.json((data || []).map(normalizeTicket));
 });
 
-// ─── GET /api/tickets/:id ─────────────────────────────────────────────────────
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
   const { data: ticket, error } = await supabase
     .from('tickets')
     .select('*, technicians(id, full_name, role, phone)')
@@ -146,17 +166,20 @@ router.get('/:id', async (req, res) => {
     .eq('ticket_id', ticket.id)
     .order('created_at', { ascending: true });
 
-  res.json({ ticket, logs: logs || [] });
+  res.json({ ticket: normalizeTicket(ticket), logs: logs || [], work_logs: logs || [] });
 });
 
-// ─── PUT /api/tickets/:id ─────────────────────────────────────────────────────
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
   const {
     status,
     assigned_technician_id,
+    technician_id,
     estimated_cost,
+    total_cost,
+    parts_cost,
+    diagnosis,
     work_log_note,
-    technician_name,
+    notes,
     parts_used,
     labor_cost,
     status_change,
@@ -172,8 +195,16 @@ router.put('/:id', async (req, res) => {
 
   const updates = { updated_at: new Date().toISOString() };
   if (status) updates.status = status;
-  if (assigned_technician_id !== undefined) updates.assigned_technician_id = assigned_technician_id || null;
-  if (estimated_cost !== undefined) updates.estimated_cost = parseFloat(estimated_cost) || 0;
+  
+  let techId = assigned_technician_id !== undefined ? assigned_technician_id : technician_id;
+  // Auto-claim unassigned tickets when technician updates status
+  if (!techId && !current.assigned_technician_id && req.user && req.user.role === 'technician' && req.user.id !== 'admin' && req.user.id !== 'demo-tech') {
+    techId = req.user.id;
+  }
+  if (techId !== undefined) updates.assigned_technician_id = techId || null;
+
+  if (total_cost !== undefined) updates.estimated_cost = parseFloat(total_cost) || 0;
+  else if (estimated_cost !== undefined) updates.estimated_cost = parseFloat(estimated_cost) || 0;
 
   const { data: updated, error: updateErr } = await supabase
     .from('tickets')
@@ -184,13 +215,14 @@ router.put('/:id', async (req, res) => {
 
   if (updateErr) return res.status(400).json({ error: updateErr.message });
 
-  // Add work log if note or status changed
-  if (work_log_note?.trim() || (status && status !== current.status)) {
+  const noteContent = (work_log_note || notes || diagnosis || '').trim();
+  if (noteContent || (status && status !== current.status)) {
+    const partsStr = typeof parts_used === 'object' ? JSON.stringify(parts_used) : parts_used;
     await supabase.from('ticket_logs').insert([{
       ticket_id: req.params.id,
-      technician_id: assigned_technician_id || null,
-      work_notes: work_log_note?.trim() || `Status changed to: ${status}`,
-      parts_used: parts_used || null,
+      technician_id: techId || current.assigned_technician_id || null,
+      work_notes: noteContent || `Status changed to: ${status}`,
+      parts_used: partsStr || null,
       labor_cost: labor_cost ? parseFloat(labor_cost) : 0,
       status_change: status && status !== current.status ? status : null,
     }]);
@@ -202,21 +234,40 @@ router.put('/:id', async (req, res) => {
     .eq('ticket_id', req.params.id)
     .order('created_at', { ascending: true });
 
-  res.json({ message: 'Ticket updated', ticket: updated, logs: logs || [] });
+  res.json({ message: 'Ticket updated', ticket: normalizeTicket(updated), logs: logs || [], work_logs: logs || [] });
 });
 
-// ─── POST /api/tickets/:id/logs ───────────────────────────────────────────────
-router.post('/:id/logs', async (req, res) => {
-  const { work_notes, technician_id, parts_used, labor_cost, status_change } = req.body;
-  if (!work_notes?.trim()) return res.status(400).json({ error: 'work_notes is required' });
+router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) => {
+  const { work_notes, notes, technician_id, parts_used, labor_cost, status_change } = req.body;
+  const noteText = (work_notes || notes || '').trim();
+  if (!noteText) return res.status(400).json({ error: 'work_notes is required' });
+
+  // Guard: Work logs are locked on Completed or Cancelled tickets
+  const { data: ticket, error: ticketErr } = await supabase
+    .from('tickets')
+    .select('status, assigned_technician_id')
+    .eq('id', req.params.id)
+    .single();
+
+  if (ticketErr || !ticket) return res.status(404).json({ error: 'Ticket not found' });
+  if (ticket.status === 'Completed' || ticket.status === 'Cancelled') {
+    return res.status(400).json({ error: `Cannot add work logs to a ticket that is already ${ticket.status}.` });
+  }
+
+  const effectiveTech = technician_id || (req.user && req.user.role === 'technician' && req.user.id !== 'admin' && req.user.id !== 'demo-tech' ? req.user.id : null);
+  if (!ticket.assigned_technician_id && effectiveTech) {
+    await supabase.from('tickets').update({ assigned_technician_id: effectiveTech }).eq('id', req.params.id);
+  }
+
+  const partsStr = typeof parts_used === 'object' ? JSON.stringify(parts_used) : parts_used;
 
   const { data, error } = await supabase
     .from('ticket_logs')
     .insert([{
       ticket_id: req.params.id,
       technician_id: technician_id || null,
-      work_notes: work_notes.trim(),
-      parts_used: parts_used || null,
+      work_notes: noteText,
+      parts_used: partsStr || null,
       labor_cost: labor_cost ? parseFloat(labor_cost) : 0,
       status_change: status_change || null,
     }])
@@ -227,8 +278,7 @@ router.post('/:id/logs', async (req, res) => {
   res.status(201).json(data);
 });
 
-// ─── DELETE /api/tickets/:id ──────────────────────────────────────────────────
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth(['admin']), async (req, res) => {
   const { error } = await supabase.from('tickets').delete().eq('id', req.params.id);
   if (error) return res.status(400).json({ error: error.message });
   res.json({ message: 'Ticket deleted' });

@@ -4,8 +4,10 @@
   "private": true,
   "description": "JC Tech Zone — IT Service Portal Full-Stack Application",
   "scripts": {
+    "build": "npm install --prefix server",
+    "postinstall": "npm install --prefix server",
+    "start": "node server/src/index.js",
     "dev": "npm run dev --prefix server",
-    "start": "npm start --prefix server",
     "seed": "npm run seed --prefix server",
     "test": "npm test --prefix server"
   }

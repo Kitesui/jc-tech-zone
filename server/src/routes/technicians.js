@@ -1,16 +1,18 @@
-// ============================================================
-// routes/technicians.js — Technicians REST API
-// GET  /api/technicians        — list all active technicians
-// GET  /api/technicians/:id    — get one technician
-// POST /api/technicians        — create technician (admin)
-// PUT  /api/technicians/:id    — update technician (admin)
-// ============================================================
 import express from 'express';
 import supabase from '../db.js';
+import { requireAuth } from '../auth.js';
 
 const router = express.Router();
 
-// GET /api/technicians — list all technicians
+function normalizeTech(t) {
+  if (!t) return t;
+  return {
+    ...t,
+    name: t.full_name,
+    specialty: t.role,
+  };
+}
+
 router.get('/', async (req, res) => {
   const { data, error } = await supabase
     .from('technicians')
@@ -18,10 +20,9 @@ router.get('/', async (req, res) => {
     .order('full_name', { ascending: true });
 
   if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  res.json((data || []).map(normalizeTech));
 });
 
-// GET /api/technicians/:id — single technician
 router.get('/:id', async (req, res) => {
   const { data, error } = await supabase
     .from('technicians')
@@ -30,11 +31,10 @@ router.get('/:id', async (req, res) => {
     .single();
 
   if (error) return res.status(404).json({ error: 'Technician not found' });
-  res.json(data);
+  res.json(normalizeTech(data));
 });
 
-// POST /api/technicians — add new technician
-router.post('/', async (req, res) => {
+router.post('/', requireAuth(['admin']), async (req, res) => {
   const { full_name, email, phone, role } = req.body;
   if (!full_name || !phone) {
     return res.status(400).json({ error: 'full_name and phone are required' });
@@ -50,8 +50,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(data);
 });
 
-// PUT /api/technicians/:id — update technician
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth(['admin']), async (req, res) => {
   const { full_name, email, phone, role, is_active } = req.body;
 
   const { data, error } = await supabase
@@ -63,6 +62,22 @@ router.put('/:id', async (req, res) => {
 
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);
+});
+
+router.delete('/:id', requireAuth(['admin']), async (req, res) => {
+  // Unassign any tickets currently assigned to this technician to prevent foreign key errors
+  await supabase
+    .from('tickets')
+    .update({ assigned_technician_id: null })
+    .eq('assigned_technician_id', req.params.id);
+
+  const { error } = await supabase
+    .from('technicians')
+    .delete()
+    .eq('id', req.params.id);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ message: 'Technician deleted successfully' });
 });
 
 export default router;

@@ -1,17 +1,9 @@
-// ============================================================
-// routes/products.js — Products / Hardware Catalog REST API
-// GET  /api/products           — list products with optional filters
-// GET  /api/products/:id       — get one product
-// POST /api/products           — create product (admin)
-// PUT  /api/products/:id       — update product (admin)
-// DELETE /api/products/:id     — delete product (admin)
-// ============================================================
 import express from 'express';
 import supabase from '../db.js';
+import { requireAuth } from '../auth.js';
 
 const router = express.Router();
 
-// GET /api/products
 router.get('/', async (req, res) => {
   const { category, search, available } = req.query;
 
@@ -31,7 +23,6 @@ router.get('/', async (req, res) => {
   res.json(data);
 });
 
-// GET /api/products/categories — distinct categories
 router.get('/categories', async (req, res) => {
   const { data, error } = await supabase
     .from('products')
@@ -43,7 +34,6 @@ router.get('/categories', async (req, res) => {
   res.json(cats);
 });
 
-// GET /api/products/:id
 router.get('/:id', async (req, res) => {
   const { data, error } = await supabase
     .from('products')
@@ -55,8 +45,7 @@ router.get('/:id', async (req, res) => {
   res.json(data);
 });
 
-// POST /api/products
-router.post('/', async (req, res) => {
+router.post('/', requireAuth(['admin']), async (req, res) => {
   const { item_name, category, description, price, stock_qty, image_url } = req.body;
   if (!item_name || !category || price == null) {
     return res.status(400).json({ error: 'item_name, category, and price are required' });
@@ -80,8 +69,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(data);
 });
 
-// PUT /api/products/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth(['admin']), async (req, res) => {
   const { item_name, category, description, price, stock_qty, image_url, is_available } = req.body;
 
   const { data, error } = await supabase
@@ -104,8 +92,7 @@ router.put('/:id', async (req, res) => {
   res.json(data);
 });
 
-// DELETE /api/products/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth(['admin']), async (req, res) => {
   const { error } = await supabase.from('products').delete().eq('id', req.params.id);
   if (error) return res.status(400).json({ error: error.message });
   res.json({ message: 'Product deleted' });

@@ -8,94 +8,621 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    .admin-tab { cursor:pointer; padding:.5rem 1.1rem; border-radius:8px; border:1px solid var(--border);
-                 background:transparent; color:var(--text-muted); font-family:var(--font-mono);
-                 font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; transition:all .2s; }
-    .admin-tab:hover { color:var(--text); border-color:var(--primary-mid); }
-    .admin-tab.active { background:var(--primary-dim); border-color:var(--primary); color:var(--primary); }
-    .tab-pane { display:none; } .tab-pane.active { display:block; }
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
+<style>
+    .admin-tab { cursor:pointer; padding:.65rem 1.4rem; border-radius:8px; border:1px solid var(--border);
+                  background:transparent; color:var(--text-muted); font-family:var(--font-mono);
+                  font-size:.8rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; transition:background .15s, border-color .15s, color .15s;
+                  white-space:nowrap; }
+    .admin-tab:hover { color:var(--text); border-color:var(--primary-mid); background:var(--primary-dim); }
+    .admin-tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .admin-tab.active { background:var(--primary); border-color:var(--primary); color:#ffffff; font-weight:600; }
+    .tab-pane { display:none; }
+    .tab-pane.active { display:block; animation: tabFadeIn 0.15s ease-out; }
+    @keyframes tabFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     select.form-select-jc option { background: #0e1621; color: #e2e8f0; }
+
+    /* Table Row Interactions */
+    .ticket-row {
+      cursor: pointer;
+      transition: background-color var(--transition);
+    }
+    .ticket-row:hover td {
+      background: var(--primary-dim) !important;
+    }
+    .ticket-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color var(--transition);
+    }
+    .ticket-link:hover {
+      color: #ffffff !important;
+      text-decoration: underline !important;
+    }
+
+    /* Google Calendar Month View */
+    .cal-day-cell {
+      min-height: 84px;
+      padding: .45rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: border-color var(--transition), background-color var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+    .cal-day-cell:hover {
+      border-color: var(--primary-mid) !important;
+      background: rgba(0, 168, 150, 0.05) !important;
+    }
+    .cal-day-cell.selected {
+      border-color: var(--primary) !important;
+      background: rgba(0, 168, 150, 0.12) !important;
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+    .cal-day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+    .cal-day-num {
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .cal-day-cell.is-today .cal-day-num {
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .cal-day-cell.selected .cal-day-num {
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .cal-chips-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 2px;
+      overflow: hidden;
+    }
+    .gcal-chip {
+      background: rgba(0, 168, 150, 0.15);
+      border-left: 3px solid var(--primary);
+      border-radius: 3px;
+      padding: 1px 4px;
+      font-size: .62rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      line-height: 1.3;
+    }
+    .gcal-chip.chip-warning {
+      border-left-color: var(--warning);
+      background: rgba(245, 158, 11, 0.15);
+    }
+    .gcal-chip.chip-info {
+      border-left-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+    }
+    .gcal-chip.chip-purple {
+      border-left-color: #a78bfa;
+      background: rgba(167, 139, 250, 0.15);
+    }
+    .gcal-chip.chip-success {
+      border-left-color: var(--success);
+      background: rgba(16, 185, 129, 0.15);
+    }
+
+    /* Google Calendar Day Agenda */
+    .gcal-agenda-card {
+      display: flex;
+      gap: 1.1rem;
+      padding: .85rem 1rem;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background-color var(--transition), border-color var(--transition);
+      align-items: flex-start;
+      margin-bottom: .6rem;
+    }
+    .gcal-agenda-card:hover {
+      background: var(--primary-dim);
+      border-color: var(--primary-mid);
+    }
+    .gcal-time-col {
+      min-width: 88px;
+      font-family: var(--font-mono);
+      text-align: right;
+    }
+    .gcal-time-main {
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .gcal-time-sub {
+      font-size: .68rem;
+      color: var(--text-muted);
+    }
+    .gcal-divider-bar {
+      width: 4px;
+      border-radius: 4px;
+      align-self: stretch;
+      min-height: 48px;
+      background: var(--primary);
+      flex-shrink: 0;
+    }
+    .gcal-content-col {
+      flex: 1;
+      min-width: 0;
+    }
+    .gcal-event-title {
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .gcal-meta-line {
+      font-size: .75rem;
+      color: var(--text-muted);
+      margin-top: .2rem;
+    }
+    .gcal-meta-line strong {
+      color: var(--text-dim);
+    }
+
+    /* Mobile-first enhancements for admin layout */
+    .admin-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .admin-header-action {
+      display: flex;
+    }
+    .admin-tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .cal-grid-row {
+      display: grid !important;
+      grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+      gap: 3px;
+      width: 100%;
+    }
+    .cal-day-cell {
+      min-width: 0 !important;
+      width: 100%;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    .cal-chips-container {
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .gcal-chip {
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      max-width: 100% !important;
+      display: block;
+    }
+    .ticket-link {
+      white-space: nowrap !important;
+    }
+    .stock-badge,
+    .badge-status {
+      white-space: nowrap !important;
+      display: inline-flex !important;
+      align-items: center;
+      gap: 4px;
+      line-height: 1.2;
+    }
+    .table-responsive-jc {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .card-jc {
+      overflow: hidden; /* Prevent uneven borders and table clipping */
+    }
+    .navbar-jc .navbar-toggler {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.35rem 0.65rem;
+      background: var(--bg-card2);
+      color: var(--text-dim);
+      line-height: 1;
+    }
+    .navbar-jc .navbar-toggler:focus {
+      box-shadow: 0 0 0 2px var(--primary-mid);
+      outline: none;
+    }
+
+    /* Offcanvas Right-to-Left Mobile Drawer */
+    .offcanvas.offcanvas-end {
+      background: var(--bg-card);
+      color: var(--text);
+      border-left: 1px solid var(--border);
+      width: 290px;
+      max-width: 85vw;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7);
+    }
+    .offcanvas .btn-close {
+      filter: invert(0.8) sepia(1) saturate(5) hue-rotate(175deg);
+    }
+    .offcanvas-backdrop.show {
+      opacity: 0.7;
+      backdrop-filter: blur(2px);
+    }
+
+    /* Tickets Tab Header Controls (Desktop default) */
+    .admin-tickets-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.65rem;
+    }
+    .admin-tickets-top-row {
+      display: contents;
+    }
+    .admin-tickets-filter-row {
+      display: contents;
+    }
+    .admin-tickets-title {
+      order: 1;
+      margin-right: auto;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      text-transform: uppercase;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .admin-tickets-search {
+      order: 2;
+      width: 210px !important;
+      max-width: 250px !important;
+      height: 32px !important;
+      min-height: 32px !important;
+      font-size: 0.78rem !important;
+      padding: 0 0.75rem !important;
+    }
+    .admin-tickets-status {
+      order: 3;
+      width: auto !important;
+      min-width: 145px !important;
+      height: 32px !important;
+      min-height: 32px !important;
+      font-size: 0.78rem !important;
+      padding: 0 0.75rem !important;
+    }
+    .admin-tickets-refresh {
+      order: 4;
+      flex-shrink: 0;
+    }
+
+    /* Responsive admin layout */
+    @media (max-width: 768px) {
+      .admin-header-row {
+        margin-bottom: 1rem !important;
+      }
+      .section-title {
+        font-size: 1.35rem !important;
+      }
+      #metricCards {
+        margin-bottom: 1rem !important;
+      }
+      .admin-tabs-nav {
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        padding-bottom: 0.35rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .admin-tabs-nav::-webkit-scrollbar {
+        display: none;
+      }
+      .admin-tabs-nav .admin-tab {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.72rem;
+      }
+      .card-header-jc {
+        padding: 0.75rem 0.9rem;
+      }
+      .admin-tickets-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.65rem !important;
+        padding: 0.75rem 0.9rem !important;
+      }
+      .admin-tickets-top-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+      }
+      .admin-tickets-title {
+        order: unset !important;
+        margin-right: 0 !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 0.05em !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      .admin-tickets-refresh {
+        order: unset !important;
+      }
+      .admin-tickets-filter-row {
+        display: flex !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        align-items: center !important;
+      }
+      .admin-tickets-search {
+        order: unset !important;
+        flex: 1 1 50% !important;
+        width: 50% !important;
+        max-width: none !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        font-size: 0.75rem !important;
+        padding: 0 0.65rem !important;
+      }
+      .admin-tickets-status {
+        order: unset !important;
+        flex: 1 1 50% !important;
+        width: 50% !important;
+        max-width: none !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        font-size: 0.75rem !important;
+        padding: 0 0.65rem !important;
+      }
+      .cal-card-body {
+        padding: 0.6rem !important;
+      }
+      .cal-grid-row {
+        gap: 2px !important;
+      }
+      .cal-day-cell {
+        min-height: 56px;
+        padding: 0.25rem 0.2rem;
+      }
+      .gcal-agenda-card {
+        padding: 0.75rem 0.85rem;
+      }
+      .metric-card { padding:.8rem .9rem !important; }
+      .metric-value { font-size:1.5rem !important; }
+      .table-jc { font-size:.75rem; }
+      .table-jc thead th, .table-jc tbody td { padding:.5rem .6rem; }
+      .gcal-chip { font-size:.52rem; padding:1px 3px; }
+
+      /* Sticky first column so item/ticket/tech name stays visible when scrolling sideways */
+      .table-responsive-jc {
+        position: relative;
+      }
+      .table-responsive-jc table thead th:first-child,
+      .table-responsive-jc table tbody td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--bg-card);
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.45);
+      }
+      .table-responsive-jc table thead th:first-child {
+        z-index: 3;
+        background: var(--bg-card2);
+      }
+    }
+    @media (max-width: 576px) {
+      .metric-card { padding:.65rem .75rem !important; }
+      .metric-value { font-size:1.25rem !important; }
+      .metric-label { font-size:.6rem !important; }
+      .d-flex.gap-2 { gap:.5rem !important; }
+      .gcal-agenda-card { flex-direction: column; gap: .5rem; }
+      .gcal-divider-bar { width: 100%; height: 3px; min-height: 3px; }
+      .gcal-time-col { text-align: left; min-width: auto; }
+      .cal-day-cell { min-height: 50px; padding: .2rem .15rem; }
+    }
   </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-jc">
-  <div class="container-fluid px-4">
+  <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-      <i class="bi bi-cpu-fill text-primary-jc"></i> JC TECH ZONE
+      <img src="assets/logo.jpg" alt="JC Tech Zone" width="34" height="34" class="rounded-circle" style="object-fit:cover;border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
       <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
-            style="background:#00d8ff12;border:1px solid #00d8ff33;font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
+            style="background:var(--primary-dim);border:1px solid var(--primary-mid);font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
         <span class="status-dot"></span> ADMIN MODE
       </span>
     </a>
-    <div class="d-flex gap-2 align-items-center">
-      <a class="nav-link" href="index.html" style="color:var(--text-muted);font-size:.82rem;"><i class="bi bi-house me-1"></i>Home</a>
-      <a class="nav-link" href="track.html" style="color:var(--text-muted);font-size:.82rem;"><i class="bi bi-search me-1"></i>Track</a>
-      <a class="nav-link" href="tech.html" style="color:var(--text-muted);font-size:.82rem;"><i class="bi bi-terminal me-1"></i>Tech Portal</a>
+
+    <!-- Hamburger toggler: opens right-to-left offcanvas drawer on mobile -->
+    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminDrawer" aria-controls="adminDrawer" aria-label="Toggle navigation">
+      <i class="bi bi-list" style="font-size:1.4rem;"></i>
+    </button>
+
+    <!-- Desktop Nav Links -->
+    <div class="collapse navbar-collapse d-none d-lg-flex" id="desktopNav">
+      <ul class="navbar-nav ms-auto gap-2 align-items-center">
+        <li class="nav-item">
+          <span class="badge d-inline-flex align-items-center gap-1 py-1 px-2"
+                style="background:var(--primary-dim);border:1px solid var(--primary-mid);color:var(--primary);font-size:.72rem;">
+            <i class="bi bi-person-fill"></i> <span class="adminUserNameText">Admin</span>
+          </span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="tech.html"><i class="bi bi-terminal me-1"></i>Tech Portal</a>
+        </li>
+        <li class="nav-item ms-2">
+          <button class="btn-outline-jc btn-sm-jc" onclick="API.logout()" style="font-size:.72rem;padding:.35rem .75rem;">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+          </button>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>
 
-<main class="container-fluid px-4 py-4">
+<!-- Right-to-Left Offcanvas Mobile Drawer -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="adminDrawer" aria-labelledby="adminDrawerLabel">
+  <div class="offcanvas-header" style="border-bottom: 1px solid var(--border); padding: 1rem 1.25rem;">
+    <h5 class="offcanvas-title d-flex align-items-center gap-2 mb-0" id="adminDrawerLabel" style="font-family:var(--font-display);font-size:1rem;">
+      <img src="assets/logo.jpg" alt="Logo" width="28" height="28" class="rounded-circle" style="border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column gap-2 p-3">
+    <!-- User Status -->
+    <div class="p-2 px-3 rounded mb-1" style="background:var(--bg-card2);border:1px solid var(--border);">
+      <div style="font-size:.65rem;color:var(--text-muted);font-family:var(--font-mono);text-transform:uppercase;">Signed In As</div>
+      <div class="d-flex align-items-center gap-2 mt-1">
+        <span class="badge d-inline-flex align-items-center gap-1 py-1 px-2"
+              style="background:var(--primary-dim);border:1px solid var(--primary-mid);color:var(--primary);font-size:.75rem;">
+          <i class="bi bi-shield-lock-fill"></i> <span class="adminUserNameText">System Administrator</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Create Walk-In Ticket (HIGHLIGHTED) -->
+    <button class="btn-primary-jc w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+            data-bs-dismiss="offcanvas" data-bs-toggle="modal" data-bs-target="#walkinModal">
+      <i class="bi bi-plus-circle"></i> Create Walk-In Ticket
+    </button>
+
+    <!-- Navigation links (NOT HIGHLIGHTED) -->
+    <a class="drawer-nav-item" href="index.html">
+      <span class="nav-icon-box"><i class="bi bi-house"></i></span>
+      <span>Home</span>
+    </a>
+    <a class="drawer-nav-item" href="tech.html">
+      <span class="nav-icon-box"><i class="bi bi-terminal"></i></span>
+      <span>Tech Portal</span>
+    </a>
+
+    <!-- Bottom of the screen: Logout (NOT HIGHLIGHTED) -->
+    <div class="mt-auto pt-3" style="border-top:1px solid var(--border);">
+      <button class="btn-outline-jc w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+              onclick="API.logout()" style="color:var(--text-muted);border:1px solid var(--border);font-size:.85rem;background:transparent;">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+  </div>
+</div>
+
+<main class="container py-4">
 
   <!-- Header & Metrics -->
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div class="admin-header-row mb-3">
     <div>
-      <h1 class="section-title mb-0"><i class="bi bi-shield-check me-2" style="color:var(--primary);"></i>Admin <span class="accent">Dashboard</span></h1>
-      <p style="color:var(--text-muted);font-size:.82rem;margin-top:.25rem;">
+      <h1 class="section-title mb-0">Admin <span class="accent">Dashboard</span></h1>
+      <p style="color:var(--text-muted);font-size:.82rem;margin-top:.25rem;margin-bottom:0;">
         Ticket dispatch, technician management, hardware inventory, and calendar oversight.
       </p>
     </div>
-    <button class="btn-primary-jc" data-bs-toggle="modal" data-bs-target="#walkinModal">
-      <i class="bi bi-plus-circle me-1"></i>Create Walk-In Ticket
-    </button>
+    <!-- Visible on desktop only since on mobile it is inside the three-line drawer -->
+    <div class="admin-header-action d-none d-lg-flex">
+      <button class="btn-primary-jc" data-bs-toggle="modal" data-bs-target="#walkinModal">
+        Create Walk-In Ticket
+      </button>
+    </div>
   </div>
 
-  <!-- Metric Cards -->
   <div class="row g-3 mb-4" id="metricCards">
     <div class="col-6 col-md-3">
       <div class="metric-card">
-        <div class="metric-label">Total Tickets</div>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="metric-label">Total Tickets</div>
+          <div class="metric-icon-badge" style="color:var(--primary);"><i class="bi bi-ticket-perforated"></i></div>
+        </div>
         <div class="metric-value" id="metricTotal">—</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="border-color:#f59e0b44;">
-        <div class="metric-label" style="color:var(--warning);">Pending / Received</div>
+      <div class="metric-card" style="border-color:#f59e0b33;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="metric-label" style="color:var(--warning);">Pending / Received</div>
+          <div class="metric-icon-badge" style="color:var(--warning);"><i class="bi bi-clock-history"></i></div>
+        </div>
         <div class="metric-value" style="color:var(--warning);" id="metricPending">—</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="border-color:#a78bfa44;">
-        <div class="metric-label" style="color:#a78bfa;">In Progress</div>
+      <div class="metric-card" style="border-color:#a78bfa33;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="metric-label" style="color:#a78bfa;">In Progress</div>
+          <div class="metric-icon-badge" style="color:#a78bfa;"><i class="bi bi-gear-wide-connected"></i></div>
+        </div>
         <div class="metric-value" style="color:#a78bfa;" id="metricActive">—</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="border-color:#10b98144;">
-        <div class="metric-label" style="color:var(--success);">Completed</div>
+      <div class="metric-card" style="border-color:#10b98133;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="metric-label" style="color:var(--success);">Completed</div>
+          <div class="metric-icon-badge" style="color:var(--success);"><i class="bi bi-check2-circle"></i></div>
+        </div>
         <div class="metric-value" style="color:var(--success);" id="metricDone">—</div>
       </div>
     </div>
   </div>
 
   <!-- Admin Tabs -->
-  <div class="d-flex flex-wrap gap-2 mb-4">
-    <button class="admin-tab active" data-tab="tickets"><i class="bi bi-ticket me-1"></i>Ticket Dispatch</button>
-    <button class="admin-tab" data-tab="calendar"><i class="bi bi-calendar3 me-1"></i>Schedule Calendar</button>
-    <button class="admin-tab" data-tab="inventory"><i class="bi bi-boxes me-1"></i>Hardware Inventory</button>
-    <button class="admin-tab" data-tab="technicians"><i class="bi bi-people me-1"></i>Technicians</button>
+  <div class="admin-tabs-nav mb-4">
+    <button class="admin-tab active" data-tab="tickets">Ticket Dispatch</button>
+    <button class="admin-tab" data-tab="calendar">Schedule Calendar</button>
+    <button class="admin-tab" data-tab="inventory">Hardware Inventory</button>
+    <button class="admin-tab" data-tab="technicians">Technicians</button>
   </div>
 
   <!-- TAB: Tickets -->
   <div class="tab-pane active" id="tab-tickets">
     <div class="card-jc">
-      <div class="card-header-jc justify-content-between flex-wrap gap-2">
-        <span><i class="bi bi-table me-1"></i>All Service Tickets</span>
-        <div class="d-flex gap-2 align-items-center flex-wrap">
+      <div class="card-header-jc admin-tickets-header">
+        <div class="admin-tickets-top-row">
+          <span class="admin-tickets-title">All Service Tickets</span>
+          <button class="btn-circle-jc admin-tickets-refresh" onclick="loadTickets(true)" title="Refresh tickets" aria-label="Refresh tickets">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+        </div>
+        <div class="admin-tickets-filter-row">
+          <!-- Search -->
+          <input type="text" id="ticketSearch" class="form-control-jc admin-tickets-search"
+                 placeholder="Search name, ref, device..." />
           <!-- Status filter -->
-          <select id="statusFilter" class="form-select-jc" style="width:auto;padding:.3rem .75rem;font-size:.75rem;">
+          <select id="statusFilter" class="form-select-jc admin-tickets-status">
             <option value="">All Statuses</option>
             <option>Received</option>
             <option>Under Diagnostics</option>
@@ -104,30 +631,23 @@
             <option>Completed</option>
             <option>Cancelled</option>
           </select>
-          <!-- Search -->
-          <input type="text" id="ticketSearch" class="form-control-jc" style="width:200px;padding:.3rem .75rem;font-size:.75rem;"
-                 placeholder="Search name, ref, device..." />
-          <button class="btn-outline-jc btn-sm-jc" onclick="loadTickets()">
-            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
-          </button>
         </div>
       </div>
-      <div style="overflow-x:auto;">
-        <table class="table-jc">
+      <div class="table-responsive-jc">
+        <table class="table-jc" style="min-width:680px;">
           <thead>
             <tr>
-              <th>Ref ID</th>
+              <th>Tickets</th>
               <th>Customer</th>
               <th>Device &amp; Service</th>
               <th>Status</th>
               <th>Technician</th>
               <th>Est. Cost</th>
               <th>Date</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="ticketsTableBody">
-            <tr><td colspan="8" class="text-center py-4" style="color:var(--text-muted);">
+            <tr><td colspan="7" class="text-center py-4" style="color:var(--text-muted);">
               <div class="spinner-jc"></div>
             </td></tr>
           </tbody>
@@ -139,25 +659,25 @@
   <!-- TAB: Calendar -->
   <div class="tab-pane" id="tab-calendar">
     <div class="card-jc">
-      <div class="card-header-jc"><i class="bi bi-calendar3 me-1"></i>Technician Schedule &amp; Home-Service Calendar</div>
-      <div class="p-4">
+      <div class="card-header-jc"><span>Technician Schedule &amp; Home-Service Calendar</span></div>
+      <div class="cal-card-body p-4">
         <div id="calendarContainer">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <button class="btn-outline-jc btn-sm-jc" id="calPrevBtn"><i class="bi bi-chevron-left"></i></button>
             <h5 style="font-family:var(--font-display);color:var(--primary);margin:0;" id="calTitle"></h5>
             <button class="btn-outline-jc btn-sm-jc" id="calNextBtn"><i class="bi bi-chevron-right"></i></button>
           </div>
-          <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+          <div id="calGrid" class="cal-grid-row">
             <!-- Days header -->
-            <div class="font-mono text-center" style="font-size:.65rem;color:var(--text-muted);padding:.4rem 0;">SUN</div>
-            <div class="font-mono text-center" style="font-size:.65rem;color:var(--text-muted);padding:.4rem 0;">MON</div>
-            <div class="font-mono text-center" style="font-size:.65rem;color:var(--text-muted);padding:.4rem 0;">TUE</div>
-            <div class="font-mono text-center" style="font-size:.65rem;color:var(--text-muted);padding:.4rem 0;">WED</div>
-            <div class="font-mono text-center" style="font-size:.65rem;color:var(--text-muted);padding:.4rem 0;">THU</div>
-            <div class="font-mono text-center" style="font-size:.65rem;color:var(--text-muted);padding:.4rem 0;">FRI</div>
-            <div class="font-mono text-center" style="font-size:.65rem;color:var(--text-muted);padding:.4rem 0;">SAT</div>
+            <div class="font-mono text-center" style="font-size:.6rem;color:var(--text-muted);padding:.3rem 0;">SUN</div>
+            <div class="font-mono text-center" style="font-size:.6rem;color:var(--text-muted);padding:.3rem 0;">MON</div>
+            <div class="font-mono text-center" style="font-size:.6rem;color:var(--text-muted);padding:.3rem 0;">TUE</div>
+            <div class="font-mono text-center" style="font-size:.6rem;color:var(--text-muted);padding:.3rem 0;">WED</div>
+            <div class="font-mono text-center" style="font-size:.6rem;color:var(--text-muted);padding:.3rem 0;">THU</div>
+            <div class="font-mono text-center" style="font-size:.6rem;color:var(--text-muted);padding:.3rem 0;">FRI</div>
+            <div class="font-mono text-center" style="font-size:.6rem;color:var(--text-muted);padding:.3rem 0;">SAT</div>
           </div>
-          <div id="calDaysGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:4px;"></div>
+          <div id="calDaysGrid" class="cal-grid-row mt-1"></div>
           <div class="mt-4" id="calScheduledList"></div>
         </div>
       </div>
@@ -167,14 +687,19 @@
   <!-- TAB: Inventory -->
   <div class="tab-pane" id="tab-inventory">
     <div class="card-jc">
-      <div class="card-header-jc justify-content-between">
-        <span><i class="bi bi-boxes me-1"></i>Hardware Inventory Management</span>
-        <button class="btn-primary-jc btn-sm-jc" data-bs-toggle="modal" data-bs-target="#productModal" onclick="openProductModal()">
-          <i class="bi bi-plus me-1"></i>Add Product
-        </button>
+      <div class="card-header-jc d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span>Hardware Inventory Management</span>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn-circle-jc" id="inventoryRefreshBtn" onclick="loadInventory(true)" title="Refresh Inventory" aria-label="Refresh Inventory" style="width:32px;height:32px;min-width:32px;min-height:32px;">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button class="btn-primary-jc btn-sm-jc" onclick="openProductModal()">
+            <i class="bi bi-plus me-1"></i>Add Product
+          </button>
+        </div>
       </div>
-      <div style="overflow-x:auto;">
-        <table class="table-jc">
+      <div class="table-responsive-jc">
+        <table class="table-jc" style="min-width:520px;">
           <thead>
             <tr>
               <th>Item Name</th>
@@ -182,11 +707,10 @@
               <th>Price (₱)</th>
               <th>Stock</th>
               <th>Status</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="inventoryTableBody">
-            <tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted);"><div class="spinner-jc"></div></td></tr>
+            <tr><td colspan="5" class="text-center py-4" style="color:var(--text-muted);"><div class="spinner-jc"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -196,21 +720,26 @@
   <!-- TAB: Technicians -->
   <div class="tab-pane" id="tab-technicians">
     <div class="card-jc">
-      <div class="card-header-jc justify-content-between">
-        <span><i class="bi bi-people me-1"></i>Technician Roster</span>
-        <button class="btn-primary-jc btn-sm-jc" data-bs-toggle="modal" data-bs-target="#techModal" onclick="openTechModal()">
-          <i class="bi bi-plus me-1"></i>Add Technician
-        </button>
+      <div class="card-header-jc d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span>Technician Roster</span>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn-circle-jc" id="techRefreshBtn" onclick="loadTechnicians(true)" title="Refresh Technicians" aria-label="Refresh Technicians" style="width:32px;height:32px;min-width:32px;min-height:32px;">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button class="btn-primary-jc btn-sm-jc" onclick="openTechModal()">
+            <i class="bi bi-plus me-1"></i>Add Technician
+          </button>
+        </div>
       </div>
-      <div style="overflow-x:auto;">
-        <table class="table-jc">
+      <div class="table-responsive-jc">
+        <table class="table-jc" style="min-width:480px;">
           <thead>
             <tr>
-              <th>Name</th><th>Role</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th>
+              <th>Name</th><th>Role</th><th>Email</th><th>Phone</th><th>Status</th>
             </tr>
           </thead>
           <tbody id="techTableBody">
-            <tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted);"><div class="spinner-jc"></div></td></tr>
+            <tr><td colspan="5" class="text-center py-4" style="color:var(--text-muted);"><div class="spinner-jc"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -219,13 +748,12 @@
 
 </main>
 
-<!-- ════ WALK-IN TICKET MODAL ════ -->
 <div class="modal fade modal-jc" id="walkinModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" style="font-family:var(--font-display);">
-          <i class="bi bi-ticket-perforated me-2" style="color:var(--primary);"></i>Create Walk-In / Admin Ticket
+          Create Walk-In / Admin Ticket
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
@@ -258,7 +786,7 @@
             <select id="wkCategory" class="form-select-jc">
               <option>Laptop Repair</option><option>Desktop Repair</option><option>Data Recovery</option>
               <option>Network Setup</option><option>Hardware Upgrade</option>
-              <option>Virus &amp; Malware Removal</option><option>CCTV Installation</option>
+              <option>Printer Repair</option><option>CCTV Installation</option>
               <option>General Diagnostics</option>
             </select>
           </div>
@@ -304,13 +832,12 @@
   </div>
 </div>
 
-<!-- ════ EDIT TICKET MODAL ════ -->
 <div class="modal fade modal-jc" id="editTicketModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" style="font-family:var(--font-display);">
-          <i class="bi bi-pencil me-2" style="color:var(--primary);"></i>Update Ticket
+          Update Ticket
           <span id="editTicketRef" class="font-mono ms-2" style="font-size:.85rem;color:var(--primary);"></span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -345,23 +872,25 @@
                       placeholder="Add a note to the work log (e.g. diagnostic findings, parts ordered)..."></textarea>
           </div>
         </div>
-        <div class="modal-footer gap-2">
-          <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn-primary-jc"><i class="bi bi-save me-1"></i>Save Changes</button>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn-outline-jc text-danger border-danger-subtle btn-sm-jc" onclick="deleteTicketCurrent()">
+            <i class="bi bi-trash me-1"></i>Delete Ticket
+          </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn-primary-jc">Save Changes</button>
+          </div>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- ════ PRODUCT MODAL ════ -->
 <div class="modal fade modal-jc" id="productModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" style="font-family:var(--font-display);" id="productModalTitle">
-          <i class="bi bi-box me-2" style="color:var(--primary);"></i>Add Product
-        </h5>
+        <h5 class="modal-title" style="font-family:var(--font-display);" id="productModalTitle">Add Product</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form id="productForm">
@@ -374,9 +903,24 @@
           <div class="col-sm-6">
             <label class="form-label-jc">Category *</label>
             <select id="pCategory" class="form-select-jc">
-              <option>RAM</option><option>Storage</option><option>Power Supply</option>
-              <option>PC Case</option><option>Keyboard</option><option>Networking</option>
-              <option>Cooling</option><option>Other</option>
+              <option>Accessories</option>
+              <option>Audio</option>
+              <option>Cables & Adapters</option>
+              <option>CCTV & Cameras</option>
+              <option>Cooling</option>
+              <option>Keyboard</option>
+              <option>Monitors</option>
+              <option>Motherboards</option>
+              <option>Mouse</option>
+              <option>Networking</option>
+              <option>PC Case</option>
+              <option>Peripherals</option>
+              <option>Power Supply</option>
+              <option>Printer Parts</option>
+              <option>Processors</option>
+              <option>RAM</option>
+              <option>Storage</option>
+              <option>Other</option>
             </select>
           </div>
           <div class="col-sm-6">
@@ -399,25 +943,25 @@
             <textarea id="pDesc" class="form-control-jc" rows="2" placeholder="Specs, compatibility, notes..."></textarea>
           </div>
         </div>
-        <div class="modal-footer gap-2">
-          <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn-primary-jc" id="productSubmitBtn">
-            <i class="bi bi-plus me-1"></i>Add Product
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn-outline-jc text-danger border-danger-subtle btn-sm-jc d-none" id="btnDeleteProductModal" onclick="deleteProductCurrent()">
+            <i class="bi bi-trash me-1"></i>Delete Product
           </button>
+          <div class="d-flex gap-2 ms-auto">
+            <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn-primary-jc" id="productSubmitBtn">Add Product</button>
+          </div>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- ════ TECHNICIAN MODAL ════ -->
 <div class="modal fade modal-jc" id="techModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" style="font-family:var(--font-display);" id="techModalTitle">
-          <i class="bi bi-person-plus me-2" style="color:var(--primary);"></i>Add Technician
-        </h5>
+        <h5 class="modal-title" style="font-family:var(--font-display);" id="techModalTitle">Add Technician</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form id="techForm">
@@ -440,9 +984,14 @@
             <input type="email" id="tEmail" class="form-control-jc" placeholder="tech@jctechzone.com" />
           </div>
         </div>
-        <div class="modal-footer gap-2">
-          <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn-primary-jc"><i class="bi bi-person-plus me-1"></i>Add Technician</button>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn-outline-jc text-danger border-danger-subtle btn-sm-jc d-none" id="btnDeleteTechModal" onclick="deleteTechCurrent()">
+            <i class="bi bi-trash me-1"></i>Delete Technician
+          </button>
+          <div class="d-flex gap-2 ms-auto">
+            <button type="button" class="btn-outline-jc" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn-primary-jc" id="techSubmitBtn">Save Technician</button>
+          </div>
         </div>
       </form>
     </div>
@@ -453,7 +1002,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="api.js"></script>
 <script>
-// ── State ──────────────────────────────────────────────────
+const currentUser = API.getUser();
+if (!currentUser) {
+  window.location.href = 'login.html';
+} else if (currentUser.role !== 'admin') {
+  // If logged in as technician, clear auth session so login.html does not auto-redirect back to tech.html
+  API.clearAuth();
+  window.location.href = 'login.html?msg=admin_required';
+} else {
+  $('.adminUserNameText, #adminUserName').text(currentUser.name || 'Admin');
+}
+
 let allTechs = [];
 let calYear, calMonth;
 let homeServiceTickets = [];
@@ -466,20 +1025,23 @@ const STATUS_BADGE = {
   'Cancelled':         'badge-cancelled',
 };
 
-// ── Tab navigation ─────────────────────────────────────────
 $(document).on('click', '.admin-tab', function() {
   $('.admin-tab').removeClass('active');
   $('.tab-pane').removeClass('active');
   $(this).addClass('active');
   const tab = $(this).data('tab');
   $(`#tab-${tab}`).addClass('active');
+  $(`#tab-${tab} .table-responsive-jc`).scrollLeft(0);
   if (tab === 'inventory') loadInventory();
   if (tab === 'technicians') loadTechnicians();
   if (tab === 'calendar') renderCalendar();
 });
 
-// ── Load Tickets ───────────────────────────────────────────
-function loadTickets() {
+function loadTickets(showToast = false) {
+  const $icon = $('.admin-tickets-refresh i');
+  $icon.addClass('spin-anim');
+  setTimeout(() => $icon.removeClass('spin-anim'), 650);
+
   const status = $('#statusFilter').val();
   const search = $('#ticketSearch').val().trim();
   const params = {};
@@ -490,6 +1052,9 @@ function loadTickets() {
     updateMetrics(tickets);
     homeServiceTickets = tickets.filter(t => t.service_type === 'home_service' && t.preferred_schedule);
     renderTicketsTable(tickets);
+    if (showToast) UI.toast('Tickets refreshed', 'info', 1800);
+  }).catch(err => {
+    if (showToast) UI.toast('Failed to refresh tickets: ' + err.message, 'error');
   });
 }
 
@@ -503,7 +1068,25 @@ function updateMetrics(tickets) {
 function renderTicketsTable(tickets) {
   const $tbody = $('#ticketsTableBody');
   if (!tickets || tickets.length === 0) {
-    $tbody.html('<tr><td colspan="8" class="text-center py-4" style="color:var(--text-muted);">No tickets found.</td></tr>');
+    const isFiltered = $('#statusFilter').val() || $('#ticketSearch').val().trim();
+    const message = isFiltered
+      ? 'No tickets match the selected status or search filter.'
+      : 'No service tickets registered in the system.';
+    const actionBtn = isFiltered
+      ? `<button class="btn-outline-jc btn-sm-jc mt-2" onclick="$('#statusFilter').val('');$('#ticketSearch').val('');loadTickets();">
+           <i class="bi bi-x-circle me-1"></i>Clear Filters
+         </button>`
+      : `<button class="btn-primary-jc btn-sm-jc mt-2" data-bs-toggle="modal" data-bs-target="#walkinModal">
+           Create Walk-In Ticket
+         </button>`;
+    $tbody.html(`
+      <tr>
+        <td colspan="7" class="text-center py-5">
+          <i class="bi bi-inbox text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
+          <div style="color:var(--text-muted);font-size:.85rem;">${message}</div>
+          ${actionBtn}
+        </td>
+      </tr>`);
     return;
   }
   $tbody.empty();
@@ -511,39 +1094,34 @@ function renderTicketsTable(tickets) {
     const badgeCls = STATUS_BADGE[t.status] || 'badge-received';
     const tech = t.technicians ? t.technicians.full_name : '<span style="color:var(--text-muted);">Unassigned</span>';
     const dt = new Date(t.created_at).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
+    const serviceName = t.service_type === 'home_service' ? 'Home Service' : 'Drop-Off';
+
     $tbody.append(`
-      <tr>
-        <td class="font-mono" style="color:var(--primary);font-size:.8rem;">${t.ticket_reference_id}</td>
+      <tr class="ticket-row" data-id="${t.id}" onclick="openEditTicket('${t.id}')" title="Click to update ticket details">
+        <td>
+          <a href="track.html?ref=${encodeURIComponent(t.ticket_reference_id)}" target="_blank"
+             class="ticket-link font-mono"
+             onclick="event.stopPropagation();"
+             title="Track Repair">
+            ${t.ticket_reference_id}
+          </a>
+        </td>
         <td>
           <div style="font-weight:600;">${t.customer_name}</div>
           <div style="font-size:.72rem;color:var(--text-muted);">${t.contact_number}</div>
         </td>
         <td>
-          <div style="font-size:.8rem;">${t.device_type || '—'}</div>
-          <div style="font-size:.7rem;color:var(--text-muted);">${t.service_type === 'home_service' ? '🏡 Home' : '🏬 Drop-Off'}</div>
+          <div style="font-size:.8rem;font-weight:600;">${t.device_type || '—'}</div>
+          <div style="font-size:.72rem;color:var(--text-muted);font-weight:500;">${serviceName}</div>
         </td>
         <td><span class="badge-status ${badgeCls}">${t.status}</span></td>
         <td style="font-size:.8rem;">${tech}</td>
         <td class="font-mono" style="color:var(--success);font-size:.82rem;">₱${Number(t.estimated_cost||0).toFixed(2)}</td>
         <td style="font-size:.75rem;color:var(--text-muted);">${dt}</td>
-        <td>
-          <div class="d-flex gap-1">
-            <button class="btn-outline-jc btn-sm-jc" onclick="openEditTicket('${t.id}')">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <a href="track.html?ref=${t.ticket_reference_id}" target="_blank" class="btn-outline-jc btn-sm-jc">
-              <i class="bi bi-search"></i>
-            </a>
-            <button class="btn-danger-jc btn-sm-jc" onclick="deleteTicket('${t.id}','${t.ticket_reference_id}')">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
-        </td>
       </tr>`);
   });
 }
 
-// ── Edit Ticket ────────────────────────────────────────────
 function openEditTicket(id) {
   API.getTicket(id).then(res => {
     const t = res.ticket;
@@ -559,7 +1137,8 @@ function openEditTicket(id) {
         ${tech.full_name} (${tech.role})
       </option>`);
     });
-    new bootstrap.Modal('#editTicketModal').show();
+
+    bootstrap.Modal.getOrCreateInstance('#editTicketModal').show();
   });
 }
 
@@ -574,17 +1153,31 @@ $('#editTicketForm').on('submit', function(e) {
     work_log_note:         $('#editWorkNote').val().trim() || null,
   };
   API.updateTicket(id, payload).then(() => {
-    bootstrap.Modal.getInstance('#editTicketModal').hide();
+    bootstrap.Modal.getOrCreateInstance('#editTicketModal').hide();
+    UI.toast('Ticket updated successfully.', 'success');
     loadTickets();
-  }).catch(err => alert('Error: ' + err.message));
+  }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 });
 
-function deleteTicket(id, ref) {
-  if (!confirm(`Delete ticket ${ref}? This cannot be undone.`)) return;
-  API.deleteTicket(id).then(() => loadTickets()).catch(err => alert('Error: ' + err.message));
+async function deleteTicketCurrent() {
+  const id = $('#editTicketId').val();
+  const ref = $('#editTicketRef').text().trim();
+  if (!id) return;
+  const ok = await UI.confirm({
+    title: 'Delete Ticket',
+    message: `Are you sure you want to delete ticket <strong class="text-primary-jc">${ref}</strong>?<div style="color:#cbd5e1;font-size:0.84rem;margin-top:0.45rem;line-height:1.45;">This will permanently purge the ticket record. This action cannot be undone.</div>`,
+    confirmText: 'Delete Ticket',
+    danger: true
+  });
+  if (!ok) return;
+
+  API.deleteTicket(id).then(() => {
+    bootstrap.Modal.getOrCreateInstance('#editTicketModal').hide();
+    UI.toast(`Ticket ${ref} was deleted successfully.`, 'success');
+    loadTickets();
+  }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 }
 
-// ── Walk-In Form ───────────────────────────────────────────
 $('#wkMode').on('change', function() {
   if ($(this).val() === 'home_service') {
     $('#wkHomeFields').removeClass('d-none');
@@ -613,13 +1206,14 @@ $('#walkinForm').on('submit', function(e) {
     estimated_cost:    parseFloat($('#wkCost').val()) || 0,
   };
   API.createTicket(payload).then(res => {
-    alert(`✅ Ticket created! Reference: ${res.ticket_reference_id}`);
-    bootstrap.Modal.getInstance('#walkinModal').hide();
+    UI.toast(`Ticket created successfully! Ref: ${res.ticket_reference_id}`, 'success');
+    bootstrap.Modal.getOrCreateInstance('#walkinModal').hide();
     $('#walkinForm')[0].reset();
     loadTickets();
   }).catch(err => {
     $('#walkinErrorMsg').text(err.message);
     $('#walkinError').removeClass('d-none');
+    UI.toast('Error: ' + err.message, 'error');
   });
 });
 $('#walkinModal').on('hidden.bs.modal', () => {
@@ -628,11 +1222,43 @@ $('#walkinModal').on('hidden.bs.modal', () => {
   $('#wkHomeFields').addClass('d-none');
 });
 
-// ── Calendar ───────────────────────────────────────────────
+function formatTimeShort(isoStr) {
+  if (!isoStr) return '09:00 AM';
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return '09:00 AM';
+  return d.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+function getStatusTheme(status) {
+  switch (status) {
+    case 'Received':
+      return { chip: 'chip-warning', bar: 'var(--warning)' };
+    case 'Under Diagnostics':
+      return { chip: 'chip-info', bar: '#38bdf8' };
+    case 'In Progress':
+      return { chip: 'chip-purple', bar: '#a78bfa' };
+    case 'Ready for Pick-Up':
+    case 'Completed':
+      return { chip: 'chip-success', bar: 'var(--success)' };
+    default:
+      return { chip: '', bar: 'var(--primary)' };
+  }
+}
+
+function openWalkinForDate(dateStr) {
+  $('#wkMode').val('home_service').trigger('change');
+  if (dateStr) {
+    $('#wkSchedule').val(`${dateStr}T09:00`);
+  }
+  bootstrap.Modal.getOrCreateInstance('#walkinModal').show();
+}
+
+let selectedCalDate = null;
+
 function renderCalendar() {
   const today = new Date();
   if (!calYear)  calYear  = today.getFullYear();
-  if (!calMonth) calMonth = today.getMonth();
+  if (!calMonth && calMonth !== 0) calMonth = today.getMonth();
 
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   $('#calTitle').text(`${monthNames[calMonth]} ${calYear}`);
@@ -643,61 +1269,146 @@ function renderCalendar() {
   const $grid = $('#calDaysGrid');
   $grid.empty();
 
-  // Leading empty cells
   for (let i = 0; i < firstDay; i++) {
     $grid.append('<div></div>');
   }
 
-  // Day cells
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = (d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear());
+    const isSelected = selectedCalDate === dateStr;
 
-    // Count home service visits on this day
     const visits = homeServiceTickets.filter(t => {
       const ds = t.preferred_schedule ? t.preferred_schedule.substring(0,10) : '';
       return ds === dateStr;
     });
-    const dot = visits.length > 0
-      ? `<div style="font-size:.55rem;color:var(--primary);margin-top:2px;">● ${visits.length} visit${visits.length>1?'s':''}</div>`
-      : '';
+
+    let chipsHtml = '';
+    if (visits.length > 0) {
+      visits.slice(0, 2).forEach(v => {
+        const timeStr = formatTimeShort(v.preferred_schedule);
+        const theme = getStatusTheme(v.status);
+        chipsHtml += `<div class="gcal-chip ${theme.chip}" title="${v.customer_name}: ${v.device_type || 'Home Service'}">
+          <strong>${timeStr}</strong> ${v.device_type ? v.device_type.split('—').pop().trim() : 'Service'}
+        </div>`;
+      });
+      if (visits.length > 2) {
+        chipsHtml += `<div style="font-size:.6rem;color:var(--primary);margin-top:2px;font-weight:600;">+${visits.length - 2} more</div>`;
+      }
+    }
+
+    const cellClasses = ['cal-day-cell'];
+    if (isToday) cellClasses.push('is-today');
+    if (isSelected) cellClasses.push('selected');
 
     $grid.append(`
-      <div style="min-height:52px;padding:.35rem .4rem;border-radius:6px;border:1px solid ${isToday?'var(--primary)':'var(--border)'};
-                  background:${isToday?'var(--primary-dim)':'var(--bg-card2)'};cursor:${visits.length?'pointer':'default'};"
-           onclick="showCalDayDetails('${dateStr}')">
-        <div style="font-family:var(--font-mono);font-size:.72rem;color:${isToday?'var(--primary)':'var(--text-muted)'};">${d}</div>
-        ${dot}
+      <div class="${cellClasses.join(' ')}"
+           onclick="selectCalDay('${dateStr}')"
+           title="${visits.length} scheduled service(s) on ${dateStr}">
+        <div class="cal-day-header">
+          <span class="cal-day-num">${d}</span>
+        </div>
+        <div class="cal-chips-container">${chipsHtml}</div>
       </div>`);
   }
 
-  // Upcoming scheduled home visits
-  const upcoming = homeServiceTickets.filter(t => t.preferred_schedule).sort((a,b) => new Date(a.preferred_schedule)-new Date(b.preferred_schedule));
-  const $list = $('#calScheduledList');
-  if (upcoming.length === 0) {
-    $list.html('<p style="color:var(--text-muted);font-size:.82rem;margin-top:1rem;">No scheduled home-service visits.</p>');
-    return;
-  }
-  $list.html(`<h6 class="font-mono mb-2" style="font-size:.72rem;color:var(--primary);text-transform:uppercase;letter-spacing:.05em;">Scheduled Home-Service Visits</h6>`);
-  upcoming.slice(0, 10).forEach(t => {
-    const dt = new Date(t.preferred_schedule).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
-    $list.append(`
-      <div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--border);">
-        <i class="bi bi-calendar-event" style="color:var(--primary);font-size:1rem;"></i>
-        <div style="flex:1;">
-          <div style="font-size:.82rem;font-weight:600;">${t.customer_name} — ${t.device_type || 'Device'}</div>
-          <div style="font-size:.73rem;color:var(--text-muted);">${dt} · ${t.address || 'No address'}</div>
-        </div>
-        <span class="badge-status badge-received">${t.status}</span>
-      </div>`);
-  });
+  renderCalScheduledList();
 }
 
-function showCalDayDetails(dateStr) {
-  const visits = homeServiceTickets.filter(t => t.preferred_schedule && t.preferred_schedule.substring(0,10) === dateStr);
-  if (!visits.length) return;
-  const info = visits.map(v => `• ${v.customer_name} (${v.ticket_reference_id}) — ${v.address || 'No addr'}`).join('\n');
-  alert(`Home Service Visits on ${dateStr}:\n\n${info}`);
+function selectCalDay(dateStr) {
+  selectedCalDate = selectedCalDate === dateStr ? null : dateStr;
+  renderCalendar();
+}
+
+function renderCalScheduledList() {
+  const $list = $('#calScheduledList');
+  let visits = homeServiceTickets.filter(t => t.preferred_schedule);
+
+  let headerHtml = '';
+  if (selectedCalDate) {
+    const dObj = new Date(`${selectedCalDate}T00:00:00`);
+    const formatted = dObj.toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    visits = visits.filter(t => t.preferred_schedule.substring(0, 10) === selectedCalDate);
+    visits.sort((a,b) => new Date(a.preferred_schedule) - new Date(b.preferred_schedule));
+
+    headerHtml = `
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 flex-wrap gap-2" style="border-bottom:1px solid var(--border);">
+        <div>
+          <h5 class="mb-0" style="font-weight:600;font-size:1rem;color:var(--text);">${formatted}</h5>
+          <div style="font-size:.75rem;color:var(--text-muted);">${visits.length} scheduled home-service visit${visits.length === 1 ? '' : 's'}</div>
+        </div>
+        <button class="btn-outline-jc btn-sm-jc" onclick="selectCalDay(null)" style="font-size:.72rem;padding:.25rem .7rem;">
+          View All Month
+        </button>
+      </div>`;
+
+    if (visits.length === 0) {
+      $list.html(`
+        ${headerHtml}
+        <div class="text-center py-5 p-3 rounded" style="background:var(--bg-card2);border:1px solid var(--border);">
+          <div style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:.25rem;">Nothing scheduled on this day</div>
+          <div style="color:var(--text-muted);font-size:.8rem;margin-bottom:1rem;">No home-service visits booked for ${formatted}.</div>
+          <button class="btn-primary-jc btn-sm-jc" onclick="openWalkinForDate('${selectedCalDate}')">
+            Schedule Home Service
+          </button>
+        </div>`);
+      return;
+    }
+  } else {
+    visits.sort((a,b) => new Date(a.preferred_schedule) - new Date(b.preferred_schedule));
+    headerHtml = `
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 flex-wrap gap-2" style="border-bottom:1px solid var(--border);">
+        <div>
+          <h5 class="mb-0" style="font-weight:600;font-size:1rem;color:var(--text);">Upcoming Home-Service Visits</h5>
+          <div style="font-size:.75rem;color:var(--text-muted);">${visits.length} total visits this period</div>
+        </div>
+      </div>`;
+
+    if (visits.length === 0) {
+      $list.html(`
+        ${headerHtml}
+        <div class="text-center py-5 p-3 rounded" style="background:var(--bg-card2);border:1px solid var(--border);">
+          <div style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:.25rem;">No upcoming home-service visits</div>
+          <div style="color:var(--text-muted);font-size:.8rem;margin-bottom:1rem;">Drop-off and bench repair tickets can be viewed in the Ticket Dispatch tab.</div>
+        </div>`);
+      return;
+    }
+  }
+
+  let rows = '';
+  visits.slice(0, 15).forEach(t => {
+    const timeStr = formatTimeShort(t.preferred_schedule);
+    const dateFormatted = new Date(t.preferred_schedule).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
+    const badgeCls = STATUS_BADGE[t.status] || 'badge-received';
+    const theme = getStatusTheme(t.status);
+    const techName = t.technicians ? t.technicians.full_name : 'Unassigned';
+
+    rows += `
+      <div class="gcal-agenda-card" onclick="openEditTicket('${t.id}')" title="Click to view or edit ticket">
+        <div class="gcal-time-col">
+          <div class="gcal-time-main">${timeStr}</div>
+          <div class="gcal-time-sub">${selectedCalDate ? 'Scheduled' : dateFormatted}</div>
+        </div>
+        <div class="gcal-divider-bar" style="background:${theme.bar};"></div>
+        <div class="gcal-content-col">
+          <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+            <div class="gcal-event-title">${t.device_type || 'Home Service'}</div>
+            <span class="badge-status ${badgeCls}">${t.status}</span>
+          </div>
+          <div class="gcal-meta-line">
+            <span><strong>Customer:</strong> ${t.customer_name} (${t.contact_number})</span>
+            ${t.address ? `<span class="mx-1">·</span><span><strong>Address:</strong> ${t.address}</span>` : ''}
+          </div>
+          <div class="gcal-meta-line" style="font-size:.72rem;">
+            <span><strong>Technician:</strong> ${techName}</span>
+            <span class="mx-1">·</span>
+            <span class="font-mono" style="color:var(--primary);">${t.ticket_reference_id}</span>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  $list.html(headerHtml + rows);
 }
 
 $('#calPrevBtn').on('click', () => {
@@ -711,13 +1422,25 @@ $('#calNextBtn').on('click', () => {
   renderCalendar();
 });
 
-// ── Inventory ──────────────────────────────────────────────
-function loadInventory() {
+function loadInventory(showToast = false) {
+  const $icon = $('#inventoryRefreshBtn i');
+  $icon.addClass('spin-anim');
+  setTimeout(() => $icon.removeClass('spin-anim'), 650);
+
   API.getProducts().then(items => {
     const $tbody = $('#inventoryTableBody');
     $tbody.empty();
     if (!items.length) {
-      $tbody.html('<tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted);">No products.</td></tr>');
+      $tbody.html(`
+        <tr>
+          <td colspan="5" class="text-center py-5">
+            <i class="bi bi-boxes text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
+            <div style="color:var(--text-muted);font-size:.85rem;">No hardware items listed in inventory.</div>
+            <button class="btn-primary-jc btn-sm-jc mt-2" onclick="openProductModal()">
+              <i class="bi bi-plus me-1"></i>Add Product
+            </button>
+          </td>
+        </tr>`);
       return;
     }
     items.forEach(item => {
@@ -728,24 +1451,17 @@ function loadInventory() {
         ? '<span style="color:var(--success);font-size:.8rem;">● Listed</span>'
         : '<span style="color:var(--text-muted);font-size:.8rem;">○ Hidden</span>';
       $tbody.append(`
-        <tr>
-          <td style="font-weight:600;max-width:200px;">${item.item_name}</td>
+        <tr class="ticket-row" onclick="openProductModal('${item.id}')" title="Click to edit product">
+          <td style="font-weight:600;max-width:220px;">${item.item_name}</td>
           <td class="font-mono" style="font-size:.75rem;color:var(--primary);">${item.category}</td>
           <td class="font-mono" style="color:var(--success);">₱${Number(item.price).toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
           <td>${stock}</td>
           <td>${avail}</td>
-          <td>
-            <div class="d-flex gap-1">
-              <button class="btn-outline-jc btn-sm-jc" onclick="openProductModal('${item.id}')">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn-danger-jc btn-sm-jc" onclick="deleteProduct('${item.id}','${item.item_name}')">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </td>
         </tr>`);
     });
+    if (showToast) UI.toast('Hardware inventory refreshed', 'info', 1800);
+  }).catch(err => {
+    if (showToast) UI.toast('Failed to refresh inventory: ' + err.message, 'error');
   });
 }
 
@@ -753,22 +1469,24 @@ function openProductModal(id) {
   if (id) {
     API.getProduct(id).then(item => {
       $('#productId').val(item.id);
-      $('#productModalTitle').html(`<i class="bi bi-pencil me-2" style="color:var(--primary);"></i>Edit Product`);
-      $('#productSubmitBtn').html('<i class="bi bi-save me-1"></i>Save Changes');
+      $('#productModalTitle').text('Edit Product');
+      $('#productSubmitBtn').text('Save Changes');
+      $('#btnDeleteProductModal').removeClass('d-none');
       $('#pName').val(item.item_name);
       $('#pCategory').val(item.category);
       $('#pPrice').val(item.price);
       $('#pStock').val(item.stock_qty);
       $('#pAvailable').val(String(item.is_available));
       $('#pDesc').val(item.description || '');
-      new bootstrap.Modal('#productModal').show();
+      bootstrap.Modal.getOrCreateInstance('#productModal').show();
     });
   } else {
     $('#productId').val('');
-    $('#productModalTitle').html(`<i class="bi bi-box me-2" style="color:var(--primary);"></i>Add Product`);
-    $('#productSubmitBtn').html('<i class="bi bi-plus me-1"></i>Add Product');
+    $('#productModalTitle').text('Add Product');
+    $('#productSubmitBtn').text('Add Product');
+    $('#btnDeleteProductModal').addClass('d-none');
     $('#productForm')[0].reset();
-    new bootstrap.Modal('#productModal').show();
+    bootstrap.Modal.getOrCreateInstance('#productModal').show();
   }
 }
 
@@ -785,24 +1503,51 @@ $('#productForm').on('submit', function(e) {
   };
   const call = id ? API.updateProduct(id, payload) : API.createProduct(payload);
   call.then(() => {
-    bootstrap.Modal.getInstance('#productModal').hide();
+    bootstrap.Modal.getOrCreateInstance('#productModal').hide();
+    UI.toast(id ? 'Product updated successfully.' : 'Product added successfully.', 'success');
     loadInventory();
-  }).catch(err => alert('Error: ' + err.message));
+  }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 });
 
-function deleteProduct(id, name) {
-  if (!confirm(`Delete "${name}"?`)) return;
-  API.deleteProduct(id).then(loadInventory).catch(err => alert('Error: ' + err.message));
+async function deleteProductCurrent() {
+  const id = $('#productId').val();
+  const name = $('#pName').val().trim();
+  if (!id) return;
+  const ok = await UI.confirm({
+    title: 'Delete Hardware Product',
+    message: `Are you sure you want to remove <strong class="text-primary-jc">${name}</strong> from hardware inventory?<div style="color:#cbd5e1;font-size:0.84rem;margin-top:0.45rem;line-height:1.45;">This product will be permanently deleted from catalog.</div>`,
+    confirmText: 'Delete Product',
+    danger: true
+  });
+  if (!ok) return;
+
+  API.deleteProduct(id).then(() => {
+    bootstrap.Modal.getOrCreateInstance('#productModal').hide();
+    UI.toast(`Product "${name}" was deleted.`, 'success');
+    loadInventory();
+  }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 }
 
-// ── Technicians ────────────────────────────────────────────
-function loadTechnicians() {
+function loadTechnicians(showToast = false) {
+  const $icon = $('#techRefreshBtn i');
+  $icon.addClass('spin-anim');
+  setTimeout(() => $icon.removeClass('spin-anim'), 650);
+
   API.getTechnicians().then(techs => {
     allTechs = techs;
     const $tbody = $('#techTableBody');
     $tbody.empty();
     if (!techs.length) {
-      $tbody.html('<tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted);">No technicians.</td></tr>');
+      $tbody.html(`
+        <tr>
+          <td colspan="5" class="text-center py-5">
+            <i class="bi bi-people text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
+            <div style="color:var(--text-muted);font-size:.85rem;">No staff technicians registered in roster.</div>
+            <button class="btn-primary-jc btn-sm-jc mt-2" onclick="openTechModal()">
+              <i class="bi bi-plus me-1"></i>Add Technician
+            </button>
+          </td>
+        </tr>`);
       return;
     }
     techs.forEach(t => {
@@ -810,23 +1555,21 @@ function loadTechnicians() {
         ? '<span class="stock-badge stock-in">● Active</span>'
         : '<span class="stock-badge stock-out">○ Inactive</span>';
       $tbody.append(`
-        <tr>
+        <tr class="ticket-row" onclick="openTechModal('${t.id}')" title="Click to edit technician">
           <td style="font-weight:600;">${t.full_name}</td>
           <td style="font-size:.8rem;color:var(--primary);">${t.role || '—'}</td>
           <td style="font-size:.8rem;color:var(--text-muted);">${t.email || '—'}</td>
           <td style="font-size:.8rem;">${t.phone}</td>
           <td>${active}</td>
-          <td>
-            <button class="btn-outline-jc btn-sm-jc" onclick="openTechModal('${t.id}')">
-              <i class="bi bi-pencil"></i>
-            </button>
-          </td>
         </tr>`);
     });
 
     // Populate walk-in tech dropdown
     const $sel = $('#wkTech').find('option:not(:first)').remove().end();
     techs.forEach(t => $sel.append(`<option value="${t.id}">${t.full_name} (${t.role})</option>`));
+    if (showToast) UI.toast('Technician roster refreshed', 'info', 1800);
+  }).catch(err => {
+    if (showToast) UI.toast('Failed to refresh technicians: ' + err.message, 'error');
   });
 }
 
@@ -835,18 +1578,41 @@ function openTechModal(id) {
     const tech = allTechs.find(t => t.id === id);
     if (!tech) return;
     $('#techId').val(tech.id);
-    $('#techModalTitle').html(`<i class="bi bi-pencil me-2" style="color:var(--primary);"></i>Edit Technician`);
+    $('#techModalTitle').text('Edit Technician');
+    $('#techSubmitBtn').text('Save Changes');
+    $('#btnDeleteTechModal').removeClass('d-none');
     $('#tName').val(tech.full_name);
     $('#tRole').val(tech.role || '');
     $('#tPhone').val(tech.phone);
     $('#tEmail').val(tech.email || '');
-    new bootstrap.Modal('#techModal').show();
+    bootstrap.Modal.getOrCreateInstance('#techModal').show();
   } else {
     $('#techId').val('');
-    $('#techModalTitle').html(`<i class="bi bi-person-plus me-2" style="color:var(--primary);"></i>Add Technician`);
+    $('#techModalTitle').text('Add Technician');
+    $('#techSubmitBtn').text('Add Technician');
+    $('#btnDeleteTechModal').addClass('d-none');
     $('#techForm')[0].reset();
-    new bootstrap.Modal('#techModal').show();
+    bootstrap.Modal.getOrCreateInstance('#techModal').show();
   }
+}
+
+async function deleteTechCurrent() {
+  const id = $('#techId').val();
+  const name = $('#tName').val().trim();
+  if (!id) return;
+  const ok = await UI.confirm({
+    title: 'Delete Technician',
+    message: `Are you sure you want to remove technician <strong class="text-primary-jc">${name}</strong> from the staff roster?<div style="color:#cbd5e1;font-size:0.84rem;margin-top:0.45rem;line-height:1.45;">Assigned tickets will become unassigned.</div>`,
+    confirmText: 'Delete Technician',
+    danger: true
+  });
+  if (!ok) return;
+
+  API.deleteTechnician(id).then(() => {
+    bootstrap.Modal.getOrCreateInstance('#techModal').hide();
+    UI.toast(`Technician "${name}" was removed.`, 'success');
+    loadTechnicians();
+  }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 }
 
 $('#techForm').on('submit', function(e) {
@@ -860,12 +1626,12 @@ $('#techForm').on('submit', function(e) {
   };
   const call = id ? API.updateTechnician(id, payload) : API.createTechnician(payload);
   call.then(() => {
-    bootstrap.Modal.getInstance('#techModal').hide();
+    bootstrap.Modal.getOrCreateInstance('#techModal').hide();
+    UI.toast(id ? 'Technician updated successfully.' : 'Technician registered successfully.', 'success');
     loadTechnicians();
-  }).catch(err => alert('Error: ' + err.message));
+  }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 });
 
-// ── Filter & Search Events ─────────────────────────────────
 $('#statusFilter').on('change', loadTickets);
 let searchTimer;
 $('#ticketSearch').on('input', () => {
@@ -873,11 +1639,15 @@ $('#ticketSearch').on('input', () => {
   searchTimer = setTimeout(loadTickets, 400);
 });
 
-// ── Init ───────────────────────────────────────────────────
 $(document).ready(() => {
-  loadTechnicians().then ? loadTechnicians() : null;
-  API.getTechnicians().then(t => { allTechs = t; });
+  loadTechnicians();
   loadTickets();
+
+  // Ensure modal backdrops and body scroll locks are cleanly purged on modal cancel/close
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    $('.modal-backdrop').remove();
+    $('body').removeClass('modal-open').css({ overflow: '', paddingRight: '' });
+  });
 });
 </script>
 </body>

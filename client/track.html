@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
 </head>
 <body>
 
@@ -15,28 +16,62 @@
 <nav class="navbar navbar-expand-lg navbar-jc">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-      <i class="bi bi-cpu-fill text-primary-jc"></i> JC TECH ZONE
+      <img src="assets/logo.jpg" alt="JC Tech Zone" width="34" height="34" class="rounded-circle" style="object-fit:cover;border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
       <span class="ms-2 d-none d-md-inline-flex align-items-center gap-1 px-2 py-0 rounded"
-            style="background:#00d8ff12;border:1px solid #00d8ff33;font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
-        <span class="status-dot"></span> SYS-ONLINE
+            style="background:var(--primary-dim);border:1px solid var(--primary-mid);font-family:var(--font-mono);font-size:.65rem;color:var(--primary);">
+        <span class="status-dot"></span> MARIKINA
       </span>
     </a>
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
-            style="color:var(--text-muted);"><i class="bi bi-list" style="font-size:1.4rem;"></i></button>
-    <div class="collapse navbar-collapse" id="navMenu">
+    <!-- Hamburger toggler: opens right-to-left offcanvas drawer on mobile -->
+    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#customerDrawer" aria-controls="customerDrawer" aria-label="Toggle navigation">
+      <i class="bi bi-list" style="font-size:1.4rem;"></i>
+    </button>
+
+    <!-- Desktop Nav Links -->
+    <div class="collapse navbar-collapse d-none d-lg-flex" id="desktopNav">
       <ul class="navbar-nav ms-auto gap-1 align-items-lg-center py-2 py-lg-0">
         <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
         <li class="nav-item"><a class="nav-link active" href="track.html"><i class="bi bi-search me-1"></i>Track Repair</a></li>
         <li class="nav-item"><a class="nav-link" href="catalog.html"><i class="bi bi-hdd-stack me-1"></i>Hardware Catalog</a></li>
-        <li class="nav-item"><a class="nav-link" href="admin.html"><i class="bi bi-shield-check me-1"></i>Admin</a></li>
-        <li class="nav-item"><a class="nav-link" href="tech.html"><i class="bi bi-terminal me-1"></i>Tech Portal</a></li>
       </ul>
-      <a href="index.html" class="btn-outline-jc ms-lg-3 mt-2 mt-lg-0">
-        <i class="bi bi-plus me-1"></i>New Ticket
+      <a href="index.html#booking" class="btn-primary-jc ms-lg-3 mt-2 mt-lg-0" id="navBookBtn">
+        <i class="bi bi-wrench me-1"></i>Book Repair
       </a>
     </div>
   </div>
 </nav>
+
+<!-- Right-to-Left Offcanvas Mobile Drawer (Customer) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="customerDrawer" aria-labelledby="customerDrawerLabel">
+  <div class="offcanvas-header" style="border-bottom: 1px solid var(--border); padding: 1rem 1.25rem;">
+    <h5 class="offcanvas-title d-flex align-items-center gap-2 mb-0" id="customerDrawerLabel" style="font-family:var(--font-display);font-size:1rem;">
+      <img src="assets/logo.jpg" alt="Logo" width="28" height="28" class="rounded-circle" style="border:1px solid var(--border);" />
+      <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column gap-2 p-3">
+    <!-- BOOK REPAIR (HIGHLIGHTED) -->
+    <a href="index.html#booking" class="btn-primary-jc w-100 py-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+      <i class="bi bi-wrench"></i> Book Repair
+    </a>
+
+    <!-- Navigation links (NOT HIGHLIGHTED) -->
+    <a class="drawer-nav-item" href="index.html">
+      <span class="nav-icon-box"><i class="bi bi-house"></i></span>
+      <span>Home</span>
+    </a>
+    <a class="drawer-nav-item" href="track.html">
+      <span class="nav-icon-box"><i class="bi bi-search"></i></span>
+      <span>Track Repair</span>
+    </a>
+    <a class="drawer-nav-item" href="catalog.html">
+      <span class="nav-icon-box"><i class="bi bi-hdd-stack"></i></span>
+      <span>Hardware Catalog</span>
+    </a>
+  </div>
+</div>
 
 <main class="container py-4">
 
@@ -57,8 +92,8 @@
             <div class="input-group">
               <input type="text" id="refInput" class="form-control-jc"
                      placeholder="JCT-2026-XXXX" style="border-radius:8px 0 0 8px;" />
-              <button type="submit" class="btn-primary-jc" style="border-radius:0 8px 8px 0;">
-                <i class="bi bi-search"></i> Track
+              <button type="submit" class="btn-primary-jc" style="border-radius:0 8px 8px 0;white-space:nowrap;padding:0.55rem 1.25rem;">
+                <i class="bi bi-search me-2"></i>Track
               </button>
             </div>
           </form>
@@ -72,6 +107,17 @@
     <i class="bi bi-exclamation-triangle me-2"></i><span id="trackErrorMsg">No ticket found.</span>
   </div>
 
+  <!-- Initial Placeholder (shown before search) -->
+  <div id="trackPlaceholder" class="card-jc p-4 text-center mb-4" style="border-style:dashed;">
+    <div style="max-width:480px;margin:1.8rem auto;">
+      <i class="bi bi-search-heart" style="font-size:2.5rem;color:var(--primary);opacity:0.85;"></i>
+      <h5 class="mt-3" style="font-family:var(--font-display);">Ready to Track Your Device</h5>
+      <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:0;">
+        Enter your JC Tech Zone Reference ID (e.g. <span class="font-mono text-primary-jc">JCT-2026-AB12</span>) from your booking confirmation to view live diagnostics and progress.
+      </p>
+    </div>
+  </div>
+
   <!-- Results (hidden until search) -->
   <div id="trackResults" class="d-none">
 
@@ -79,11 +125,8 @@
     <div class="row g-4 mb-4">
       <div class="col-md-7">
         <div class="card-jc h-100">
-          <div class="card-header-jc d-flex justify-content-between align-items-center">
-            <span><i class="bi bi-ticket-perforated me-1"></i>Ticket Details</span>
-            <button type="button" class="btn-outline-jc btn-sm-jc no-print" onclick="window.print()" style="font-size:.72rem;">
-              <i class="bi bi-printer me-1"></i>Print Slip
-            </button>
+          <div class="card-header-jc">
+            <i class="bi bi-ticket-perforated me-1"></i>Ticket Details
           </div>
           <div class="p-4">
             <div class="row g-2" id="ticketInfoGrid"><!-- JS --></div>
@@ -164,6 +207,21 @@
 
   </div><!-- /trackResults -->
 
+  <!-- Customer Photo Enlarge Modal -->
+  <div class="modal fade modal-jc" id="trackImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="background:#080d14;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,0.6);">
+        <div class="modal-header py-2" style="background:var(--bg-card);border-bottom:1px solid var(--border);">
+          <h5 class="modal-title" style="font-size:.9rem;"><i class="bi bi-image me-2" style="color:var(--primary);"></i>Attached Diagnostics Photo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-2 text-center" style="background:#05080e;">
+          <img id="trackModalImg" src="" style="max-width:100%;max-height:75vh;border-radius:6px;object-fit:contain;" />
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- Footer -->
@@ -171,12 +229,19 @@
   <div class="container">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
       <div>
-        <div class="footer-brand"><i class="bi bi-cpu-fill me-2" style="color:var(--primary);"></i>JC TECH ZONE</div>
+        <div class="footer-brand d-flex align-items-center gap-2 mb-2">
+          <img src="assets/logo.jpg" alt="Logo" width="28" height="28" class="rounded-circle" style="border:1px solid var(--border);object-fit:cover;" />
+          <span>JC TECH <span style="color:var(--accent);">ZONE</span></span>
+        </div>
         <p style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem;">3 E. Santos Street, Concepcion Uno, Marikina City</p>
       </div>
-      <div style="font-size:.72rem;color:var(--text-muted);">
-        BSIT – LFSA411A034 · Busita · Ledesma · Macabingkil · Santos · Velsis<br>
-        Instructor: Mr. Carlos Jessneir D. Javier
+      <div class="d-flex flex-column align-items-md-end gap-1">
+        <a href="login.html" style="font-size:.72rem;color:var(--text-muted);text-decoration:none;">
+          <i class="bi bi-shield-lock me-1"></i>Staff Portal
+        </a>
+        <div style="font-size:.72rem;color:var(--text-muted);">
+          BSIT – LFSA411A034 · Busita · Ledesma · Macabingkil · Santos · Velsis
+        </div>
       </div>
     </div>
   </div>
@@ -186,7 +251,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="api.js"></script>
 <script>
-// ── Constants ──────────────────────────────────────────────
 const MILESTONES = [
   { status: 'Received',          icon: 'bi-inbox-fill',      label: 'Received',          desc: 'Ticket logged in system' },
   { status: 'Under Diagnostics', icon: 'bi-search',          label: 'Under Diagnostics', desc: 'Device being assessed' },
@@ -216,7 +280,6 @@ const STATUS_MESSAGES = {
 let currentTicketId = null;
 let starSelected = 0;
 
-// ── Render Helpers ─────────────────────────────────────────
 function getMilestoneIndex(status) {
   return MILESTONES.findIndex(m => m.status === status);
 }
@@ -224,17 +287,38 @@ function getMilestoneIndex(status) {
 function renderMilestones(currentStatus) {
   const $bar = $('#milestoneBar');
   $bar.empty();
+
+  if (currentStatus === 'Cancelled') {
+    $bar.html(`
+      <div class="w-100 text-center py-2">
+        <span class="badge-status badge-cancelled" style="font-size:.8rem;padding:.4rem 1rem;">
+          <i class="bi bi-x-circle me-1"></i>Ticket Cancelled
+        </span>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-top:.4rem;">
+          This repair request has been cancelled.
+        </div>
+      </div>`);
+    return;
+  }
+
   const currentIdx = getMilestoneIndex(currentStatus);
+  const isCompleted = currentStatus === 'Completed';
 
   MILESTONES.forEach((m, i) => {
     let cls = 'upcoming';
-    if (i < currentIdx) cls = 'done';
-    else if (i === currentIdx) cls = 'active';
+    if (isCompleted) {
+      cls = 'done';
+    } else {
+      if (i < currentIdx) cls = 'done';
+      else if (i === currentIdx) cls = 'active';
+    }
+
+    const icon = (isCompleted && i === MILESTONES.length - 1) ? 'bi-patch-check-fill' : m.icon;
 
     $bar.append(`
       <div class="milestone-step ${cls}">
         <div class="milestone-dot">
-          <i class="${m.icon}"></i>
+          <i class="${icon}"></i>
         </div>
         <div class="milestone-label">${m.label}<br><span style="font-size:.58rem;opacity:.7;">${m.desc}</span></div>
       </div>`);
@@ -272,23 +356,45 @@ function renderWorkLogs(logs) {
   });
 }
 
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function renderTicketInfo(ticket) {
   const fields = [
     { label: 'Reference ID',    value: `<span class="font-mono" style="color:var(--primary);font-size:.9rem;">${ticket.ticket_reference_id}</span>` },
-    { label: 'Customer Name',   value: ticket.customer_name },
-    { label: 'Contact Number',  value: ticket.contact_number },
-    { label: 'Email',           value: ticket.email || '—' },
-    { label: 'Device',          value: ticket.device_type || '—' },
+    { label: 'Customer Name',   value: escapeHtml(ticket.customer_name) },
+    { label: 'Contact Number',  value: escapeHtml(ticket.contact_number) },
+    { label: 'Email',           value: ticket.email ? escapeHtml(ticket.email) : '—' },
+    { label: 'Device',          value: ticket.device_type ? escapeHtml(ticket.device_type) : '—' },
     { label: 'Service Type',    value: ticket.service_type === 'home_service' ? '🏡 Home Service' : '🏬 Drop-Off at Shop' },
   ];
   if (ticket.service_type === 'home_service') {
-    fields.push({ label: 'Address', value: ticket.address || '—' });
+    fields.push({ label: 'Address', value: ticket.address ? escapeHtml(ticket.address) : '—' });
     if (ticket.preferred_schedule) {
       fields.push({ label: 'Schedule', value: new Date(ticket.preferred_schedule).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) });
     }
   }
-  fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;">${ticket.issue_description}</span>`, full: true });
+  fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;">${escapeHtml(ticket.issue_description)}</span>`, full: true });
   fields.push({ label: 'Submitted', value: new Date(ticket.created_at).toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' }) });
+
+  if (ticket.attachment_url) {
+    fields.push({
+      label: 'Attached Diagnostics Photo',
+      value: `<div class="mt-2 d-flex align-items-center gap-3">
+        <img src="${ticket.attachment_url}" style="height:65px;width:95px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;" onclick="openTrackImageModal('${ticket.attachment_url}')" />
+        <button type="button" class="btn-outline-jc btn-sm-jc" style="font-size:.72rem;" onclick="openTrackImageModal('${ticket.attachment_url}')">
+          <i class="bi bi-zoom-in me-1"></i>Enlarge Photo
+        </button>
+      </div>`,
+      full: true,
+    });
+  }
 
   const $grid = $('#ticketInfoGrid');
   $grid.empty();
@@ -302,12 +408,18 @@ function renderTicketInfo(ticket) {
   });
 }
 
-// ── Track Function ─────────────────────────────────────────
+function openTrackImageModal(url) {
+  $('#trackModalImg').attr('src', url);
+  bootstrap.Modal.getOrCreateInstance('#trackImageModal').show();
+}
+
 function doTrack(ref) {
-  const $results = $('#trackResults');
-  const $error   = $('#trackError');
+  const $results     = $('#trackResults');
+  const $error       = $('#trackError');
+  const $placeholder = $('#trackPlaceholder');
   $results.addClass('d-none');
   $error.addClass('d-none');
+  $placeholder.addClass('d-none');
 
   API.trackTicket(ref).then(res => {
     const { ticket, logs, feedback } = res;
@@ -317,30 +429,37 @@ function doTrack(ref) {
     renderMilestones(ticket.status);
     renderWorkLogs(logs);
 
-    // Status badge & message
     const cls = STATUS_BADGE_MAP[ticket.status] || 'badge-received';
     $('#statusBadgeDisplay').html(`<span class="badge-status ${cls}" style="font-size:.9rem;padding:.5rem 1rem;">${ticket.status}</span>`);
     $('#statusMessageDisplay').text(STATUS_MESSAGES[ticket.status] || '');
 
-    // Estimated cost
-    if (ticket.estimated_cost > 0) {
+    const costValue = parseFloat(ticket.total_cost !== undefined ? ticket.total_cost : ticket.estimated_cost) || 0;
+    if (costValue > 0) {
+      const isFinal = ticket.status === 'Completed' || ticket.status === 'Ready for Pick-Up';
+      const feeTitle = isFinal ? 'Total Final Bill (Parts + Labor)' : 'Estimated Cost';
       $('#estimatedCostDisplay').html(`
         <div class="d-flex align-items-center gap-2">
-          <i class="bi bi-cash-coin" style="color:var(--success);"></i>
+          <i class="bi bi-cash-coin" style="color:var(--success);font-size:1.2rem;"></i>
           <div>
-            <div class="form-label-jc">Estimated Cost</div>
-            <div class="font-mono" style="color:var(--success);font-size:1.1rem;font-weight:700;">
-              ₱${Number(ticket.estimated_cost).toLocaleString('en-PH', {minimumFractionDigits:2})}
+            <div class="form-label-jc">${feeTitle}</div>
+            <div class="font-mono" style="color:var(--success);font-size:1.15rem;font-weight:700;">
+              ₱${costValue.toLocaleString('en-PH', {minimumFractionDigits:2})}
             </div>
+            ${isFinal ? `<div style="font-size:.72rem;color:var(--text-dim);margin-top:.15rem;"><i class="bi bi-check2-circle text-success me-1"></i>Amount payable upon collection / service completion</div>` : ''}
           </div>
         </div>`);
     } else {
-      $('#estimatedCostDisplay').html(`<div style="font-size:.8rem;color:var(--text-muted);">
-        <i class="bi bi-info-circle me-1"></i>Estimated cost will be updated after diagnostics.
-      </div>`);
+      if (ticket.status === 'Completed') {
+        $('#estimatedCostDisplay').html(`<div style="font-size:.8rem;color:var(--success);">
+          <i class="bi bi-check-circle me-1"></i>Service completed (No fee recorded / Under warranty).
+        </div>`);
+      } else {
+        $('#estimatedCostDisplay').html(`<div style="font-size:.8rem;color:var(--text-muted);">
+          <i class="bi bi-info-circle me-1"></i>Estimated cost will be updated after diagnostics.
+        </div>`);
+      }
     }
 
-    // Assigned tech
     if (ticket.technicians) {
       $('#assignedTechDisplay').html(`
         <div class="d-flex align-items-center gap-2">
@@ -357,7 +476,6 @@ function doTrack(ref) {
       </div>`);
     }
 
-    // Feedback section
     if (ticket.status === 'Completed') {
       $('#feedbackSection').removeClass('d-none');
       if (feedback) {
@@ -366,7 +484,7 @@ function doTrack(ref) {
         const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
         $('#existingFeedbackDisplay').html(`
           <div style="font-size:1.4rem;color:#f59e0b;">${stars}</div>
-          ${feedback.comments ? `<p style="color:var(--text-dim);font-size:.85rem;margin-top:.5rem;">"${feedback.comments}"</p>` : ''}`);
+          ${feedback.comments ? `<p style="color:var(--text-dim);font-size:.85rem;margin-top:.5rem;">"${escapeHtml(feedback.comments)}"</p>` : ''}`);
       }
     } else {
       $('#feedbackSection').addClass('d-none');
@@ -376,10 +494,10 @@ function doTrack(ref) {
   }).catch(err => {
     $('#trackErrorMsg').text(err.message || 'No ticket found with this reference ID.');
     $error.removeClass('d-none');
+    $placeholder.removeClass('d-none');
   });
 }
 
-// ── Events ─────────────────────────────────────────────────
 $('#trackForm').on('submit', function(e) {
   e.preventDefault();
   const ref = $('#refInput').val().trim().toUpperCase();
@@ -388,7 +506,6 @@ $('#trackForm').on('submit', function(e) {
   doTrack(ref);
 });
 
-// Star rating
 $('#starRating').on('mouseenter', '.star', function() {
   const val = parseInt($(this).data('val'));
   $('#starRating .star').each(function(i) {
@@ -411,22 +528,24 @@ $('#feedbackForm').on('submit', function(e) {
     $('#feedbackError').removeClass('d-none');
     return;
   }
+  const commentVal = $('#feedbackComments').val().trim();
   API.submitFeedback({
     ticket_id: currentTicketId,
     rating,
-    comments: $('#feedbackComments').val().trim() || null,
+    comments: commentVal || null,
   }).then(() => {
     $('#feedbackForm').addClass('d-none');
     $('#existingFeedback').removeClass('d-none');
     const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-    $('#existingFeedbackDisplay').html(`<div style="font-size:1.4rem;color:#f59e0b;">${stars}</div>`);
+    $('#existingFeedbackDisplay').html(`
+      <div style="font-size:1.4rem;color:#f59e0b;">${stars}</div>
+      ${commentVal ? `<p style="color:var(--text-dim);font-size:.85rem;margin-top:.5rem;">"${escapeHtml(commentVal)}"</p>` : ''}`);
   }).catch(err => {
     $('#feedbackErrorMsg').text(err.message);
     $('#feedbackError').removeClass('d-none');
   });
 });
 
-// ── Init: check URL param ──────────────────────────────────
 $(document).ready(() => {
   const params = new URLSearchParams(location.search);
   const ref = params.get('ref');

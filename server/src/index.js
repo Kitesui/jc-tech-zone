@@ -1,34 +1,35 @@
-// ============================================================
-// index.js — JC TECH ZONE Express Server Entry Point
-// Stack: Node.js + Express (RESTful API) + Supabase (PostgreSQL)
-// ============================================================
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config();
 
 import ticketsRoutes from './routes/tickets.js';
 import productsRoutes from './routes/products.js';
 import techniciansRoutes from './routes/technicians.js';
 import feedbackRoutes from './routes/feedback.js';
+import authRoutes from './routes/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// ── Middleware ──────────────────────────────────────────────
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
-// Serve static HTML/CSS/JS frontend from /client directory
-app.use(express.static(path.join(__dirname, '../../client')));
+// Serve static frontend from client directory with no-cache for instant live updates.
+app.use(express.static(path.join(__dirname, '../../client'), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+}));
 
-// ── Request Logger ──────────────────────────────────────────
 app.use((req, res, next) => {
   if (req.url.startsWith('/api')) {
     console.log(`[${new Date().toLocaleTimeString('en-PH')}] ${req.method} ${req.url}`);
@@ -36,7 +37,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Health Check ────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
@@ -47,18 +47,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ── API Routes ──────────────────────────────────────────────
+app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/technicians', techniciansRoutes);
 app.use('/api/feedback', feedbackRoutes);
 
-// ── Catch-all: Serve frontend index.html for all non-API routes ──
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../client/index.html'));
 });
 
-// ── Global Error Handler ────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal Server Error', message: err.message });

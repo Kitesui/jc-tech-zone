@@ -1,0 +1,1394 @@
+[
+  {
+    "item_name": "adapter dvi vga 24+5(120)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 120,
+    "stock_qty": 6,
+    "is_available": true
+  },
+  {
+    "item_name": "AUDIO JACK aa 1.5 stereo 3.5mm (m-m) (120)",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 100,
+    "stock_qty": 6,
+    "is_available": true
+  },
+  {
+    "item_name": "AUDIO SPLITTER 2 WAY connector (headphone x3 pro) (100)",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 100,
+    "stock_qty": 15,
+    "is_available": true
+  },
+  {
+    "item_name": "avr (450)",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 450,
+    "stock_qty": 12,
+    "is_available": true
+  },
+  {
+    "item_name": "Bluetooth dongle 5.0 (350)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 350,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "bt speaker kimso km-s1 (USED)",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 1000,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Cable AUX RCA Audio to Stereo Jack AST-1.5m (100)",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 100,
+    "stock_qty": 6,
+    "is_available": true
+  },
+  {
+    "item_name": "Cable dvi vga 24+4 (350)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 350,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Cable HDMI Cable Highend 1.5M (HC-1.5HE)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 350,
+    "stock_qty": 10,
+    "is_available": true
+  },
+  {
+    "item_name": "cable hdmi 10M (550) (new stocks)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 550,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Cable hdmi to VGA (350)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 350,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "cable vga 1.5 blk HE(150)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 150,
+    "stock_qty": 8,
+    "is_available": true
+  },
+  {
+    "item_name": "camera IP cloud (2500)",
+    "category": "CCTV & Cameras",
+    "description": "Surveillance camera hardware and video monitoring peripherals.",
+    "price": 2500,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "CASING MARS 8 CASE ONLY",
+    "category": "PC Case",
+    "description": "Durable computer enclosure chassis engineered for ventilation and hardware protection.",
+    "price": 750,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "Casing MARS 10A",
+    "category": "PC Case",
+    "description": "Durable computer enclosure chassis engineered for ventilation and hardware protection.",
+    "price": 750,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "casing MARS 10B",
+    "category": "PC Case",
+    "description": "Durable computer enclosure chassis engineered for ventilation and hardware protection.",
+    "price": 750,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "CASING YGT N275 BLACK",
+    "category": "PC Case",
+    "description": "Durable computer enclosure chassis engineered for ventilation and hardware protection.",
+    "price": 2000,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "CASING YGT 420B MICRO ATX BLACK",
+    "category": "PC Case",
+    "description": "Durable computer enclosure chassis engineered for ventilation and hardware protection.",
+    "price": 2800,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Casing Darkflash M305 (NEW STOCK)",
+    "category": "PC Case",
+    "description": "Durable computer enclosure chassis engineered for ventilation and hardware protection.",
+    "price": 2000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "cat5e blue(20/m)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 20,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "cat5e gray uc-305m ord(10)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 10,
+    "stock_qty": 24,
+    "is_available": true
+  },
+  {
+    "item_name": "CCTV BNB Short",
+    "category": "CCTV & Cameras",
+    "description": "Surveillance camera hardware and video monitoring peripherals.",
+    "price": 0,
+    "stock_qty": 7,
+    "is_available": true
+  },
+  {
+    "item_name": "CCTV Camera AMAX S9101 fisheye (2400)",
+    "category": "CCTV & Cameras",
+    "description": "Surveillance camera hardware and video monitoring peripherals.",
+    "price": 2400,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "CCTV IP CAMERA 3pm WIFI DH INDOOR DAHUA Hero 4",
+    "category": "CCTV & Cameras",
+    "description": "Surveillance camera hardware and video monitoring peripherals.",
+    "price": 2100,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "CCTV Junction Box Large",
+    "category": "CCTV & Cameras",
+    "description": "Surveillance camera hardware and video monitoring peripherals.",
+    "price": 150,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "CCTV Junction Box SMALL",
+    "category": "CCTV & Cameras",
+    "description": "Surveillance camera hardware and video monitoring peripherals.",
+    "price": 120,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "CELLPHONE OTG TYPE C (100)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 100,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "centralized power supply fusebox 9 channel (995)",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 995,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "cmos(65)",
+    "category": "Accessories",
+    "description": "Essential workshop accessories, tools, and technical maintenance supplies.",
+    "price": 65,
+    "stock_qty": 42,
+    "is_available": true
+  },
+  {
+    "item_name": "CMOS Branded (150)",
+    "category": "Accessories",
+    "description": "Essential workshop accessories, tools, and technical maintenance supplies.",
+    "price": 150,
+    "stock_qty": 7,
+    "is_available": true
+  },
+  {
+    "item_name": "converter hdmi to vga (500)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 500,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "converter vga to hdmi (450)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 450,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "CONVERTER DP TO HDMI",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 500,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "DDR3 8GB UDIMM RAM STORM",
+    "category": "RAM",
+    "description": "High-speed system memory module for responsive multitasking and PC performance.",
+    "price": 2000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "DDR4 8GB KINGSTON FURY",
+    "category": "RAM",
+    "description": "High-speed system memory module for responsive multitasking and PC performance.",
+    "price": 5500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "DDR 4 8GB RAM OVATION",
+    "category": "RAM",
+    "description": "High-speed system memory module for responsive multitasking and PC performance.",
+    "price": 5500,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "enclosure orico (600)",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 600,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "Ethernet Adapter Converter USB to LAN Converter GL-USB 3.0",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Fan 8cm blk(90)",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 90,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Fan 12cm GSTORM Frost Rainbow (200)",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 200,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Fan 12cm Gstorm Ice Blue",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 250,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Fan 12cm YGT 1290 BLUE",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 200,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Fan 12cm YGT 1290 WHITE",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 250,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "Fan 12cm YGT 1290 BLK",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 250,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "FAN YGT 3-IN-1 ARBG FAN KIT BLACK",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 1500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "HDD 320gb (750)",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 750,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Hdd Cady Big (200)",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 250,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "HDMI CONNECTOR M TO F(350)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 350,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "headphone x3 pro (400)",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 400,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Headset Inplay H20 blk rgb headset",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 450,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Headset Inplay H20 white rgb headset",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Headset int-s08",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 250,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "headset ordinary KOYO",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 250,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "HSF for AM4 Brandnew",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 450,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink 003 epson blk",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 450,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink 003 epson cyan",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 450,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink 003 epson magenta",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 450,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink 003 epson yellow",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 450,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "INK 664 epson magenta",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 450,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "INK 664 epson cyan",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 450,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink IT&T-100ML blk (150)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 150,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink IT&T-100ML cyan(150)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 150,
+    "stock_qty": 6,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink IT&T-100ML magenta(150)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 150,
+    "stock_qty": 8,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink IT&T-100ML yellow (150)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 150,
+    "stock_qty": 6,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink 1L cyan (800)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 800,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink 1L magenta (800)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 800,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Ink 1L magenta (800)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 800,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "karaoke speaker bts 1783",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 2500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "KEYBOARD INTELLIGENT",
+    "category": "Keyboard",
+    "description": "Ergonomic and responsive input keyboard for typing and gaming.",
+    "price": 350,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "keyboard and mouse a4tech KRS-3330",
+    "category": "Peripherals",
+    "description": "Essential computer interface accessories and peripheral equipment.",
+    "price": 800,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "KEYBOARD INPLAY STX360 BLK (500)",
+    "category": "Keyboard",
+    "description": "Ergonomic and responsive input keyboard for typing and gaming.",
+    "price": 500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "KEYBOARD INPLAY STX365 white grey mix (650)",
+    "category": "Keyboard",
+    "description": "Ergonomic and responsive input keyboard for typing and gaming.",
+    "price": 650,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "KEYBOARD INPLAY STX365 BLACK grey mix (650)",
+    "category": "Keyboard",
+    "description": "Ergonomic and responsive input keyboard for typing and gaming.",
+    "price": 650,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "Lan Cable CAT6 BLUE(3m)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 150,
+    "stock_qty": 12,
+    "is_available": true
+  },
+  {
+    "item_name": "Lan Cable CAT6 BLUE(5m)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 190,
+    "stock_qty": 7,
+    "is_available": true
+  },
+  {
+    "item_name": "Lan Cable Cat 6 (10M)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 250,
+    "stock_qty": 10,
+    "is_available": true
+  },
+  {
+    "item_name": "Lan Cable CAT6 BLUE(15m)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 300,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "Lan Cable CAT6 BLUE(20m)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 400,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "Lan Cable CAT6 BLUE(30m)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 420,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "Lan Cable CAT6 BLUE(50m)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 650,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "LAN TESTER",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 450,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "lan ethernet adapter usb 2.0",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 350,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "lan splitter 2 way (65)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 65,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "lan splitter 3 way (85)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 85,
+    "stock_qty": 15,
+    "is_available": true
+  },
+  {
+    "item_name": "laptop / notebook cooler pad / fan (300)",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 300,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "laptop / notebook power / universal adapter (900)",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 900,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP CHARGER LENOVO 20V - 3.25A USB type 45W",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 1400,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP CHARGER ACER SMALL PIN 19V",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 1400,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "Laptop ram DDR3 8gb Storm",
+    "category": "RAM",
+    "description": "High-speed system memory module for responsive multitasking and PC performance.",
+    "price": 2000,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "MONITOR VIEWPOINT 20\"",
+    "category": "Monitors",
+    "description": "Vibrant high-resolution display monitor suitable for office work and media.",
+    "price": 2900,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Monitor Viewpoint 24\"",
+    "category": "Monitors",
+    "description": "Vibrant high-resolution display monitor suitable for office work and media.",
+    "price": 4800,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "MONITOR YGT TN20HD-GD",
+    "category": "Monitors",
+    "description": "Vibrant high-resolution display monitor suitable for office work and media.",
+    "price": 3000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "MOTHER BOARD OVATION GAMEFORCE MAX",
+    "category": "Motherboards",
+    "description": "Compatible mainboard foundation for reliable hardware and CPU integration.",
+    "price": 5500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "MOTHERBOARD WHALECOM A520",
+    "category": "Motherboards",
+    "description": "Compatible mainboard foundation for reliable hardware and CPU integration.",
+    "price": 5000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Mouse a4tech OP-330 (300)",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 300,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "mouse led int-m666 (250)",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 250,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "mouse ordinary m02 (120)",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 120,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "Mouse Wireless BLACK",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 450,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "mousepad character (50)",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 50,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "MOUSEPAD EXTENDED ASSORTED FROM KOYO",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 150,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "MS OFFICE 2021 Prof Plus",
+    "category": "Accessories",
+    "description": "Essential workshop accessories, tools, and technical maintenance supplies.",
+    "price": 4200,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "OTHERS Cord Data USB",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 0,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "OTHERS CRIMPING TOOLS CRM-TO",
+    "category": "Accessories",
+    "description": "Essential workshop accessories, tools, and technical maintenance supplies.",
+    "price": 200,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "OTHERS CUYI Cleaning Solution",
+    "category": "Accessories",
+    "description": "Essential workshop accessories, tools, and technical maintenance supplies.",
+    "price": 120,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "OTHERS Headset Hanger",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 50,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "Patch Cord lc-lc (250)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 250,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "Patch Cord sc-sc (250)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 250,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "PCIE AUDIO (350)",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 350,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "Power ADAPTOR 12V 3A",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 650,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "POWER ADAPTER 5A",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 650,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "POWER CORD 2 HOLES 1020 for printer(150)",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 150,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "POWER CORD 3HOLES Mikey Mouse PC-3hole",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 150,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "power cord pc888 intelligent (150)",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 150,
+    "stock_qty": 23,
+    "is_available": true
+  },
+  {
+    "item_name": "Power supply 700w INTELLIGENT",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 850,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "POWER SUPPLY 750WATS TOP ONE",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 850,
+    "stock_qty": 7,
+    "is_available": true
+  },
+  {
+    "item_name": "POWERSUPPLY AK400 400W",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 0,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "POWERSUPPLY ACER AC 650W 80PLUS BRONZE BLACK",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 3500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "printer cable (150)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 150,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "printer epson flex cable for l3210/3250/3110",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 800,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Printer Epson Pickup Roller (L120, L121, L360)",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 500,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "printer epson pickup rubber for l3210/l3110",
+    "category": "Printer Parts",
+    "description": "Quality replacement printing ink and maintenance accessories.",
+    "price": 500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Processor I5 4th gen",
+    "category": "Processors",
+    "description": "High-efficiency multi-core desktop processor for heavy compute workloads.",
+    "price": 0,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "rj45 cat6 (15)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 15,
+    "stock_qty": 339,
+    "is_available": true
+  },
+  {
+    "item_name": "rj45(10)",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 10,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "SATA DATA CABLE",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 25,
+    "stock_qty": 11,
+    "is_available": true
+  },
+  {
+    "item_name": "Sata to IDE S/f- ide/m",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 150,
+    "stock_qty": 13,
+    "is_available": true
+  },
+  {
+    "item_name": "Sound Adapter USB (150)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 350,
+    "stock_qty": 4,
+    "is_available": true
+  },
+  {
+    "item_name": "SSD NVME Ovation 256GB",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 4000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "SSD OVATION BREEZE 128GB 2.5 SATA",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 2500,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "SSD Lexar 120gb 2.5",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 2000,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "SSD 240GB OVATION",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 3200,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "SSD 256gb STORM 2.5",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 3200,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "Speaker bluetooth SONICGO 5",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 1000,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Speaker bluetooth SONICGO 6",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 1200,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Spealer bluetooth SONICGO 101",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 1500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "SPEAKER JEDEL S-527 SPEAKER",
+    "category": "Audio",
+    "description": "Clear sound audio gear and accessories for workstation or entertainment setups.",
+    "price": 850,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "SWITCH TP-LINK 5 PORT GIGABIT LS105G",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 1000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "SWITCH ALFA-S108 8 PORT 100MBPS",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 1000,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "Tapo Mini Smart WIFI Plug Socket",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 750,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "thermal paste jumbo(150)",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 150,
+    "stock_qty": 23,
+    "is_available": true
+  },
+  {
+    "item_name": "thermal paste small(65)",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 65,
+    "stock_qty": 8,
+    "is_available": true
+  },
+  {
+    "item_name": "ThermalPaste Z5",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 350,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "TRAVEL adapter converter adp-con",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 35,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "USB 2.0 to Parallel (450)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 350,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "USB 3.0 TO VGA (700)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 700,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "USB IEEE1284 (450)",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 350,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "USB Flashdrive 64gb Ovation uLTRA METAL",
+    "category": "Storage",
+    "description": "Reliable data storage drive for quick boot times, backups, and file transfers.",
+    "price": 450,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "VGA Splitter 2 ports",
+    "category": "Cables & Adapters",
+    "description": "High-compatibility connector cable and adapter for display, data, or power.",
+    "price": 0,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "WEBCAM 1080P",
+    "category": "CCTV & Cameras",
+    "description": "Surveillance camera hardware and video monitoring peripherals.",
+    "price": 1050,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Wifi Dongle BL-WDN650A",
+    "category": "Networking",
+    "description": "High-performance networking component for fast, stable connectivity.",
+    "price": 650,
+    "stock_qty": 5,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP RAM 8GB 2666MHZ HKC",
+    "category": "RAM",
+    "description": "High-speed system memory module for responsive multitasking and PC performance.",
+    "price": 5000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Processor RYZEN 5 3400g",
+    "category": "Processors",
+    "description": "High-efficiency multi-core desktop processor for heavy compute workloads.",
+    "price": 5000,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "MotherBoard ASUS prime A520",
+    "category": "Motherboards",
+    "description": "Compatible mainboard foundation for reliable hardware and CPU integration.",
+    "price": 4500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Motherboard H310M",
+    "category": "Motherboards",
+    "description": "Compatible mainboard foundation for reliable hardware and CPU integration.",
+    "price": 3500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "MONITOR VIEWPOINT 27 INCHES",
+    "category": "Monitors",
+    "description": "Vibrant high-resolution display monitor suitable for office work and media.",
+    "price": 7800,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "DDR4 8gb whalekom RAM",
+    "category": "RAM",
+    "description": "High-speed system memory module for responsive multitasking and PC performance.",
+    "price": 5500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "MOTHER TWISTER A88CP",
+    "category": "Motherboards",
+    "description": "Compatible mainboard foundation for reliable hardware and CPU integration.",
+    "price": 2500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "AMD A8-7600 WITH FAN",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 2500,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "AMD A8-7500 WITH FAN",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 2500,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP CHARGER ASUS 19V-2,37A SMALL PIN",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 1200,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP CHARGER ASUS 19V-2,37A MEDUIM PIN",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 1200,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP CHARGER ASUS 19V-6.32A",
+    "category": "Power Supply",
+    "description": "Reliable power unit / charging adapter built for stable electrical delivery.",
+    "price": 2700,
+    "stock_qty": 0,
+    "is_available": true
+  },
+  {
+    "item_name": "Casing CG-71 BLACK Fantech",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 2000,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "Casing CG-71 WHITE Fantech",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 2000,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "MONITOR KINGSTER 24\" 100hz",
+    "category": "Monitors",
+    "description": "Vibrant high-resolution display monitor suitable for office work and media.",
+    "price": 6500,
+    "stock_qty": 3,
+    "is_available": true
+  },
+  {
+    "item_name": "Mousepad MP-256",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 100,
+    "stock_qty": 10,
+    "is_available": true
+  },
+  {
+    "item_name": "Mousepad MP-296",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 120,
+    "stock_qty": 10,
+    "is_available": true
+  },
+  {
+    "item_name": "Mousepad MP-292",
+    "category": "Mouse",
+    "description": "Smooth tracking optical mouse designed for comfortable everyday control.",
+    "price": 130,
+    "stock_qty": 10,
+    "is_available": true
+  },
+  {
+    "item_name": "Mouse Wireless FANTECH WHITE",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 700,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "Mouse Wireless FANTECH BIEGE",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 700,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP COOLER NC-14",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 800,
+    "stock_qty": 2,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP COOLER NC-21",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 1600,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "LAPTOP COOLER NC-11",
+    "category": "Cooling",
+    "description": "Thermal cooling solution to maintain optimal operating temperatures.",
+    "price": 600,
+    "stock_qty": 1,
+    "is_available": true
+  },
+  {
+    "item_name": "KEYBOARD & MOUSE KM-101",
+    "category": "Peripherals",
+    "description": "Essential computer interface accessories and peripheral equipment.",
+    "price": 500,
+    "stock_qty": 0,
+    "is_available": true
+  }
+]

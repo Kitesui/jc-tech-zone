@@ -1,24 +1,20 @@
-// ============================================================
-// routes/feedback.js — Customer Ratings & Feedback REST API
-// POST /api/feedback   — submit rating & comment (public)
-// GET  /api/feedback/:ticket_id  — get feedback for a ticket
-// ============================================================
 import express from 'express';
 import supabase from '../db.js';
 
 const router = express.Router();
 
-// POST /api/feedback
 router.post('/', async (req, res) => {
-  const { ticket_id, rating, comments } = req.body;
+  const { ticket_id, rating, comments, comment } = req.body;
+  const finalComment = (comments || comment || '').trim() || null;
+
   if (!ticket_id || !rating) {
     return res.status(400).json({ error: 'ticket_id and rating are required' });
   }
-  if (rating < 1 || rating > 5) {
+  const numRating = parseInt(rating);
+  if (isNaN(numRating) || numRating < 1 || numRating > 5) {
     return res.status(400).json({ error: 'Rating must be between 1 and 5' });
   }
 
-  // Verify ticket exists and is Completed
   const { data: ticket } = await supabase
     .from('tickets')
     .select('id, status')
@@ -30,10 +26,10 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Feedback can only be submitted for Completed tickets' });
   }
 
-  // Upsert (one feedback per ticket)
+  // Enforce single feedback submission per ticket.
   const { data, error } = await supabase
     .from('ticket_feedback')
-    .upsert([{ ticket_id, rating: parseInt(rating), comments: comments?.trim() || null }], { onConflict: 'ticket_id' })
+    .upsert([{ ticket_id, rating: numRating, comments: finalComment }], { onConflict: 'ticket_id' })
     .select()
     .single();
 
@@ -41,7 +37,6 @@ router.post('/', async (req, res) => {
   res.status(201).json({ message: 'Feedback submitted, thank you!', feedback: data });
 });
 
-// GET /api/feedback/:ticket_id
 router.get('/:ticket_id', async (req, res) => {
   const { data, error } = await supabase
     .from('ticket_feedback')
