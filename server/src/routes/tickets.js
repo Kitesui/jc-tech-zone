@@ -183,7 +183,18 @@ router.get('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     .eq('ticket_id', ticket.id)
     .order('created_at', { ascending: true });
 
-  res.json({ ticket: normalizeTicket(ticket), logs: logs || [], work_logs: logs || [] });
+  const { data: feedback } = await supabase
+    .from('ticket_feedback')
+    .select('*')
+    .eq('ticket_id', ticket.id)
+    .maybeSingle();
+
+  res.json({
+    ticket: normalizeTicket(ticket),
+    logs: logs || [],
+    work_logs: logs || [],
+    feedback: feedback || null
+  });
 });
 
 router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {

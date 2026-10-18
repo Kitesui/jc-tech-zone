@@ -561,7 +561,7 @@
   </div>
 
   <div class="row g-3 mb-4" id="metricCards">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-xl">
       <div class="metric-card">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label">Total Tickets</div>
@@ -570,7 +570,7 @@
         <div class="metric-value" id="metricTotal">—</div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-xl">
       <div class="metric-card" style="border-color:#f59e0b33;">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:var(--warning);">Pending / Received</div>
@@ -579,7 +579,7 @@
         <div class="metric-value" style="color:var(--warning);" id="metricPending">—</div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-xl">
       <div class="metric-card" style="border-color:#a78bfa33;">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:#a78bfa;">In Progress</div>
@@ -588,13 +588,25 @@
         <div class="metric-value" style="color:#a78bfa;" id="metricActive">—</div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-6 col-xl">
       <div class="metric-card" style="border-color:#10b98133;">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:var(--success);">Completed</div>
           <div class="metric-icon-badge" style="color:var(--success);"><i class="bi bi-check2-circle"></i></div>
         </div>
         <div class="metric-value" style="color:var(--success);" id="metricDone">—</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-6 col-xl">
+      <div class="metric-card" style="border-color:#00a89644;cursor:pointer;" onclick="switchAdminTab('feedback')" title="View Customer Reviews">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="metric-label" style="color:var(--primary);">Customer CSAT</div>
+          <div class="metric-icon-badge" style="color:#f59e0b;"><i class="bi bi-star-fill"></i></div>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <div class="metric-value" style="color:var(--text);" id="metricCsat">—</div>
+          <span class="badge" id="metricCsatBadge" style="font-size:0.68rem;background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.3);">—</span>
+        </div>
       </div>
     </div>
   </div>
@@ -605,6 +617,7 @@
     <button class="admin-tab" data-tab="calendar">Schedule Calendar</button>
     <button class="admin-tab" data-tab="inventory">Hardware Inventory</button>
     <button class="admin-tab" data-tab="technicians">Technicians</button>
+    <button class="admin-tab" data-tab="feedback">Customer Reviews</button>
   </div>
 
   <!-- TAB: Tickets -->
@@ -746,6 +759,67 @@
     </div>
   </div>
 
+  <!-- TAB: Customer Feedback & Reviews -->
+  <div class="tab-pane" id="tab-feedback">
+    <!-- CSAT Overview Hero Card -->
+    <div class="card-jc mb-4 p-4" style="background:var(--bg-card);border:1px solid var(--border);">
+      <div class="row g-4 align-items-center">
+        <div class="col-12 col-md-4 text-center border-md-end" style="border-color:var(--border)!important;">
+          <div class="metric-label mb-1">Overall Satisfaction (CSAT)</div>
+          <div class="d-flex align-items-baseline justify-content-center gap-2">
+            <span class="font-mono fw-bold" id="feedbackAvgDisplay" style="font-size:2.8rem;color:var(--success);line-height:1;">—</span>
+            <span style="font-size:1.1rem;color:var(--text-muted);font-weight:600;">/ 5.0</span>
+          </div>
+          <div class="mt-2" id="feedbackAvgStars" style="font-size:1.2rem;color:#f59e0b;letter-spacing:2px;">★★★★★</div>
+          <div class="mt-1" style="font-size:0.78rem;color:var(--text-muted);" id="feedbackTotalReviewsCount">Based on 0 customer reviews</div>
+        </div>
+        <div class="col-12 col-md-5">
+          <div class="d-flex flex-column gap-2" id="feedbackDistributionBars">
+            <!-- 5 to 1 star percentage bars rendered via JS -->
+          </div>
+        </div>
+        <div class="col-12 col-md-3 text-center text-md-start">
+          <div class="p-3 rounded" style="background:var(--bg-card2);border:1px solid var(--border);">
+            <div class="metric-label mb-1">Positive Sentiment</div>
+            <div class="fw-bold font-mono text-primary-jc" id="feedbackPositivePctDisplay" style="font-size:1.8rem;line-height:1.1;">—%</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.35rem;">Customer ratings rated 4★ or 5★ after service completion.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback Table Card -->
+    <div class="card-jc">
+      <div class="card-header-jc justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-chat-heart text-primary-jc"></i>
+          <span style="font-weight:600;">Customer Reviews Log</span>
+        </div>
+        <button class="btn-circle-jc" onclick="loadFeedbackReviews(true)" title="Refresh reviews" aria-label="Refresh reviews">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <div class="table-responsive-jc">
+        <table class="table-jc" style="min-width:760px;">
+          <thead>
+            <tr>
+              <th>Ticket Ref</th>
+              <th>Customer</th>
+              <th>Device</th>
+              <th>Assigned Tech</th>
+              <th>Rating &amp; Sentiment</th>
+              <th>Customer Comments</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="feedbackTableBody">
+            <tr><td colspan="7" class="text-center py-4" style="color:var(--text-muted);"><div class="spinner-jc"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <div class="modal fade modal-jc" id="walkinModal" tabindex="-1">
@@ -870,6 +944,15 @@
             <label class="form-label-jc">Work Log Note <span style="color:var(--text-muted);">(optional)</span></label>
             <textarea id="editWorkNote" class="form-control-jc" rows="2"
                       placeholder="Add a note to the work log (e.g. diagnostic findings, parts ordered)..."></textarea>
+          </div>
+          <div class="col-12 d-none" id="editTicketFeedbackBox">
+            <div class="p-3 rounded" style="background:var(--bg-card2);border:1px solid var(--border);">
+              <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                <span class="form-label-jc mb-0"><i class="bi bi-star-fill text-warning me-1"></i>Customer Review &amp; Rating</span>
+                <span id="editTicketFeedbackBadge"></span>
+              </div>
+              <div id="editTicketFeedbackContent" class="mt-2" style="font-size:0.85rem;color:var(--text);"></div>
+            </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
@@ -1035,7 +1118,125 @@ $(document).on('click', '.admin-tab', function() {
   if (tab === 'inventory') loadInventory();
   if (tab === 'technicians') loadTechnicians();
   if (tab === 'calendar') renderCalendar();
+  if (tab === 'feedback') loadFeedbackReviews();
 });
+
+function switchAdminTab(tab) {
+  $(`.admin-tab[data-tab="${tab}"]`).trigger('click');
+}
+
+function getSentimentBadge(rating) {
+  const r = parseInt(rating) || 0;
+  if (r === 5) return { label: 'Excellent', color: '#10b981', icon: 'bi-star-fill' };
+  if (r === 4) return { label: 'Good', color: '#00a896', icon: 'bi-hand-thumbs-up-fill' };
+  if (r === 3) return { label: 'Average', color: '#f59e0b', icon: 'bi-dash-circle' };
+  return { label: 'Needs Attention', color: '#ef4444', icon: 'bi-exclamation-triangle-fill' };
+}
+
+function updateCsatMetrics(summary) {
+  if (!summary || !summary.total_reviews) {
+    $('#metricCsat').text('N/A');
+    $('#metricCsatBadge').text('No reviews').css({ background: 'var(--bg-card2)', color: 'var(--text-muted)', borderColor: 'var(--border)' });
+    $('#feedbackAvgDisplay').text('0.0');
+    $('#feedbackAvgStars').text('☆☆☆☆☆');
+    $('#feedbackTotalReviewsCount').text('Based on 0 customer reviews');
+    $('#feedbackPositivePctDisplay').text('0%');
+    return;
+  }
+  const avg = Number(summary.average_rating || 0).toFixed(1);
+  const stars = '★'.repeat(Math.round(summary.average_rating)) + '☆'.repeat(5 - Math.round(summary.average_rating));
+  $('#metricCsat').text(`${avg} ★`);
+  $('#metricCsatBadge').text(`${summary.positive_percentage}% Positive (${summary.total_reviews})`).css({
+    background: summary.positive_percentage >= 80 ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
+    color: summary.positive_percentage >= 80 ? 'var(--success)' : 'var(--warning)',
+    borderColor: summary.positive_percentage >= 80 ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'
+  });
+
+  $('#feedbackAvgDisplay').text(avg);
+  $('#feedbackAvgStars').text(stars);
+  $('#feedbackTotalReviewsCount').text(`Based on ${summary.total_reviews} customer review${summary.total_reviews === 1 ? '' : 's'}`);
+  $('#feedbackPositivePctDisplay').text(`${summary.positive_percentage}%`);
+
+  const $bars = $('#feedbackDistributionBars').empty();
+  for (let s = 5; s >= 1; s--) {
+    const count = (summary.distribution && summary.distribution[s]) || 0;
+    const pct = summary.total_reviews > 0 ? Math.round((count / summary.total_reviews) * 100) : 0;
+    $bars.append(`
+      <div class="d-flex align-items-center gap-2" style="font-size:0.75rem;">
+        <span style="width:36px;font-family:var(--font-mono);color:var(--text-dim);">${s} ★</span>
+        <div class="flex-grow-1" style="height:7px;background:var(--bg-card2);border-radius:4px;overflow:hidden;border:1px solid var(--border);">
+          <div style="height:100%;width:${pct}%;background:${s>=4?'var(--success)':(s===3?'var(--warning)':'var(--danger)')};border-radius:4px;transition:width .3s ease;"></div>
+        </div>
+        <span style="width:55px;text-align:right;font-family:var(--font-mono);color:var(--text-muted);">${count} (${pct}%)</span>
+      </div>
+    `);
+  }
+}
+
+function loadFeedbackReviews(showToast = false) {
+  const $tbody = $('#feedbackTableBody');
+  $tbody.html('<tr><td colspan="7" class="text-center py-4" style="color:var(--text-muted);"><div class="spinner-jc"></div></td></tr>');
+
+  API.getFeedbackSummary().then(summary => {
+    updateCsatMetrics(summary);
+    const reviews = summary.reviews || [];
+    if (!reviews.length) {
+      $tbody.html(`
+        <tr>
+          <td colspan="7" class="text-center py-5">
+            <i class="bi bi-chat-square-heart text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
+            <div style="color:var(--text-muted);font-size:.85rem;">No customer reviews recorded yet.</div>
+            <div style="color:var(--text-dim);font-size:.75rem;margin-top:.25rem;">Customers can submit star ratings and feedback after their tickets reach Completed status.</div>
+          </td>
+        </tr>`);
+      if (showToast) UI.toast('Reviews refreshed', 'info', 1800);
+      return;
+    }
+
+    $tbody.empty();
+    reviews.forEach(r => {
+      const ticket = r.tickets || {};
+      const ref = ticket.ticket_reference_id || '—';
+      const cust = ticket.customer_name || 'Customer';
+      const device = ticket.device_type || '—';
+      const tech = ticket.technicians ? escapeHtml(ticket.technicians.full_name) : '<span style="color:var(--text-muted);">Unassigned</span>';
+      const sent = getSentimentBadge(r.rating);
+      const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+      const dt = new Date(r.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+      const comments = r.comments
+        ? `<span style="font-style:italic;color:var(--text);font-size:0.83rem;">"${escapeHtml(r.comments)}"</span>`
+        : '<span style="color:var(--text-muted);font-size:0.75rem;">(No written comment)</span>';
+
+      $tbody.append(`
+        <tr class="ticket-row" onclick="openEditTicket('${ticket.id || r.ticket_id}')" title="Click to view ticket details">
+          <td>
+            <a href="/track?ref=${encodeURIComponent(ref)}" target="_blank" class="ticket-link font-mono" onclick="event.stopPropagation();" title="Open Customer Tracker">
+              ${escapeHtml(ref)}
+            </a>
+          </td>
+          <td style="font-weight:600;">${escapeHtml(cust)}</td>
+          <td style="font-size:0.8rem;">${escapeHtml(device)}</td>
+          <td style="font-size:0.8rem;">${tech}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span style="color:#f59e0b;letter-spacing:1px;font-size:0.88rem;">${stars}</span>
+              <span class="badge" style="background:${sent.color}22;border:1px solid ${sent.color}55;color:${sent.color};font-size:0.68rem;padding:0.25rem 0.5rem;">
+                <i class="bi ${sent.icon} me-1"></i>${sent.label}
+              </span>
+            </div>
+          </td>
+          <td style="max-width:280px;">${comments}</td>
+          <td style="font-size:0.75rem;color:var(--text-muted);">${dt}</td>
+        </tr>
+      `);
+    });
+
+    if (showToast) UI.toast('Customer reviews refreshed', 'info', 1800);
+  }).catch(err => {
+    $tbody.html(`<tr><td colspan="7" class="text-center py-4 text-danger">Failed to load reviews: ${escapeHtml(err.message)}</td></tr>`);
+    if (showToast) UI.toast('Error loading reviews: ' + err.message, 'error');
+  });
+}
 
 let allTickets = [];
 
@@ -1053,6 +1254,9 @@ function loadTickets(showToast = false) {
   }).catch(err => {
     if (showToast) UI.toast('Failed to refresh tickets: ' + err.message, 'error');
   });
+
+  // Keep CSAT score updated on dashboard
+  API.getFeedbackSummary().then(updateCsatMetrics).catch(() => {});
 }
 
 function applyTicketsFilter() {
@@ -1153,6 +1357,29 @@ function openEditTicket(id) {
         ${tech.full_name} (${tech.role})
       </option>`);
     });
+
+    // Populate Customer Review if available
+    const fb = res.feedback;
+    if (fb) {
+      const sent = getSentimentBadge(fb.rating);
+      const stars = '★'.repeat(fb.rating) + '☆'.repeat(5 - fb.rating);
+      const dt = fb.created_at ? new Date(fb.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+      $('#editTicketFeedbackBadge').html(`
+        <span class="badge" style="background:${sent.color}22;border:1px solid ${sent.color}55;color:${sent.color};font-size:0.7rem;">
+          <i class="bi ${sent.icon} me-1"></i>${fb.rating}.0 · ${sent.label}
+        </span>
+      `);
+      $('#editTicketFeedbackContent').html(`
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span style="font-size:1.15rem;color:#f59e0b;letter-spacing:1px;">${stars}</span>
+          <span style="font-size:0.75rem;color:var(--text-muted);">${dt}</span>
+        </div>
+        ${fb.comments ? `<div style="font-style:italic;color:var(--text);margin-top:0.35rem;line-height:1.45;">"${escapeHtml(fb.comments)}"</div>` : '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic;">Customer submitted star rating without comments.</div>'}
+      `);
+      $('#editTicketFeedbackBox').removeClass('d-none');
+    } else {
+      $('#editTicketFeedbackBox').addClass('d-none');
+    }
 
     bootstrap.Modal.getOrCreateInstance('#editTicketModal').show();
   });

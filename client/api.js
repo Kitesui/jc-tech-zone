@@ -94,6 +94,7 @@ const API = (() => {
 
     submitFeedback: (d) => request('POST', '/feedback', d),
     getFeedback: (ticket_id) => request('GET', `/feedback/${ticket_id}`),
+    getFeedbackSummary: () => request('GET', '/feedback/summary'),
 
     health: () => request('GET', '/health'),
   };

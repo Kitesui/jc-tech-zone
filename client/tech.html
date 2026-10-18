@@ -313,17 +313,25 @@
               <div>
                 <div class="form-label-jc">Overall Bill (Parts + Labor)</div>
                 <div class="d-flex align-items-baseline gap-2">
-                  <span class="font-mono fw-bold" id="panelCurrentTotalDisplay" style="font-size:1.4rem;color:var(--success);">₱0.00</span>
+                  <span class="font-mono fw-bold" id="panelCurrentTotalDisplay" style="font-size:1.4rem;color:var(--success);cursor:pointer;" onclick="openOverallPriceModal()" title="Click to adjust bill">₱0.00</span>
                   <span id="panelPricingTypeTag" class="badge" style="font-size:0.65rem;background:var(--bg-card2);border:1px solid var(--border);color:var(--text-muted);">Drop-Off</span>
                 </div>
                 <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.25rem;">
-                  Visible to customer on tracking portal as the final amount payable.
+                  Visible to customer on tracking portal as the final amount payable. Prompted automatically on completion.
                 </div>
               </div>
-              <button type="button" class="btn-outline-jc btn-sm-jc" id="btnEditOverallPrice" onclick="openOverallPriceModal()">
-                <i class="bi bi-pencil-square me-1 text-primary-jc"></i>Set / Update Overall Price
-              </button>
             </div>
+          </div>
+        </div>
+
+        <!-- Customer Service Review Card (visible when ticket is Completed) -->
+        <div class="card-jc mb-3 d-none" id="panelFeedbackCard">
+          <div class="card-header-jc justify-content-between flex-wrap gap-2">
+            <span><i class="bi bi-star-fill me-1" style="color:#f59e0b;"></i>Customer Service Review</span>
+            <span id="panelFeedbackSentimentBadge"></span>
+          </div>
+          <div class="p-3" id="panelFeedbackContent">
+            <!-- Populated via JS -->
           </div>
         </div>
 
@@ -609,6 +617,23 @@ const STATUS_BADGE = {
   'Cancelled':         'badge-cancelled',
 };
 
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function getSentimentBadge(rating) {
+  const r = parseInt(rating) || 0;
+  if (r === 5) return { label: 'Excellent', color: '#10b981', icon: 'bi-star-fill' };
+  if (r === 4) return { label: 'Good', color: '#00a896', icon: 'bi-hand-thumbs-up-fill' };
+  if (r === 3) return { label: 'Average', color: '#f59e0b', icon: 'bi-dash-circle' };
+  return { label: 'Needs Attention', color: '#ef4444', icon: 'bi-exclamation-triangle-fill' };
+}
+
 function loadTechDropdown() {
   API.getTechnicians().then(techs => {
     allTechnicians = techs || [];
@@ -769,6 +794,42 @@ function selectJob(id) {
 
     updateWorkLogLockState();
     renderTechLogs(logs);
+
+    // Populate Customer Feedback if ticket is completed
+    const fb = res.feedback;
+    if (selectedTicket.status === 'Completed') {
+      $('#panelFeedbackCard').removeClass('d-none');
+      if (fb) {
+        const sent = getSentimentBadge(fb.rating);
+        const stars = '★'.repeat(fb.rating) + '☆'.repeat(5 - fb.rating);
+        const dt = fb.created_at ? new Date(fb.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+        $('#panelFeedbackSentimentBadge').html(`
+          <span class="badge" style="background:${sent.color}22;border:1px solid ${sent.color}55;color:${sent.color};font-size:0.7rem;padding:0.3rem 0.55rem;">
+            <i class="bi ${sent.icon} me-1"></i>${fb.rating}.0 · ${sent.label}
+          </span>
+        `);
+        $('#panelFeedbackContent').html(`
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span style="font-size:1.25rem;color:#f59e0b;letter-spacing:2px;">${stars}</span>
+            <span style="font-size:0.75rem;color:var(--text-muted);">${dt}</span>
+          </div>
+          ${fb.comments ? `<div style="color:var(--text);background:var(--bg-card2);padding:.65rem .85rem;border-radius:6px;border:1px solid var(--border);font-size:.85rem;font-style:italic;line-height:1.45;">"${escapeHtml(fb.comments)}"</div>` : '<div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">Customer submitted a star rating without written notes.</div>'}
+        `);
+      } else {
+        $('#panelFeedbackSentimentBadge').html(`
+          <span class="badge" style="background:var(--bg-card2);border:1px solid var(--border);color:var(--text-muted);font-size:0.68rem;">
+            Pending Customer Rating
+          </span>
+        `);
+        $('#panelFeedbackContent').html(`
+          <div style="font-size:0.8rem;color:var(--text-muted);">
+            <i class="bi bi-hourglass me-1 text-warning"></i>Job is completed. Awaiting customer review on the live tracking portal.
+          </div>
+        `);
+      }
+    } else {
+      $('#panelFeedbackCard').addClass('d-none');
+    }
 
     // On mobile view, automatically activate the detail panel tab
     $('#mobileDetailRef').text(selectedTicket.ticket_reference_id);
