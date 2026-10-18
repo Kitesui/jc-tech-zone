@@ -960,11 +960,53 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.15rem 1.25rem;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  height: 100%;
+  min-height: 98px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
 }
 .metric-card:hover {
+  transform: translateY(-2px);
   border-color: var(--primary-mid);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.metric-card:active {
+  transform: translateY(0);
+}
+#cardMetricTotal:hover { border-color: var(--primary); }
+#cardMetricPending:hover { border-color: var(--warning); }
+#cardMetricActive:hover { border-color: #a78bfa; }
+#cardMetricDone:hover { border-color: var(--success); }
+#cardMetricCsat:hover { border-color: var(--primary); }
+
+.metric-card.active-metric {
+  box-shadow: 0 0 0 2px var(--primary), 0 8px 24px rgba(0, 168, 150, 0.25);
+  border-color: var(--primary) !important;
+  background: rgba(0, 168, 150, 0.08);
+}
+.metric-card.active-pending {
+  box-shadow: 0 0 0 2px var(--warning), 0 8px 24px rgba(245, 158, 11, 0.25);
+  border-color: var(--warning) !important;
+  background: rgba(245, 158, 11, 0.08);
+}
+.metric-card.active-progress {
+  box-shadow: 0 0 0 2px #a78bfa, 0 8px 24px rgba(167, 139, 250, 0.25);
+  border-color: #a78bfa !important;
+  background: rgba(167, 139, 250, 0.08);
+}
+.metric-card.active-completed {
+  box-shadow: 0 0 0 2px var(--success), 0 8px 24px rgba(16, 185, 129, 0.25);
+  border-color: var(--success) !important;
+  background: rgba(16, 185, 129, 0.08);
+}
+.metric-card.active-csat {
+  box-shadow: 0 0 0 2px var(--primary), 0 8px 24px rgba(0, 168, 150, 0.25);
+  border-color: var(--primary) !important;
+  background: rgba(0, 168, 150, 0.08);
 }
 .metric-icon-badge {
   width: 32px;

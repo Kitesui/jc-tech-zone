@@ -562,50 +562,53 @@
 
   <div class="row g-3 mb-4" id="metricCards">
     <div class="col-6 col-md-4 col-xl">
-      <div class="metric-card">
+      <div class="metric-card active-metric active-total" id="cardMetricTotal" onclick="filterByMetric('all')" role="button" tabindex="0" title="Click to view all tickets">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label">Total Tickets</div>
           <div class="metric-icon-badge" style="color:var(--primary);"><i class="bi bi-ticket-perforated"></i></div>
         </div>
-        <div class="metric-value" id="metricTotal">—</div>
+        <div class="metric-value font-mono" id="metricTotal">—</div>
       </div>
     </div>
     <div class="col-6 col-md-4 col-xl">
-      <div class="metric-card" style="border-color:#f59e0b33;">
+      <div class="metric-card" id="cardMetricPending" style="border-color:#f59e0b33;" onclick="filterByMetric('pending_received')" role="button" tabindex="0" title="Click to filter Pending / Received tickets">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:var(--warning);">Pending / Received</div>
           <div class="metric-icon-badge" style="color:var(--warning);"><i class="bi bi-clock-history"></i></div>
         </div>
-        <div class="metric-value" style="color:var(--warning);" id="metricPending">—</div>
+        <div class="metric-value font-mono" style="color:var(--warning);" id="metricPending">—</div>
       </div>
     </div>
     <div class="col-6 col-md-4 col-xl">
-      <div class="metric-card" style="border-color:#a78bfa33;">
+      <div class="metric-card" id="cardMetricActive" style="border-color:#a78bfa33;" onclick="filterByMetric('In Progress')" role="button" tabindex="0" title="Click to filter In Progress tickets">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:#a78bfa;">In Progress</div>
           <div class="metric-icon-badge" style="color:#a78bfa;"><i class="bi bi-gear-wide-connected"></i></div>
         </div>
-        <div class="metric-value" style="color:#a78bfa;" id="metricActive">—</div>
+        <div class="metric-value font-mono" style="color:#a78bfa;" id="metricActive">—</div>
       </div>
     </div>
     <div class="col-6 col-md-6 col-xl">
-      <div class="metric-card" style="border-color:#10b98133;">
+      <div class="metric-card" id="cardMetricDone" style="border-color:#10b98133;" onclick="filterByMetric('Completed')" role="button" tabindex="0" title="Click to filter Completed tickets">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:var(--success);">Completed</div>
           <div class="metric-icon-badge" style="color:var(--success);"><i class="bi bi-check2-circle"></i></div>
         </div>
-        <div class="metric-value" style="color:var(--success);" id="metricDone">—</div>
+        <div class="metric-value font-mono" style="color:var(--success);" id="metricDone">—</div>
       </div>
     </div>
     <div class="col-6 col-md-6 col-xl">
-      <div class="metric-card" style="border-color:#00a89644;cursor:pointer;" onclick="switchAdminTab('feedback')" title="View Customer Reviews">
+      <div class="metric-card" id="cardMetricCsat" style="border-color:#00a89644;" onclick="filterByMetric('csat')" role="button" tabindex="0" title="Click to view Customer Reviews">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:var(--primary);">Customer CSAT</div>
           <div class="metric-icon-badge" style="color:#f59e0b;"><i class="bi bi-star-fill"></i></div>
         </div>
-        <div class="d-flex align-items-baseline gap-2">
-          <div class="metric-value" style="color:var(--text);" id="metricCsat">—</div>
-          <span class="badge" id="metricCsatBadge" style="font-size:0.68rem;background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.3);">—</span>
+        <div class="d-flex align-items-baseline justify-content-between gap-1 flex-nowrap" style="margin-top:0.25rem;">
+          <div class="d-flex align-items-baseline gap-1" style="white-space:nowrap;flex-shrink:0;">
+            <span class="metric-value font-mono" style="color:var(--text);margin-top:0;" id="metricCsat">—</span>
+            <span id="metricCsatStar" style="color:#f59e0b;font-size:1.05rem;line-height:1;margin-left:2px;display:none;">★</span>
+          </div>
+          <span class="badge" id="metricCsatBadge" style="font-size:0.68rem;background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.3);white-space:nowrap;">—</span>
         </div>
       </div>
     </div>
@@ -637,6 +640,7 @@
           <!-- Status filter -->
           <select id="statusFilter" class="form-select-jc admin-tickets-status">
             <option value="">All Statuses</option>
+            <option value="pending_received">Pending / Received</option>
             <option>Received</option>
             <option>Under Diagnostics</option>
             <option>In Progress</option>
@@ -1119,10 +1123,57 @@ $(document).on('click', '.admin-tab', function() {
   if (tab === 'technicians') loadTechnicians();
   if (tab === 'calendar') renderCalendar();
   if (tab === 'feedback') loadFeedbackReviews();
+
+  // Sync active metric card with tab and filter
+  if (tab === 'feedback') {
+    setActiveMetricCard('csat');
+  } else if (tab === 'tickets') {
+    const val = $('#statusFilter').val();
+    if (!val) setActiveMetricCard('all');
+    else if (val === 'pending_received' || val === 'Received' || val === 'Under Diagnostics') setActiveMetricCard('pending_received');
+    else if (val === 'In Progress') setActiveMetricCard('In Progress');
+    else if (val === 'Completed') setActiveMetricCard('Completed');
+    else setActiveMetricCard(null);
+  } else {
+    setActiveMetricCard(null);
+  }
 });
 
 function switchAdminTab(tab) {
   $(`.admin-tab[data-tab="${tab}"]`).trigger('click');
+}
+
+function setActiveMetricCard(metricKey) {
+  $('.metric-card').removeClass('active-metric active-total active-pending active-progress active-completed active-csat');
+  if (!metricKey) return;
+  if (metricKey === 'all' || metricKey === 'total') {
+    $('#cardMetricTotal').addClass('active-metric active-total');
+  } else if (metricKey === 'pending_received' || metricKey === 'Received' || metricKey === 'Under Diagnostics') {
+    $('#cardMetricPending').addClass('active-metric active-pending');
+  } else if (metricKey === 'In Progress') {
+    $('#cardMetricActive').addClass('active-metric active-progress');
+  } else if (metricKey === 'Completed') {
+    $('#cardMetricDone').addClass('active-metric active-completed');
+  } else if (metricKey === 'csat' || metricKey === 'feedback') {
+    $('#cardMetricCsat').addClass('active-metric active-csat');
+  }
+}
+
+function filterByMetric(metricKey) {
+  if (metricKey === 'csat' || metricKey === 'feedback') {
+    switchAdminTab('feedback');
+    return;
+  }
+  switchAdminTab('tickets');
+  if (metricKey === 'all' || metricKey === 'total' || !metricKey) {
+    $('#statusFilter').val('');
+  } else if (metricKey === 'pending_received') {
+    $('#statusFilter').val('pending_received');
+  } else {
+    $('#statusFilter').val(metricKey);
+  }
+  setActiveMetricCard(metricKey);
+  applyTicketsFilter();
 }
 
 function getSentimentBadge(rating) {
@@ -1136,6 +1187,7 @@ function getSentimentBadge(rating) {
 function updateCsatMetrics(summary) {
   if (!summary || !summary.total_reviews) {
     $('#metricCsat').text('N/A');
+    $('#metricCsatStar').hide();
     $('#metricCsatBadge').text('No reviews').css({ background: 'var(--bg-card2)', color: 'var(--text-muted)', borderColor: 'var(--border)' });
     $('#feedbackAvgDisplay').text('0.0');
     $('#feedbackAvgStars').text('☆☆☆☆☆');
@@ -1145,7 +1197,8 @@ function updateCsatMetrics(summary) {
   }
   const avg = Number(summary.average_rating || 0).toFixed(1);
   const stars = '★'.repeat(Math.round(summary.average_rating)) + '☆'.repeat(5 - Math.round(summary.average_rating));
-  $('#metricCsat').text(`${avg} ★`);
+  $('#metricCsat').text(avg);
+  $('#metricCsatStar').show();
   $('#metricCsatBadge').text(`${summary.positive_percentage}% Positive (${summary.total_reviews})`).css({
     background: summary.positive_percentage >= 80 ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
     color: summary.positive_percentage >= 80 ? 'var(--success)' : 'var(--warning)',
@@ -1265,7 +1318,11 @@ function applyTicketsFilter() {
 
   let filtered = allTickets;
   if (status && status !== 'all') {
-    filtered = filtered.filter(t => t.status === status);
+    if (status === 'pending_received') {
+      filtered = filtered.filter(t => ['Received', 'Under Diagnostics'].includes(t.status));
+    } else {
+      filtered = filtered.filter(t => t.status === status);
+    }
   }
   if (search) {
     filtered = filtered.filter(t =>
@@ -1876,8 +1933,23 @@ $('#techForm').on('submit', function(e) {
   }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 });
 
-$('#statusFilter').on('change', applyTicketsFilter);
+$('#statusFilter').on('change', function() {
+  const val = $(this).val();
+  if (!val) setActiveMetricCard('all');
+  else if (val === 'pending_received' || val === 'Received' || val === 'Under Diagnostics') setActiveMetricCard('pending_received');
+  else if (val === 'In Progress') setActiveMetricCard('In Progress');
+  else if (val === 'Completed') setActiveMetricCard('Completed');
+  else setActiveMetricCard(null);
+  applyTicketsFilter();
+});
 $('#ticketSearch').on('input', applyTicketsFilter);
+
+$(document).on('keydown', '.metric-card', function(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    $(this).trigger('click');
+  }
+});
 
 $(document).ready(() => {
   loadTechnicians();
