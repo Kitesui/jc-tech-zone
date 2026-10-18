@@ -1349,6 +1349,15 @@ main { animation: fadeIn 0.3s ease; }
   width: 380px;
   pointer-events: none;
 }
+@media (max-width: 576px) {
+  .toast-container-jc {
+    top: 0.75rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    max-width: none;
+  }
+}
 .toast-jc {
   pointer-events: auto;
   background: rgba(14, 22, 33, 0.96);

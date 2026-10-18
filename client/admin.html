@@ -454,6 +454,17 @@
       .gcal-time-col { text-align: left; min-width: auto; }
       .cal-day-cell { min-height: 50px; padding: .2rem .15rem; }
     }
+    @media (max-width: 480px) {
+      .admin-tickets-filter-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .admin-tickets-search,
+      .admin-tickets-status {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -601,7 +612,7 @@
         <div class="metric-value font-mono" style="color:var(--success);" id="metricDone">—</div>
       </div>
     </div>
-    <div class="col-6 col-md-6 col-xl">
+    <div class="col-12 col-md-6 col-xl">
       <div class="metric-card" id="cardMetricCsat" style="border-color:#00a89644;" onclick="filterByMetric('csat')" role="button" tabindex="0" title="Click to view Customer Reviews">
         <div class="d-flex justify-content-between align-items-center">
           <div class="metric-label" style="color:var(--primary);">Customer CSAT</div>
@@ -612,7 +623,7 @@
             <span class="metric-value font-mono" style="color:var(--text);margin-top:0;" id="metricCsat">—</span>
             <span id="metricCsatStar" style="color:#f59e0b;font-size:1.05rem;line-height:1;margin-left:2px;display:none;">★</span>
           </div>
-          <span class="badge" id="metricCsatBadge" style="font-size:0.68rem;background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.3);white-space:nowrap;">—</span>
+          <span class="badge" id="metricCsatBadge" style="font-size:0.68rem;background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">—</span>
         </div>
       </div>
     </div>
