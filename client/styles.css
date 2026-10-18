@@ -511,9 +511,9 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   flex-shrink: 0;
 }
 .badge-received      { color: #60a5fa; background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.3); }
-.badge-diagnostics   { color: #f59e0b; background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.3); }
-.badge-in-progress   { color: #c084fc; background: rgba(192, 132, 252, 0.12); border-color: rgba(192, 132, 252, 0.3); }
-.badge-ready         { color: #34d399; background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.3); }
+.badge-diagnostics   { color: #c084fc; background: rgba(192, 132, 252, 0.12); border-color: rgba(192, 132, 252, 0.3); }
+.badge-in-progress   { color: #fb923c; background: rgba(251, 146, 60, 0.12); border-color: rgba(251, 146, 60, 0.3); }
+.badge-ready         { color: #22d3ee; background: rgba(34, 211, 238, 0.12); border-color: rgba(34, 211, 238, 0.3); }
 .badge-completed     { color: #10b981; background: rgba(16, 185, 129, 0.16); border-color: rgba(16, 185, 129, 0.35); }
 .badge-cancelled     { color: #f87171; background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.3); }
 
@@ -668,28 +668,28 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   width: 100%;
 }
 .btn-status-diagnostics {
-  border-color: rgba(0, 168, 150, 0.45) !important;
-  color: var(--primary) !important;
+  border-color: rgba(192, 132, 252, 0.45) !important;
+  color: #c084fc !important;
 }
 .btn-status-diagnostics:hover {
-  background: var(--primary-dim) !important;
-  border-color: var(--primary) !important;
+  background: rgba(192, 132, 252, 0.12) !important;
+  border-color: #c084fc !important;
 }
 .btn-status-progress {
-  border-color: rgba(245, 158, 11, 0.45) !important;
-  color: var(--warning) !important;
+  border-color: rgba(251, 146, 60, 0.45) !important;
+  color: #fb923c !important;
 }
 .btn-status-progress:hover {
-  background: rgba(245, 158, 11, 0.12) !important;
-  border-color: var(--warning) !important;
+  background: rgba(251, 146, 60, 0.12) !important;
+  border-color: #fb923c !important;
 }
 .btn-status-ready {
-  border-color: rgba(16, 185, 129, 0.45) !important;
-  color: var(--success) !important;
+  border-color: rgba(34, 211, 238, 0.45) !important;
+  color: #22d3ee !important;
 }
 .btn-status-ready:hover {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border-color: var(--success) !important;
+  background: rgba(34, 211, 238, 0.12) !important;
+  border-color: #22d3ee !important;
 }
 .btn-status-completed {
   border-color: rgba(16, 185, 129, 0.65) !important;
@@ -974,7 +974,7 @@ input[type="file"].form-control-jc::file-selector-button:hover {
 }
 #cardMetricTotal:hover { border-color: var(--primary); }
 #cardMetricPending:hover { border-color: var(--warning); }
-#cardMetricActive:hover { border-color: #a78bfa; }
+#cardMetricActive:hover { border-color: #fb923c; }
 #cardMetricDone:hover { border-color: var(--success); }
 #cardMetricCsat:hover { border-color: var(--primary); }
 
@@ -985,7 +985,7 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   border-color: var(--warning) !important;
 }
 .metric-card.active-progress {
-  border-color: #a78bfa !important;
+  border-color: #fb923c !important;
 }
 .metric-card.active-completed {
   border-color: var(--success) !important;

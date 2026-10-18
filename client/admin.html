@@ -113,17 +113,21 @@
       display: block;
       line-height: 1.3;
     }
-    .gcal-chip.chip-warning {
-      border-left-color: var(--warning);
-      background: rgba(245, 158, 11, 0.15);
-    }
     .gcal-chip.chip-info {
-      border-left-color: #38bdf8;
-      background: rgba(56, 189, 248, 0.15);
+      border-left-color: #60a5fa;
+      background: rgba(96, 165, 250, 0.15);
     }
     .gcal-chip.chip-purple {
-      border-left-color: #a78bfa;
-      background: rgba(167, 139, 250, 0.15);
+      border-left-color: #c084fc;
+      background: rgba(192, 132, 252, 0.15);
+    }
+    .gcal-chip.chip-orange {
+      border-left-color: #fb923c;
+      background: rgba(251, 146, 60, 0.15);
+    }
+    .gcal-chip.chip-cyan {
+      border-left-color: #22d3ee;
+      background: rgba(34, 211, 238, 0.15);
     }
     .gcal-chip.chip-success {
       border-left-color: var(--success);
@@ -580,12 +584,12 @@
       </div>
     </div>
     <div class="col-6 col-md-4 col-xl">
-      <div class="metric-card" id="cardMetricActive" style="border-color:#a78bfa33;" onclick="filterByMetric('In Progress')" role="button" tabindex="0" title="Click to filter In Progress tickets">
+      <div class="metric-card" id="cardMetricActive" style="border-color:#fb923c33;" onclick="filterByMetric('In Progress')" role="button" tabindex="0" title="Click to filter In Progress tickets">
         <div class="d-flex justify-content-between align-items-center">
-          <div class="metric-label" style="color:#a78bfa;">In Progress</div>
-          <div class="metric-icon-badge" style="color:#a78bfa;"><i class="bi bi-gear-wide-connected"></i></div>
+          <div class="metric-label" style="color:#fb923c;">In Progress</div>
+          <div class="metric-icon-badge" style="color:#fb923c;"><i class="bi bi-gear-wide-connected"></i></div>
         </div>
-        <div class="metric-value font-mono" style="color:#a78bfa;" id="metricActive">—</div>
+        <div class="metric-value font-mono" style="color:#fb923c;" id="metricActive">—</div>
       </div>
     </div>
     <div class="col-6 col-md-6 col-xl">
@@ -1533,12 +1537,13 @@ function formatTimeShort(isoStr) {
 function getStatusTheme(status) {
   switch (status) {
     case 'Received':
-      return { chip: 'chip-warning', bar: 'var(--warning)' };
+      return { chip: 'chip-info', bar: '#60a5fa' };
     case 'Under Diagnostics':
-      return { chip: 'chip-info', bar: '#38bdf8' };
+      return { chip: 'chip-purple', bar: '#c084fc' };
     case 'In Progress':
-      return { chip: 'chip-purple', bar: '#a78bfa' };
+      return { chip: 'chip-orange', bar: '#fb923c' };
     case 'Ready for Pick-Up':
+      return { chip: 'chip-cyan', bar: '#22d3ee' };
     case 'Completed':
       return { chip: 'chip-success', bar: 'var(--success)' };
     default:
