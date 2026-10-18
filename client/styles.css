@@ -274,6 +274,39 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); color: var(--text); }
   border-color: var(--primary);
   color: var(--primary) !important;
 }
+.btn-outline-jc.text-danger,
+.btn-outline-jc.btn-outline-danger-jc {
+  color: var(--danger) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+}
+.btn-outline-jc.text-danger:hover,
+.btn-outline-jc.btn-outline-danger-jc:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+.btn-outline-jc.text-success,
+.btn-outline-jc.btn-outline-success-jc {
+  color: var(--success) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+}
+.btn-outline-jc.text-success:hover,
+.btn-outline-jc.btn-outline-success-jc:hover {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: var(--success) !important;
+  color: var(--success) !important;
+}
+.btn-outline-jc.text-warning,
+.btn-outline-jc.btn-outline-warning-jc {
+  color: var(--warning) !important;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+}
+.btn-outline-jc.text-warning:hover,
+.btn-outline-jc.btn-outline-warning-jc:hover {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: var(--warning) !important;
+  color: var(--warning) !important;
+}
 .btn-danger-jc {
   background: var(--danger);
   color: #ffffff !important;
@@ -618,34 +651,70 @@ input[type="file"].form-control-jc::file-selector-button:hover {
 /* ── Quick Status Grid ───────────────────────────────────── */
 .quick-status-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.6rem;
 }
 .quick-status-grid button {
-  min-height: 44px;
+  min-height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0.45rem 0.75rem;
-  font-size: 0.82rem;
-  font-weight: 500;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   border-radius: var(--radius);
   transition: all var(--transition);
   width: 100%;
 }
-@media (max-width: 576px) {
+.btn-status-diagnostics {
+  border-color: rgba(0, 168, 150, 0.45) !important;
+  color: var(--primary) !important;
+}
+.btn-status-diagnostics:hover {
+  background: var(--primary-dim) !important;
+  border-color: var(--primary) !important;
+}
+.btn-status-progress {
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  color: var(--warning) !important;
+}
+.btn-status-progress:hover {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: var(--warning) !important;
+}
+.btn-status-ready {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: var(--success) !important;
+}
+.btn-status-ready:hover {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: var(--success) !important;
+}
+.btn-status-completed {
+  border-color: rgba(16, 185, 129, 0.65) !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: var(--success) !important;
+}
+.btn-status-completed:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: var(--success) !important;
+}
+@media (max-width: 991px) {
   .quick-status-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
   }
-  .quick-status-grid button {
-    font-size: 0.76rem;
-    padding: 0.45rem 0.5rem;
-    min-height: 44px;
+}
+@media (max-width: 576px) {
+  .quick-status-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
   }
-  .quick-status-grid .btn-cancel-job {
-    grid-column: span 2;
+  .quick-status-grid button {
+    font-size: 0.74rem;
+    padding: 0.4rem 0.4rem;
+    min-height: 40px;
   }
 }
 

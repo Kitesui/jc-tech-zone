@@ -275,25 +275,29 @@
 
         <div class="card-jc mb-3">
           <div class="card-header-jc"><i class="bi bi-lightning me-1"></i>Quick Status Advance</div>
-          <div class="p-3 quick-status-grid">
-            <button type="button" class="btn-outline-jc btn-sm-jc" onclick="quickStatus('Under Diagnostics')">
-              <i class="bi bi-search me-1"></i>Under Diagnostics
-            </button>
-            <button type="button" class="btn-outline-jc btn-sm-jc" onclick="quickStatus('In Progress')">
-              <i class="bi bi-wrench me-1"></i>In Progress
-            </button>
-            <button type="button" class="btn-outline-jc btn-sm-jc" onclick="quickStatus('Ready for Pick-Up')"
-                    style="border-color:var(--success);color:var(--success);">
-              <i class="bi bi-check-circle me-1"></i>Ready for Pick-Up
-            </button>
-            <button type="button" class="btn-outline-jc btn-sm-jc" onclick="quickStatus('Completed')"
-                    style="border-color:var(--success);color:var(--success);">
-              <i class="bi bi-patch-check me-1"></i>Mark Completed
-            </button>
-            <button type="button" class="btn-outline-jc btn-sm-jc btn-cancel-job" id="btnCancelJob" onclick="confirmCancelJob()"
-                    style="border-color:var(--danger);color:var(--danger);">
-              <i class="bi bi-x-circle me-1"></i>Cancel Booking
-            </button>
+          <div class="p-3">
+            <div class="quick-status-grid mb-3">
+              <button type="button" class="btn-outline-jc btn-sm-jc btn-status-diagnostics" onclick="quickStatus('Under Diagnostics')">
+                <i class="bi bi-search me-1"></i>Under Diagnostics
+              </button>
+              <button type="button" class="btn-outline-jc btn-sm-jc btn-status-progress" onclick="quickStatus('In Progress')">
+                <i class="bi bi-wrench me-1"></i>In Progress
+              </button>
+              <button type="button" class="btn-outline-jc btn-sm-jc btn-status-ready" onclick="quickStatus('Ready for Pick-Up')">
+                <i class="bi bi-check-circle me-1"></i>Ready for Pick-Up
+              </button>
+              <button type="button" class="btn-outline-jc btn-sm-jc btn-status-completed" onclick="quickStatus('Completed')">
+                <i class="bi bi-patch-check me-1"></i>Mark Completed
+              </button>
+            </div>
+            <div class="d-flex flex-wrap align-items-center justify-content-between pt-2 gap-2 border-top" style="border-color:var(--border)!important;">
+              <span style="font-size:0.75rem;color:var(--text-muted);">
+                <i class="bi bi-shield-slash me-1"></i>Unresolvable issue or cancelled by client?
+              </span>
+              <button type="button" class="btn-outline-jc btn-sm-jc text-danger btn-cancel-job" id="btnCancelJob" onclick="confirmCancelJob()">
+                <i class="bi bi-x-circle me-1"></i>Cancel Booking
+              </button>
+            </div>
           </div>
         </div>
 
@@ -476,6 +480,9 @@
               Set or confirm the overall price for ticket <strong id="priceModalTicketRef" class="text-primary-jc font-mono"></strong>.
               This total fee is recorded in the system and displayed to the customer on their live tracking portal.
             </p>
+            <div id="priceModalNotice" class="alert-jc info mb-3 d-none" style="font-size:0.78rem;">
+              <i class="bi bi-info-circle me-1"></i><span id="priceModalNoticeText"></span>
+            </div>
             <div class="mb-3">
               <label class="form-label-jc">Parts / Replacement Cost (₱)</label>
               <input type="number" id="priceModalParts" class="form-control-jc font-mono" placeholder="0.00" min="0" step="0.01" />
@@ -501,7 +508,7 @@
             <button type="button" class="btn-outline-jc btn-sm-jc" data-bs-dismiss="modal">Cancel</button>
             <button type="submit" class="btn-primary-jc btn-sm-jc" id="btnSaveOverallPrice">
               <span id="priceModalSpinner" class="spinner-jc me-1 d-none" style="width:12px;height:12px;border-width:2px;"></span>
-              <i class="bi bi-check2 me-1"></i>Save Overall Price
+              <i class="bi bi-check2 me-1"></i><span id="btnSaveOverallPriceText">Save Overall Price</span>
             </button>
           </div>
         </form>
@@ -993,6 +1000,8 @@ async function confirmCancelJob() {
   }, 400);
 }
 
+let pendingStatusAfterPrice = null;
+
 function quickStatus(status) {
   if (!selectedTicket) return;
   if (status === 'Cancelled') {
@@ -1010,6 +1019,13 @@ function quickStatus(status) {
   // Option A: If ticket is unassigned and no technician is explicitly chosen, prompt who is claiming it!
   if (isUnassigned && !techId) {
     promptClaimTicketModal(status);
+    return;
+  }
+
+  // Auto-prompt price modal if finalizing repair but bill is unset (₱0.00)
+  const currentCost = parseFloat(selectedTicket.estimated_cost) || 0;
+  if ((status === 'Ready for Pick-Up' || status === 'Completed') && currentCost === 0) {
+    openOverallPriceModal(status);
     return;
   }
 
@@ -1110,16 +1126,32 @@ function updateWorkLogLockState() {
   $('#panelPricingTypeTag').text(selectedTicket.service_type === 'home_service' ? '🏡 Home Service' : '🏬 Drop-Off');
 }
 
-function openOverallPriceModal() {
+function openOverallPriceModal(autoAdvanceStatus) {
   if (!selectedTicket) return;
+  pendingStatusAfterPrice = (typeof autoAdvanceStatus === 'string') ? autoAdvanceStatus : null;
   $('#priceModalTicketRef').text(selectedTicket.ticket_reference_id);
   const currentCost = parseFloat(selectedTicket.estimated_cost) || 0;
   $('#priceModalParts').val('');
   $('#priceModalLabor').val(currentCost > 0 ? currentCost.toFixed(2) : '');
   $('#priceModalNote').val('');
   calcPriceModalTotal();
+
+  if (pendingStatusAfterPrice) {
+    const actionLabel = pendingStatusAfterPrice === 'Completed' ? 'Complete Ticket' : 'Mark Ready';
+    $('#btnSaveOverallPriceText').text(`Save Bill & ${actionLabel}`);
+    $('#priceModalNoticeText').text(`Please set the customer service bill before advancing status to "${pendingStatusAfterPrice}".`);
+    $('#priceModalNotice').removeClass('d-none');
+  } else {
+    $('#btnSaveOverallPriceText').text('Save Overall Price');
+    $('#priceModalNotice').addClass('d-none');
+  }
+
   bootstrap.Modal.getOrCreateInstance('#overallPriceModal').show();
 }
+
+$('#overallPriceModal').on('hidden.bs.modal', function() {
+  pendingStatusAfterPrice = null;
+});
 
 function calcPriceModalTotal() {
   const parts = parseFloat($('#priceModalParts').val()) || 0;
@@ -1135,28 +1167,59 @@ $('#overallPriceForm').on('submit', function(e) {
   e.preventDefault();
   if (!selectedTicket) return;
   const total = calcPriceModalTotal();
-  const note = $('#priceModalNote').val().trim() || `Overall service fee set to ₱${total.toFixed(2)}`;
+  const advStatus = pendingStatusAfterPrice;
+  const techId = getActiveTechId();
+
+  let note = $('#priceModalNote').val().trim();
+  if (!note) {
+    note = advStatus 
+      ? `Overall bill finalized at ₱${total.toFixed(2)} & status advanced to ${advStatus}`
+      : `Overall service fee set to ₱${total.toFixed(2)}`;
+  }
+
+  const payload = {
+    estimated_cost: total,
+    work_log_note: note,
+  };
+  if (advStatus) {
+    payload.status = advStatus;
+    if (techId) payload.assigned_technician_id = techId;
+  }
 
   const $btn = $('#btnSaveOverallPrice');
   $btn.prop('disabled', true);
   $('#priceModalSpinner').removeClass('d-none');
 
-  API.updateTicket(selectedTicket.id, {
-    estimated_cost: total,
-    work_log_note: note,
-  }).then(() => {
+  API.updateTicket(selectedTicket.id, payload).then(() => {
     selectedTicket.estimated_cost = total;
+    if (advStatus) selectedTicket.status = advStatus;
+    if (techId) selectedTicket.assigned_technician_id = techId;
+
     const cached = allJobs.find(j => j.id === selectedTicket.id);
-    if (cached) cached.estimated_cost = total;
+    if (cached) {
+      cached.estimated_cost = total;
+      if (advStatus) cached.status = advStatus;
+      if (techId) cached.assigned_technician_id = techId;
+    }
+
+    pendingStatusAfterPrice = null;
+    bootstrap.Modal.getInstance('#overallPriceModal')?.hide();
+
+    const toastMsg = advStatus
+      ? `Overall bill set to ₱${total.toFixed(2)} & ticket marked as "${advStatus}"!`
+      : `Overall bill updated to ₱${total.toFixed(2)}`;
+    UI.toast(toastMsg, 'success');
 
     updateWorkLogLockState();
-    bootstrap.Modal.getInstance('#overallPriceModal')?.hide();
-    UI.toast(`Overall bill updated to ₱${total.toFixed(2)}`, 'success');
-
     // Refresh ticket details & logs
     API.getTicket(selectedTicket.id).then(res => {
+      if (res.ticket) {
+        selectedTicket = res.ticket;
+        selectJob(selectedTicket.id);
+      }
       if (res.logs) renderTechLogs(res.logs);
     }).catch(() => {});
+    applyFilter();
   }).catch(err => {
     UI.toast('Failed to update price: ' + err.message, 'error');
   }).finally(() => {
