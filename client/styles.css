@@ -959,14 +959,15 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.15rem 1.25rem;
+  padding: 1.1rem 1.2rem;
   height: 100%;
-  min-height: 98px;
+  min-height: 106px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
+  box-sizing: border-box;
   transition: border-color var(--transition);
 }
 .metric-card:hover {
@@ -1018,8 +1019,11 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   font-size: 1.85rem;
   font-weight: 700;
   color: var(--text);
-  line-height: 1.1;
+  line-height: 1;
   margin-top: 0.25rem;
+  height: 34px;
+  display: flex;
+  align-items: center;
 }
 
 /* ── Alert / Info Box ────────────────────────────────────── */
@@ -1126,8 +1130,8 @@ input[type="file"].form-control-jc::file-selector-button:hover {
 .gap-jc-2 { gap: 0.5rem; }
 
 /* Page transition */
-main { animation: fadeIn 0.3s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+main { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Active nav highlight via JS */
 .nav-link[aria-current="page"] {
