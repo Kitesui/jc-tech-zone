@@ -29,7 +29,7 @@ for (const file of files) {
   const onclickMatches = [...content.matchAll(/onclick=["']([a-zA-Z0-9_.]+)\s*\(/g)];
   for (const m of onclickMatches) {
     const fn = m[1];
-    if (['alert', 'confirm', 'prompt', 'return', 'window.print', 'location.reload', 'history.back'].includes(fn)) continue;
+    if (['alert', 'confirm', 'prompt', 'return', 'window.print', 'location.reload', 'history.back', 'event.stopPropagation'].includes(fn)) continue;
     if (fn.startsWith('API.') || fn.startsWith('UI.') || fn.startsWith('bootstrap.')) continue;
     
     // Check if fn is defined in file or api.js

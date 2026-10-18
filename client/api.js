@@ -67,6 +67,7 @@ const API = (() => {
       clearAuth();
       window.location.href = '/login';
     },
+    clearAuth,
     getMe: () => request('GET', '/auth/me'),
     getUser,
     getToken,

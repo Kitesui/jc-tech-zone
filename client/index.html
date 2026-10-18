@@ -179,7 +179,7 @@
   <section class="card-jc mb-4">
     <div class="card-header-jc d-flex justify-content-between align-items-center">
       <span><i class="bi bi-cpu me-1"></i> Hardware Catalog Preview</span>
-      <a href="catalog.html" class="btn-outline-jc btn-sm-jc" style="font-size:.7rem;">
+      <a href="/catalog" class="btn-outline-jc btn-sm-jc" style="font-size:.7rem;">
         View All <i class="bi bi-arrow-right"></i>
       </a>
     </div>
@@ -604,13 +604,31 @@ $('#trackNowBtn').on('click', () => {
 });
 
 $('#copyRefBtn').on('click', () => {
-  if (currentRefId) {
-    navigator.clipboard.writeText(currentRefId).then(() => {
-      $('#copyRefBtn').html('<i class="bi bi-check me-2"></i>Copied!');
-      setTimeout(() => $('#copyRefBtn').html('<i class="bi bi-clipboard me-2"></i>Copy ID'), 2000);
+  if (!currentRefId) return;
+  const showCopied = () => {
+    $('#copyRefBtn').html('<i class="bi bi-check me-2"></i>Copied!');
+    setTimeout(() => $('#copyRefBtn').html('<i class="bi bi-clipboard me-2"></i>Copy ID'), 2000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(currentRefId).then(showCopied).catch(() => {
+      fallbackCopy(currentRefId, showCopied);
     });
+  } else {
+    fallbackCopy(currentRefId, showCopied);
   }
 });
+
+function fallbackCopy(text, callback) {
+  try {
+    const $temp = $('<textarea>').val(text).appendTo('body').select();
+    document.execCommand('copy');
+    $temp.remove();
+    if (callback) callback();
+  } catch (e) {
+    if (window.UI) UI.toast('Ticket ID: ' + text, 'info');
+  }
+}
 
 $('#bookingModal').on('hidden.bs.modal', () => {
   $('#bookingForm')[0].reset();

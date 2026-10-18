@@ -1106,9 +1106,9 @@
 <script>
 const currentUser = API.getUser();
 if (!currentUser) {
-  window.location.href = 'login.html';
+  window.location.href = '/login';
 } else if (currentUser.role !== 'admin') {
-  // If logged in as technician, clear auth session so login.html does not auto-redirect back to tech.html
+  // If logged in as technician, clear auth session so login does not auto-redirect back to tech
   API.clearAuth();
   window.location.href = '/login?msg=admin_required';
 } else {
