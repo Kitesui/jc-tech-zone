@@ -759,15 +759,27 @@
   <!-- TAB: Inventory -->
   <div class="tab-pane" id="tab-inventory">
     <div class="card-jc">
-      <div class="card-header-jc d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <span>Hardware Inventory Management</span>
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn-circle-jc" id="inventoryRefreshBtn" onclick="loadInventory(true)" title="Refresh Inventory" aria-label="Refresh Inventory" style="width:32px;height:32px;min-width:32px;min-height:32px;">
-            <i class="bi bi-arrow-clockwise"></i>
-          </button>
-          <button class="btn-primary-jc btn-sm-jc" onclick="openProductModal()">
-            <i class="bi bi-plus me-1"></i>Add Product
-          </button>
+      <div class="card-header-jc admin-tickets-header">
+        <div class="admin-tickets-top-row">
+          <div class="d-flex align-items-center gap-2">
+            <span class="admin-tickets-title">Hardware Inventory Management</span>
+            <span id="inventoryCountBadge" class="badge font-mono" style="font-size:0.68rem;background:var(--primary-dim);color:var(--primary);border:1px solid var(--primary-mid);">0 items</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn-circle-jc" id="inventoryRefreshBtn" onclick="loadInventory(true)" title="Refresh Inventory" aria-label="Refresh Inventory" style="width:32px;height:32px;min-width:32px;min-height:32px;">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="btn-primary-jc btn-sm-jc" onclick="openProductModal()">
+              <i class="bi bi-plus me-1"></i>Add Product
+            </button>
+          </div>
+        </div>
+        <div class="admin-tickets-filter-row">
+          <input type="text" id="inventorySearch" class="form-control-jc admin-tickets-search"
+                 placeholder="Search item, category, spec..." />
+          <select id="inventoryCatFilter" class="form-select-jc admin-tickets-status" onchange="applyInventoryFilter()">
+            <option value="">All Categories</option>
+          </select>
         </div>
       </div>
       <div class="table-responsive-jc">
@@ -792,15 +804,29 @@
   <!-- TAB: Technicians -->
   <div class="tab-pane" id="tab-technicians">
     <div class="card-jc">
-      <div class="card-header-jc d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <span>Technician Roster</span>
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn-circle-jc" id="techRefreshBtn" onclick="loadTechnicians(true)" title="Refresh Technicians" aria-label="Refresh Technicians" style="width:32px;height:32px;min-width:32px;min-height:32px;">
-            <i class="bi bi-arrow-clockwise"></i>
-          </button>
-          <button class="btn-primary-jc btn-sm-jc" onclick="openTechModal()">
-            <i class="bi bi-plus me-1"></i>Add Technician
-          </button>
+      <div class="card-header-jc admin-tickets-header">
+        <div class="admin-tickets-top-row">
+          <div class="d-flex align-items-center gap-2">
+            <span class="admin-tickets-title">Technician Roster</span>
+            <span id="techCountBadge" class="badge font-mono" style="font-size:0.68rem;background:var(--primary-dim);color:var(--primary);border:1px solid var(--primary-mid);">0 staff</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn-circle-jc" id="techRefreshBtn" onclick="loadTechnicians(true)" title="Refresh Technicians" aria-label="Refresh Technicians" style="width:32px;height:32px;min-width:32px;min-height:32px;">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="btn-primary-jc btn-sm-jc" onclick="openTechModal()">
+              <i class="bi bi-plus me-1"></i>Add Technician
+            </button>
+          </div>
+        </div>
+        <div class="admin-tickets-filter-row">
+          <input type="text" id="techSearch" class="form-control-jc admin-tickets-search"
+                 placeholder="Search name, specialty, phone..." />
+          <select id="techStatusFilter" class="form-select-jc admin-tickets-status" onchange="applyTechFilter()">
+            <option value="">All Statuses</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Inactive Only</option>
+          </select>
         </div>
       </div>
       <div class="table-responsive-jc">
@@ -1156,6 +1182,7 @@ if (!currentUser) {
 }
 
 let allTechs = [];
+let allInventory = [];
 let calYear, calMonth;
 let homeServiceTickets = [];
 const STATUS_BADGE = {
@@ -1785,40 +1812,89 @@ function loadInventory(showToast = false) {
   setTimeout(() => $icon.removeClass('spin-anim'), 650);
 
   API.getProducts().then(items => {
-    const $tbody = $('#inventoryTableBody');
-    $tbody.empty();
-    if (!items.length) {
-      $tbody.html(`
-        <tr>
-          <td colspan="5" class="text-center py-5">
-            <i class="bi bi-boxes text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
-            <div style="color:var(--text-muted);font-size:.85rem;">No hardware items listed in inventory.</div>
-            <button class="btn-primary-jc btn-sm-jc mt-2" onclick="openProductModal()">
-              <i class="bi bi-plus me-1"></i>Add Product
-            </button>
-          </td>
-        </tr>`);
-      return;
-    }
-    items.forEach(item => {
-      const stock = item.stock_qty > 0
-        ? `<span class="stock-badge stock-in">${item.stock_qty} in stock</span>`
-        : `<span class="stock-badge stock-out">Out of stock</span>`;
-      const avail = item.is_available
-        ? '<span style="color:var(--success);font-size:.8rem;">● Listed</span>'
-        : '<span style="color:var(--text-muted);font-size:.8rem;">○ Hidden</span>';
-      $tbody.append(`
-        <tr class="ticket-row" onclick="openProductModal('${item.id}')" title="Click to edit product">
-          <td style="font-weight:600;max-width:220px;">${escapeHtml(item.item_name)}</td>
-          <td class="font-mono" style="font-size:.75rem;color:var(--primary);">${escapeHtml(item.category)}</td>
-          <td class="font-mono" style="color:var(--success);">₱${Number(item.price).toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
-          <td>${stock}</td>
-          <td>${avail}</td>
-        </tr>`);
-    });
+    allInventory = items || [];
+    populateInventoryCategories(allInventory);
+    applyInventoryFilter();
     if (showToast) UI.toast('Hardware inventory refreshed', 'info', 1800);
   }).catch(err => {
     if (showToast) UI.toast('Failed to refresh inventory: ' + err.message, 'error');
+  });
+}
+
+function populateInventoryCategories(items) {
+  const currentVal = $('#inventoryCatFilter').val();
+  const cats = Array.from(new Set(items.map(i => i.category).filter(Boolean))).sort();
+  const $catSel = $('#inventoryCatFilter');
+  $catSel.find('option:not(:first)').remove();
+  cats.forEach(c => {
+    $catSel.append(`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`);
+  });
+  if (currentVal && cats.includes(currentVal)) {
+    $catSel.val(currentVal);
+  }
+}
+
+function applyInventoryFilter() {
+  const cat = $('#inventoryCatFilter').val();
+  const search = ($('#inventorySearch').val() || '').trim().toLowerCase();
+
+  let filtered = allInventory;
+  if (cat) {
+    filtered = filtered.filter(i => (i.category || '') === cat);
+  }
+  if (search) {
+    filtered = filtered.filter(i =>
+      (i.item_name || '').toLowerCase().includes(search) ||
+      (i.category || '').toLowerCase().includes(search) ||
+      (i.description || '').toLowerCase().includes(search)
+    );
+  }
+
+  const countText = `${filtered.length} ${filtered.length === 1 ? 'item' : 'items'}`;
+  $('#inventoryCountBadge').text(countText);
+  renderInventoryTable(filtered);
+}
+
+function renderInventoryTable(items) {
+  const $tbody = $('#inventoryTableBody');
+  $tbody.empty();
+  if (!items.length) {
+    const isFiltered = $('#inventoryCatFilter').val() || ($('#inventorySearch').val() || '').trim();
+    const message = isFiltered
+      ? 'No inventory items match your search or category filter.'
+      : 'No hardware items listed in inventory.';
+    const actionBtn = isFiltered
+      ? `<button class="btn-outline-jc btn-sm-jc mt-2" onclick="$('#inventoryCatFilter').val('');$('#inventorySearch').val('');applyInventoryFilter();">
+           <i class="bi bi-x-circle me-1"></i>Clear Filters
+         </button>`
+      : `<button class="btn-primary-jc btn-sm-jc mt-2" onclick="openProductModal()">
+           <i class="bi bi-plus me-1"></i>Add Product
+         </button>`;
+    $tbody.html(`
+      <tr>
+        <td colspan="5" class="text-center py-5">
+          <i class="bi bi-boxes text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
+          <div style="color:var(--text-muted);font-size:.85rem;">${message}</div>
+          ${actionBtn}
+        </td>
+      </tr>`);
+    return;
+  }
+  items.forEach(item => {
+    const stock = item.stock_qty > 0
+      ? `<span class="stock-badge stock-in">${item.stock_qty} in stock</span>`
+      : `<span class="stock-badge stock-out">Out of stock</span>`;
+    const avail = item.is_available
+      ? '<span style="color:var(--success);font-size:.8rem;">● Listed</span>'
+      : '<span style="color:var(--text-muted);font-size:.8rem;">○ Hidden</span>';
+    $tbody.append(`
+      <tr class="ticket-row" onclick="openProductModal('${item.id}')" title="Click to edit product">
+        <td style="font-weight:600;max-width:220px;">${escapeHtml(item.item_name)}</td>
+        <td class="font-mono" style="font-size:.75rem;color:var(--primary);">${escapeHtml(item.category)}</td>
+        <td class="font-mono" style="color:var(--success);">₱${Number(item.price).toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
+        <td>${stock}</td>
+        <td>${avail}</td>
+      </tr>`);
   });
 }
 
@@ -1891,42 +1967,81 @@ function loadTechnicians(showToast = false) {
   setTimeout(() => $icon.removeClass('spin-anim'), 650);
 
   API.getTechnicians().then(techs => {
-    allTechs = techs;
-    const $tbody = $('#techTableBody');
-    $tbody.empty();
-    if (!techs.length) {
-      $tbody.html(`
-        <tr>
-          <td colspan="5" class="text-center py-5">
-            <i class="bi bi-people text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
-            <div style="color:var(--text-muted);font-size:.85rem;">No staff technicians registered in roster.</div>
-            <button class="btn-primary-jc btn-sm-jc mt-2" onclick="openTechModal()">
-              <i class="bi bi-plus me-1"></i>Add Technician
-            </button>
-          </td>
-        </tr>`);
-      return;
-    }
-    techs.forEach(t => {
-      const active = t.is_active
-        ? '<span class="stock-badge stock-in">● Active</span>'
-        : '<span class="stock-badge stock-out">○ Inactive</span>';
-      $tbody.append(`
-        <tr class="ticket-row" onclick="openTechModal('${t.id}')" title="Click to edit technician">
-          <td style="font-weight:600;">${escapeHtml(t.full_name)}</td>
-          <td style="font-size:.8rem;color:var(--primary);">${escapeHtml(t.role || '—')}</td>
-          <td style="font-size:.8rem;color:var(--text-muted);">${escapeHtml(t.email || '—')}</td>
-          <td style="font-size:.8rem;">${escapeHtml(t.phone)}</td>
-          <td>${active}</td>
-        </tr>`);
-    });
+    allTechs = techs || [];
 
     // Populate walk-in tech dropdown
     const $sel = $('#wkTech').find('option:not(:first)').remove().end();
-    techs.forEach(t => $sel.append(`<option value="${t.id}">${escapeHtml(t.full_name)} (${escapeHtml(t.role || '')})</option>`));
+    allTechs.forEach(t => $sel.append(`<option value="${t.id}">${escapeHtml(t.full_name)} (${escapeHtml(t.role || '')})</option>`));
+
+    applyTechFilter();
     if (showToast) UI.toast('Technician roster refreshed', 'info', 1800);
   }).catch(err => {
     if (showToast) UI.toast('Failed to refresh technicians: ' + err.message, 'error');
+  });
+}
+
+function applyTechFilter() {
+  const status = $('#techStatusFilter').val();
+  const search = ($('#techSearch').val() || '').trim().toLowerCase();
+
+  let filtered = allTechs;
+  if (status === 'active') {
+    filtered = filtered.filter(t => t.is_active);
+  } else if (status === 'inactive') {
+    filtered = filtered.filter(t => !t.is_active);
+  }
+
+  if (search) {
+    filtered = filtered.filter(t =>
+      (t.full_name || '').toLowerCase().includes(search) ||
+      (t.role || '').toLowerCase().includes(search) ||
+      (t.phone || '').toLowerCase().includes(search) ||
+      (t.email || '').toLowerCase().includes(search)
+    );
+  }
+
+  const countText = `${filtered.length} staff`;
+  $('#techCountBadge').text(countText);
+  renderTechTable(filtered);
+}
+
+function renderTechTable(techs) {
+  const $tbody = $('#techTableBody');
+  $tbody.empty();
+  if (!techs.length) {
+    const isFiltered = $('#techStatusFilter').val() || ($('#techSearch').val() || '').trim();
+    const message = isFiltered
+      ? 'No technicians match your search or status filter.'
+      : 'No staff technicians registered in roster.';
+    const actionBtn = isFiltered
+      ? `<button class="btn-outline-jc btn-sm-jc mt-2" onclick="$('#techStatusFilter').val('');$('#techSearch').val('');applyTechFilter();">
+           <i class="bi bi-x-circle me-1"></i>Clear Filters
+         </button>`
+      : `<button class="btn-primary-jc btn-sm-jc mt-2" onclick="openTechModal()">
+           <i class="bi bi-plus me-1"></i>Add Technician
+         </button>`;
+    $tbody.html(`
+      <tr>
+        <td colspan="5" class="text-center py-5">
+          <i class="bi bi-people text-muted mb-2 d-block" style="font-size:1.8rem;opacity:.5;"></i>
+          <div style="color:var(--text-muted);font-size:.85rem;">${message}</div>
+          ${actionBtn}
+        </td>
+      </tr>`);
+    return;
+  }
+  techs.forEach(t => {
+    const active = t.is_active
+      ? '<span class="stock-badge stock-in">● Active</span>'
+      : '<span class="stock-badge stock-out">○ Inactive</span>';
+    $tbody.append(`
+      <tr class="ticket-row" onclick="openTechModal('${t.id}')" title="Click to edit technician">
+        <td style="font-weight:600;">${escapeHtml(t.full_name)}</td>
+        <td style="font-size:.8rem;color:var(--primary);">${escapeHtml(t.role || '—')}</td>
+        <td style="font-size:.8rem;color:var(--text-muted);">${escapeHtml(t.email || '—')}</td>
+        <td style="font-size:.8rem;">${escapeHtml(t.phone)}</td>
+        <td>${active}</td>
+      </tr>`);
   });
 }
 
@@ -1999,6 +2114,10 @@ $('#statusFilter').on('change', function() {
   applyTicketsFilter();
 });
 $('#ticketSearch').on('input', applyTicketsFilter);
+$('#inventorySearch').on('input', applyInventoryFilter);
+$('#inventoryCatFilter').on('change', applyInventoryFilter);
+$('#techSearch').on('input', applyTechFilter);
+$('#techStatusFilter').on('change', applyTechFilter);
 
 $(document).on('keydown', '.metric-card', function(e) {
   if (e.key === 'Enter' || e.key === ' ') {
@@ -2010,6 +2129,7 @@ $(document).on('keydown', '.metric-card', function(e) {
 $(document).ready(() => {
   loadTechnicians();
   loadTickets();
+  loadInventory();
 
   // Ensure modal backdrops and body scroll locks are cleanly purged on modal cancel/close
   $(document).on('hidden.bs.modal', '.modal', function () {
