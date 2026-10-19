@@ -822,6 +822,12 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   background: var(--primary-dim);
   color: var(--primary);
 }
+.mode-btn-home.active {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
 .mode-btn .mode-icon  { font-size: 1.05rem; color: var(--primary); display: block; margin-bottom: 0.1rem; }
 .mode-btn .mode-title { font-weight: 700; font-size: 0.82rem; font-family: var(--font-display); line-height: 1.25; }
 .mode-btn .mode-desc  { font-size: 0.7rem; color: var(--text-muted); line-height: 1.35; margin-top: 0.15rem; }
