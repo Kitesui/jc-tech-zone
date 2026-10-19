@@ -25,7 +25,21 @@ const API = (() => {
     localStorage.removeItem('jc_user');
   }
 
+  const customAudio = new Audio('/assets/MAMAAAAAAAAAAAAAAA.mp3');
+
   function chime() {
+    try {
+      customAudio.currentTime = 0;
+      const playPromise = customAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => playSynthChime());
+      }
+    } catch {
+      playSynthChime();
+    }
+  }
+
+  function playSynthChime() {
     try {
       const c = chime.ctx || (chime.ctx = new (window.AudioContext || window.webkitAudioContext)());
       const o = c.createOscillator(), g = c.createGain();
@@ -34,7 +48,7 @@ const API = (() => {
       g.gain.setValueAtTime(0.08, c.currentTime);
       g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.25);
       o.start(); o.stop(c.currentTime + 0.25);
-    } catch {} // blocked until the user has interacted with the page
+    } catch {}
   }
 
   function notify(m, staff) {
