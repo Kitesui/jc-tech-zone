@@ -71,20 +71,15 @@ router.post('/login', async (req, res) => {
     .limit(1)
     .maybeSingle();
 
-  if (tech) {
-    const rawPhoneDigits = (tech.phone || '').replace(/\D/g, '');
-    const isPassValid = cleanPass === TECH_PASS || cleanPass === rawPhoneDigits;
-
-    if (isPassValid) {
-      const user = {
-        id: tech.id,
-        role: 'technician',
-        name: tech.full_name,
-        email: tech.email,
-      };
-      const token = signToken(user);
-      return res.json({ message: 'Login successful', token, user });
-    }
+  if (tech && cleanPass === TECH_PASS) {
+    const user = {
+      id: tech.id,
+      role: 'technician',
+      name: tech.full_name,
+      email: tech.email,
+    };
+    const token = signToken(user);
+    return res.json({ message: 'Login successful', token, user });
   }
 
   return res.status(401).json({ error: 'Invalid username or password' });

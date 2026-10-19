@@ -2129,6 +2129,7 @@ $(document).on('keydown', '.metric-card', function(e) {
 $(document).ready(() => {
   loadTechnicians();
   loadTickets();
+  API.live(() => loadTickets());
   loadInventory();
 
   // Ensure modal backdrops and body scroll locks are cleanly purged on modal cancel/close

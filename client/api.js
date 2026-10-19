@@ -98,6 +98,16 @@ const API = (() => {
     getFeedbackSummary: () => request('GET', '/feedback/summary'),
 
     health: () => request('GET', '/health'),
+
+    // Live updates: pass ref for a customer's ticket, omit for staff (uses token).
+    live: (onChange, ref) => {
+      const es = new EventSource(BASE + '/events?' + (ref ? 'ref=' + encodeURIComponent(ref) : 'token=' + encodeURIComponent(getToken())));
+      let timer, opened = false;
+      const fire = () => { clearTimeout(timer); timer = setTimeout(onChange, 300); };
+      es.onmessage = fire;
+      es.onopen = () => { if (opened) fire(); opened = true; };
+      return es;
+    },
   };
 })();
 

@@ -2,6 +2,7 @@ import express from 'express';
 import crypto from 'crypto';
 import supabase from '../db.js';
 import { requireAuth } from '../auth.js';
+import { broadcast } from '../events.js';
 
 const router = express.Router();
 
@@ -105,6 +106,7 @@ router.post('/', async (req, res) => {
     status_change: 'Received',
   }]);
 
+  broadcast(createdTicket.ticket_reference_id);
   const normalized = normalizeTicket(createdTicket);
   res.status(201).json({
     message: 'Ticket created',
@@ -262,6 +264,7 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     .eq('ticket_id', req.params.id)
     .order('created_at', { ascending: true });
 
+  broadcast(updated.ticket_reference_id);
   res.json({ message: 'Ticket updated', ticket: normalizeTicket(updated), logs: logs || [], work_logs: logs || [] });
 });
 
@@ -273,7 +276,7 @@ router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) 
   // Guard: Work logs are locked on Completed or Cancelled tickets
   const { data: ticket, error: ticketErr } = await supabase
     .from('tickets')
-    .select('status, assigned_technician_id')
+    .select('status, assigned_technician_id, ticket_reference_id')
     .eq('id', req.params.id)
     .single();
 
@@ -303,12 +306,14 @@ router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) 
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
+  broadcast(ticket.ticket_reference_id);
   res.status(201).json(data);
 });
 
 router.delete('/:id', requireAuth(['admin']), async (req, res) => {
   const { error } = await supabase.from('tickets').delete().eq('id', req.params.id);
   if (error) return res.status(400).json({ error: error.message });
+  broadcast();
   res.json({ message: 'Ticket deleted' });
 });
 

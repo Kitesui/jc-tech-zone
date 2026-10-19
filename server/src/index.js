@@ -15,6 +15,7 @@ import productsRoutes from './routes/products.js';
 import techniciansRoutes from './routes/technicians.js';
 import feedbackRoutes from './routes/feedback.js';
 import authRoutes from './routes/auth.js';
+import eventsRoutes from './events.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -74,7 +75,7 @@ app.use(express.static(clientDir, {
 
 app.use((req, res, next) => {
   if (req.url.startsWith('/api')) {
-    console.log(`[${new Date().toLocaleTimeString('en-PH')}] ${req.method} ${req.url}`);
+    console.log(`[${new Date().toLocaleTimeString('en-PH')}] ${req.method} ${req.originalUrl.split('?')[0]}`);
   }
   next();
 });
@@ -90,6 +91,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/events', eventsRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/technicians', techniciansRoutes);

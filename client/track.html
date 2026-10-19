@@ -413,15 +413,23 @@ function openTrackImageModal(url) {
   bootstrap.Modal.getOrCreateInstance('#trackImageModal').show();
 }
 
-function doTrack(ref) {
+let liveEs;
+
+function doTrack(ref, live = false) {
   const $results     = $('#trackResults');
   const $error       = $('#trackError');
   const $placeholder = $('#trackPlaceholder');
-  $results.addClass('d-none');
-  $error.addClass('d-none');
-  $placeholder.addClass('d-none');
+  if (!live) {
+    $results.addClass('d-none');
+    $error.addClass('d-none');
+    $placeholder.addClass('d-none');
+  }
 
   API.trackTicket(ref).then(res => {
+    if (!live) {
+      if (liveEs) liveEs.close();
+      liveEs = API.live(() => doTrack(ref, true), ref);
+    }
     const { ticket, logs, feedback } = res;
     currentTicketId = ticket.id;
 
@@ -482,7 +490,7 @@ function doTrack(ref) {
         $('#feedbackForm').addClass('d-none');
         $('#existingFeedback').removeClass('d-none');
         $('#existingFeedbackDisplay').html(renderCustomerFeedbackCard(feedback.rating, feedback.comments, feedback.created_at));
-      } else {
+      } else if (!live || $('#feedbackForm').hasClass('d-none')) {
         $('#feedbackForm').removeClass('d-none');
         $('#existingFeedback').addClass('d-none');
         $('#feedbackComments').val('');
@@ -497,6 +505,7 @@ function doTrack(ref) {
 
     $results.removeClass('d-none');
   }).catch(err => {
+    if (live) return;
     $('#trackErrorMsg').text(err.message || 'No ticket found with this reference ID.');
     $error.removeClass('d-none');
     $placeholder.removeClass('d-none');

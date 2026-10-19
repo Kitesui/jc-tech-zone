@@ -739,7 +739,7 @@ function setMobileTechTab(tab) {
   }
 }
 
-function selectJob(id) {
+function selectJob(id, live = false) {
   API.getTicket(id).then(res => {
     selectedTicket = res.ticket;
     const logs = res.logs || [];
@@ -833,7 +833,7 @@ function selectJob(id) {
 
     // On mobile view, automatically activate the detail panel tab
     $('#mobileDetailRef').text(selectedTicket.ticket_reference_id);
-    if ($(window).width() < 768) {
+    if (!live && $(window).width() < 768) {
       setMobileTechTab('detail');
     }
   });
@@ -1346,6 +1346,10 @@ $('#workLogForm').on('submit', function(e) {
 $(document).ready(() => {
   loadTechDropdown();
   loadJobs();
+  API.live(() => {
+    loadJobs();
+    if (selectedTicket) selectJob(selectedTicket.id, true);
+  });
 
   $(window).on('resize', function() {
     if ($(window).width() >= 768) {

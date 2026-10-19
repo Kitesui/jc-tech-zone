@@ -1,5 +1,6 @@
 import express from 'express';
 import supabase from '../db.js';
+import { broadcast } from '../events.js';
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.post('/', async (req, res) => {
 
   const { data: ticket } = await supabase
     .from('tickets')
-    .select('id, status')
+    .select('id, status, ticket_reference_id')
     .eq('id', ticket_id)
     .single();
 
@@ -34,6 +35,7 @@ router.post('/', async (req, res) => {
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
+  broadcast(ticket.ticket_reference_id);
   res.status(201).json({ message: 'Feedback submitted, thank you!', feedback: data });
 });
 
