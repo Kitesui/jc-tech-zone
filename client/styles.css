@@ -824,33 +824,30 @@ input[type="file"].form-control-jc::file-selector-button:hover {
 }
 .mode-btn-home {
   position: relative;
-  border: 1px solid #007569;
-  background: #007569;
+  border: 1.5px solid #00a896;
+  background: #0d2826;
   color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(0, 117, 105, 0.35);
 }
 .mode-btn-home .mode-icon {
-  color: #ffffff !important;
+  color: #00a896 !important;
 }
 .mode-btn-home .mode-title {
   color: #ffffff !important;
 }
 .mode-btn-home .mode-desc {
-  color: rgba(255, 255, 255, 0.88) !important;
+  color: #94a3b8 !important;
 }
 .mode-btn-home:hover {
-  background: #006056;
-  border-color: #006056;
-  box-shadow: 0 6px 18px rgba(0, 117, 105, 0.45);
+  background: #113835;
+  border-color: #00c4b0;
 }
 .mode-btn-home.active {
-  background: #004c44 !important;
-  border: 2px solid #5eead4 !important;
+  background: #154541 !important;
+  border: 2px solid #00e0c6 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 0 2px #007569, 0 6px 20px rgba(0, 76, 68, 0.5) !important;
 }
 .mode-btn-home.active .mode-title {
-  color: #ffffff !important;
+  color: #5eead4 !important;
 }
 .mode-btn .mode-icon  { font-size: 1.15rem; color: var(--primary); display: block; margin-bottom: 0.1rem; }
 .mode-btn .mode-title { font-weight: 700; font-size: 0.85rem; font-family: var(--font-display); line-height: 1.25; }
