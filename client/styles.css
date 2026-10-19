@@ -824,23 +824,33 @@ input[type="file"].form-control-jc::file-selector-button:hover {
 }
 .mode-btn-home {
   position: relative;
-  border: 1.5px solid rgba(0, 168, 150, 0.7);
-  background: rgba(0, 168, 150, 0.08);
-  box-shadow: 0 0 14px rgba(0, 168, 150, 0.12);
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 168, 150, 0.35);
+}
+.mode-btn-home .mode-icon {
+  color: #ffffff !important;
+}
+.mode-btn-home .mode-title {
+  color: #ffffff !important;
+}
+.mode-btn-home .mode-desc {
+  color: rgba(255, 255, 255, 0.88) !important;
 }
 .mode-btn-home:hover {
-  border-color: #00e0c6;
-  background: rgba(0, 168, 150, 0.15);
-  box-shadow: 0 0 20px rgba(0, 168, 150, 0.22);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: 0 6px 18px rgba(0, 168, 150, 0.45);
 }
 .mode-btn-home.active {
-  border: 2px solid #00e0c6 !important;
-  background: rgba(0, 168, 150, 0.25) !important;
-  color: #fff !important;
-  box-shadow: 0 0 22px rgba(0, 224, 198, 0.35), inset 0 0 0 1px #00e0c6 !important;
+  background: #007d70 !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px var(--primary), 0 6px 20px rgba(0, 168, 150, 0.5) !important;
 }
 .mode-btn-home.active .mode-title {
-  color: #5eead4 !important;
+  color: #ffffff !important;
 }
 .mode-btn .mode-icon  { font-size: 1.15rem; color: var(--primary); display: block; margin-bottom: 0.1rem; }
 .mode-btn .mode-title { font-weight: 700; font-size: 0.85rem; font-family: var(--font-display); line-height: 1.25; }
