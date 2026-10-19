@@ -42,6 +42,14 @@ await new Promise(r => setTimeout(r, 200));
 assert.strictEqual(staff.got.length, 1, 'staff skips customer-only notes');
 assert.strictEqual(mine.got.length, 1, 'customer skips staff-only notes');
 
+const shop = await listen('ref=catalog');
+[staff, mine, shop].forEach(c => (c.got.length = 0));
+broadcast('CATALOG');
+await new Promise(r => setTimeout(r, 200));
+assert.deepStrictEqual(shop.got, ['CATALOG'], 'catalog watcher gets product changes');
+assert.strictEqual(staff.got.length, 1, 'staff get product changes');
+assert.strictEqual(mine.got.length, 0, 'ticket tracker ignores product changes');
+
 console.log('✓ SSE scoping OK');
 [staff, mine, other].forEach(c => c.stop());
 server.close();

@@ -128,8 +128,8 @@ const API = (() => {
       }
       const es = new EventSource(BASE + '/events?' + (ref ? 'ref=' + encodeURIComponent(ref) : 'token=' + encodeURIComponent(getToken())));
       let timer, opened = false;
-      const fire = () => { clearTimeout(timer); timer = setTimeout(onChange, 300); };
-      es.onmessage = (e) => { notify(JSON.parse(e.data), !ref); fire(); };
+      const fire = (msg) => { clearTimeout(timer); timer = setTimeout(() => onChange(msg), 300); };
+      es.onmessage = (e) => { const m = JSON.parse(e.data); notify(m, !ref); fire(m); };
       es.onopen = () => { if (opened) fire(); opened = true; };
       return es;
     },

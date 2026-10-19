@@ -242,14 +242,15 @@ function resetSearch() {
   applyCatalogFilter();
 }
 
-function loadProducts() {
+function loadProducts(silent = false) {
   const $grid = $('#productGrid');
-  $grid.html('<div class="col-12 text-center py-5"><div class="spinner-jc"></div></div>');
+  if (!silent) $grid.html('<div class="col-12 text-center py-5"><div class="spinner-jc"></div></div>');
 
   API.getProducts().then(items => {
     allItems = items || [];
     applyCatalogFilter();
   }).catch(() => {
+    if (silent) return;
     $grid.html('<div class="col-12 text-center py-5" style="color:var(--text-muted);">Failed to load catalog.</div>');
   });
 }
@@ -322,6 +323,7 @@ $('#searchForm').on('submit', function(e) {
 $(document).ready(() => {
   renderCategoryPills();
   loadProducts();
+  API.live(() => { renderCategoryPills(); loadProducts(true); }, 'CATALOG');
 });
 </script>
 </body>

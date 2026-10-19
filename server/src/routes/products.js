@@ -1,6 +1,7 @@
 import express from 'express';
 import supabase from '../db.js';
 import { requireAuth } from '../auth.js';
+import { broadcast } from '../events.js';
 
 const router = express.Router();
 
@@ -76,6 +77,7 @@ router.post('/', requireAuth(['admin']), async (req, res) => {
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
+  broadcast('CATALOG');
   res.status(201).json(data);
 });
 
@@ -115,12 +117,14 @@ router.put('/:id', requireAuth(['admin']), async (req, res) => {
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
+  broadcast('CATALOG');
   res.json(data);
 });
 
 router.delete('/:id', requireAuth(['admin']), async (req, res) => {
   const { error } = await supabase.from('products').delete().eq('id', req.params.id);
   if (error) return res.status(400).json({ error: error.message });
+  broadcast('CATALOG');
   res.json({ message: 'Product deleted' });
 });
 

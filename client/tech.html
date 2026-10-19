@@ -1346,7 +1346,8 @@ $('#workLogForm').on('submit', function(e) {
 $(document).ready(() => {
   loadTechDropdown();
   loadJobs();
-  API.live(() => {
+  API.live((m) => {
+    if (m && m.ref === 'CATALOG') return;
     loadJobs();
     if (selectedTicket) selectJob(selectedTicket.id, true);
   });

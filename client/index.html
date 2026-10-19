@@ -664,6 +664,7 @@ $('#quickTrackForm').on('submit', function(e) {
 $(document).ready(() => {
   renderCategories();
   loadCatalogPreview();
+  API.live(loadCatalogPreview, 'CATALOG');
   const todayStr = new Date().toISOString().split('T')[0];
   $('#preferredDate').attr('min', todayStr);
   const currentPath = location.pathname.replace(/\/+$/, '') || '/customer';
