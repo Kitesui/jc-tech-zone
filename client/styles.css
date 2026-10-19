@@ -824,10 +824,10 @@ input[type="file"].form-control-jc::file-selector-button:hover {
 }
 .mode-btn-home {
   position: relative;
-  border: 1px solid var(--primary);
-  background: var(--primary);
+  border: 1px solid #007569;
+  background: #007569;
   color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(0, 168, 150, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 117, 105, 0.35);
 }
 .mode-btn-home .mode-icon {
   color: #ffffff !important;
@@ -839,15 +839,15 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   color: rgba(255, 255, 255, 0.88) !important;
 }
 .mode-btn-home:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-  box-shadow: 0 6px 18px rgba(0, 168, 150, 0.45);
+  background: #006056;
+  border-color: #006056;
+  box-shadow: 0 6px 18px rgba(0, 117, 105, 0.45);
 }
 .mode-btn-home.active {
-  background: #007d70 !important;
-  border: 2px solid #ffffff !important;
+  background: #004c44 !important;
+  border: 2px solid #5eead4 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 0 2px var(--primary), 0 6px 20px rgba(0, 168, 150, 0.5) !important;
+  box-shadow: 0 0 0 2px #007569, 0 6px 20px rgba(0, 76, 68, 0.5) !important;
 }
 .mode-btn-home.active .mode-title {
   color: #ffffff !important;
