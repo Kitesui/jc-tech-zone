@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
-  broadcast(ticket.ticket_reference_id);
+  broadcast(ticket.ticket_reference_id, { to: 'staff', title: 'New customer rating', message: `${ticket.ticket_reference_id} rated ${numRating}★` });
   res.status(201).json({ message: 'Feedback submitted, thank you!', feedback: data });
 });
 

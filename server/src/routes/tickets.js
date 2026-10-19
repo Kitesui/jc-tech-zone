@@ -106,7 +106,11 @@ router.post('/', async (req, res) => {
     status_change: 'Received',
   }]);
 
-  broadcast(createdTicket.ticket_reference_id);
+  broadcast(createdTicket.ticket_reference_id, {
+    to: 'staff',
+    title: 'New ticket',
+    message: `${createdTicket.ticket_reference_id} · ${service_type === 'home_service' ? 'Home service' : 'Drop-off'} from ${finalName}`,
+  });
   const normalized = normalizeTicket(createdTicket);
   res.status(201).json({
     message: 'Ticket created',
@@ -264,7 +268,17 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     .eq('ticket_id', req.params.id)
     .order('created_at', { ascending: true });
 
-  broadcast(updated.ticket_reference_id);
+  const ref = updated.ticket_reference_id;
+  const statusChanged = status && status !== current.status;
+  const costChanged = updates.estimated_cost !== undefined && Number(updates.estimated_cost) !== Number(current.estimated_cost);
+  const assigned = updates.assigned_technician_id && updates.assigned_technician_id !== current.assigned_technician_id;
+  broadcast(ref, statusChanged || costChanged ? {
+    to: 'customer',
+    title: statusChanged ? 'Status updated' : 'Cost updated',
+    message: statusChanged ? `Your ticket is now: ${status}` : 'The estimated cost of your repair was updated.',
+  } : {});
+  if (statusChanged) broadcast(ref, { to: 'staff', by: req.user.id, title: 'Status updated', message: `${ref} → ${status}` });
+  if (assigned) broadcast(ref, { to: 'staff', by: req.user.id, tech_id: updates.assigned_technician_id, title: 'Ticket assigned to you', message: `${ref} · ${updated.customer_name}` });
   res.json({ message: 'Ticket updated', ticket: normalizeTicket(updated), logs: logs || [], work_logs: logs || [] });
 });
 
@@ -306,7 +320,7 @@ router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) 
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
-  broadcast(ticket.ticket_reference_id);
+  broadcast(ticket.ticket_reference_id, { to: 'customer', title: 'New repair note', message: 'The technician added an update to your ticket.' });
   res.status(201).json(data);
 });
 

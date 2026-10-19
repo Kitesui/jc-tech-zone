@@ -5,9 +5,12 @@ import { verifyToken } from './auth.js';
 // ponytail: in-process client set, so one server instance only. Scale-out needs Redis/pg LISTEN.
 const clients = new Map(); // res -> ref | null (null = staff)
 
-export function broadcast(ref = null) {
+// note = { title, message, to?: 'staff'|'customer', by?, tech_id? }; omit for a silent data refresh.
+export function broadcast(ref = null, note = {}) {
   for (const [res, scope] of clients) {
-    if (!scope || scope === ref || !ref) res.write(`data: ${JSON.stringify({ ref })}\n\n`);
+    if (!scope && note.to === 'customer') continue;
+    if (scope && note.to === 'staff') continue;
+    if (!scope || scope === ref || !ref) res.write(`data: ${JSON.stringify({ ref, ...note })}\n\n`);
   }
 }
 

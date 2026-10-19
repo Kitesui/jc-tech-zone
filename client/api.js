@@ -25,6 +25,28 @@ const API = (() => {
     localStorage.removeItem('jc_user');
   }
 
+  function chime() {
+    try {
+      const c = chime.ctx || (chime.ctx = new (window.AudioContext || window.webkitAudioContext)());
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.08, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.25);
+      o.start(); o.stop(c.currentTime + 0.25);
+    } catch {} // blocked until the user has interacted with the page
+  }
+
+  function notify(m, staff) {
+    if (!m.title || (m.by && m.by === getUser()?.id)) return;
+    if (m.tech_id && m.tech_id !== getUser()?.id) return;
+    UI.toast(`<strong>${escapeHtml(m.title)}</strong><br>${escapeHtml(m.message)}`, 'info', 6000);
+    chime();
+    if (staff && document.hidden && window.Notification && Notification.permission === 'granted') {
+      new Notification(m.title, { body: m.message, icon: '/logo.jpg' });
+    }
+  }
+
   function request(method, endpoint, data) {
     const token = getToken();
     const headers = {};
@@ -101,10 +123,13 @@ const API = (() => {
 
     // Live updates: pass ref for a customer's ticket, omit for staff (uses token).
     live: (onChange, ref) => {
+      if (!ref && window.Notification && Notification.permission === 'default') {
+        $(document).one('click', () => Notification.requestPermission());
+      }
       const es = new EventSource(BASE + '/events?' + (ref ? 'ref=' + encodeURIComponent(ref) : 'token=' + encodeURIComponent(getToken())));
       let timer, opened = false;
       const fire = () => { clearTimeout(timer); timer = setTimeout(onChange, 300); };
-      es.onmessage = fire;
+      es.onmessage = (e) => { notify(JSON.parse(e.data), !ref); fire(); };
       es.onopen = () => { if (opened) fire(); opened = true; };
       return es;
     },

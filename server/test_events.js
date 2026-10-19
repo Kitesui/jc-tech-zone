@@ -35,6 +35,13 @@ assert.deepStrictEqual(staff.got, ['JCT-1'], 'staff receives all');
 assert.deepStrictEqual(mine.got, ['JCT-1'], 'customer receives own ref');
 assert.deepStrictEqual(other.got, [], 'customer does not receive other refs');
 
+[staff, mine].forEach(c => (c.got.length = 0));
+broadcast('JCT-1', { to: 'staff', title: 's' });
+broadcast('JCT-1', { to: 'customer', title: 'c' });
+await new Promise(r => setTimeout(r, 200));
+assert.strictEqual(staff.got.length, 1, 'staff skips customer-only notes');
+assert.strictEqual(mine.got.length, 1, 'customer skips staff-only notes');
+
 console.log('✓ SSE scoping OK');
 [staff, mine, other].forEach(c => c.stop());
 server.close();
