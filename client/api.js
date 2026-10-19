@@ -26,13 +26,20 @@ const API = (() => {
   }
 
   const customAudio = new Audio('/assets/MAMAAAAAAAAAAAAAAA.mp3');
+  let audioTimer = null;
 
   function chime() {
     try {
+      if (audioTimer) clearTimeout(audioTimer);
       customAudio.currentTime = 0;
       const playPromise = customAudio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => playSynthChime());
+        playPromise.then(() => {
+          audioTimer = setTimeout(() => {
+            customAudio.pause();
+            customAudio.currentTime = 0;
+          }, 3000);
+        }).catch(() => playSynthChime());
       }
     } catch {
       playSynthChime();
