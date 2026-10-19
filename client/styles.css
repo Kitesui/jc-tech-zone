@@ -822,11 +822,19 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   background: var(--primary-dim);
   color: var(--primary);
 }
+.mode-btn-home {
+  border-color: rgba(0, 168, 150, 0.45);
+  background: rgba(0, 168, 150, 0.05);
+}
+.mode-btn-home:hover {
+  border-color: var(--primary);
+  background: rgba(0, 168, 150, 0.1);
+}
 .mode-btn-home.active {
-  border-color: #38bdf8;
-  background: rgba(56, 189, 248, 0.12);
-  color: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+  border-color: var(--primary);
+  background: rgba(0, 168, 150, 0.18);
+  color: #5eead4;
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 .mode-btn .mode-icon  { font-size: 1.05rem; color: var(--primary); display: block; margin-bottom: 0.1rem; }
 .mode-btn .mode-title { font-weight: 700; font-size: 0.82rem; font-family: var(--font-display); line-height: 1.25; }
