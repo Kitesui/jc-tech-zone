@@ -50,7 +50,20 @@ assert.deepStrictEqual(shop.got, ['CATALOG'], 'catalog watcher gets product chan
 assert.strictEqual(staff.got.length, 1, 'staff get product changes');
 assert.strictEqual(mine.got.length, 0, 'ticket tracker ignores product changes');
 
-console.log('✓ SSE scoping OK');
-[staff, mine, other].forEach(c => c.stop());
+// Verify technician-specific assignment and self-action scoping
+const tech1 = await listen(`token=${signToken({ id: 'tech-1', role: 'technician' })}`);
+const tech2 = await listen(`token=${signToken({ id: 'tech-2', role: 'technician' })}`);
+[staff, tech1, tech2].forEach(c => (c.got.length = 0));
+
+// Admin 'a' assigns ticket to 'tech-1'
+broadcast('JCT-1', { to: 'staff', by: 'a', tech_id: 'tech-1', title: 'Ticket assigned to you' });
+await new Promise(r => setTimeout(r, 200));
+
+assert.strictEqual(staff.got.length, 0, 'admin does NOT receive technician-assigned notification');
+assert.strictEqual(tech2.got.length, 0, 'other technicians do NOT receive assignment notification');
+assert.strictEqual(tech1.got.length, 1, 'assigned technician receives assignment notification');
+
+console.log('✓ SSE scoping OK (including tech_id & self-action)');
+[staff, mine, other, tech1, tech2].forEach(c => c.stop());
 server.close();
 process.exit(0);
