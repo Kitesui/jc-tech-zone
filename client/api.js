@@ -25,36 +25,41 @@ const API = (() => {
     localStorage.removeItem('jc_user');
   }
 
-  const customAudio = new Audio('/assets/MAMAAAAAAAAAAAAAAA.mp3');
-  let audioTimer = null;
-
+  // Self-contained Web Audio notification chime (warm ascending C5 -> G5 harmonic interval).
+  // Zero external MP3 dependency, zero latency, smooth envelope without clicks.
   function chime() {
     try {
-      if (audioTimer) clearTimeout(audioTimer);
-      customAudio.currentTime = 0;
-      const playPromise = customAudio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          audioTimer = setTimeout(() => {
-            customAudio.pause();
-            customAudio.currentTime = 0;
-          }, 3000);
-        }).catch(() => playSynthChime());
-      }
-    } catch {
-      playSynthChime();
-    }
-  }
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = chime.ctx || (chime.ctx = new AudioCtx());
+      if (ctx.state === 'suspended') ctx.resume();
+      const now = ctx.currentTime;
 
-  function playSynthChime() {
-    try {
-      const c = chime.ctx || (chime.ctx = new (window.AudioContext || window.webkitAudioContext)());
-      const o = c.createOscillator(), g = c.createGain();
-      o.connect(g); g.connect(c.destination);
-      o.frequency.value = 880;
-      g.gain.setValueAtTime(0.08, c.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.25);
-      o.start(); o.stop(c.currentTime + 0.25);
+      // Note 1: Warm foundation tone (C5 - 523.25 Hz)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(523.25, now);
+      gain1.gain.setValueAtTime(0.001, now);
+      gain1.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.28);
+
+      // Note 2: Crisp harmonic chime (G5 - 783.99 Hz)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(783.99, now + 0.08);
+      gain2.gain.setValueAtTime(0.001, now + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.14, now + 0.10);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.08);
+      osc2.stop(now + 0.42);
     } catch {}
   }
 
@@ -141,6 +146,7 @@ const API = (() => {
     getFeedbackSummary: () => request('GET', '/feedback/summary'),
 
     health: () => request('GET', '/health'),
+    playChime: chime,
 
     // Live updates: pass ref for a customer's ticket, omit for staff (uses token).
     live: (onChange, ref) => {

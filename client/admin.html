@@ -549,6 +549,26 @@
         grid-column: span 1;
       }
     }
+
+    .notif-item {
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+    .notif-item:hover {
+      background: var(--bg-card2) !important;
+      border-color: var(--border) !important;
+    }
+    .tab-count-badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      vertical-align: middle;
+      line-height: 1.1;
+      font-weight: 700;
+    }
+    .admin-tab.active .tab-count-badge {
+      box-shadow: 0 0 6px rgba(0, 168, 150, 0.35);
+    }
   </style>
 </head>
 <body>
@@ -564,10 +584,76 @@
       </span>
     </a>
 
-    <!-- Hamburger toggler: opens right-to-left offcanvas drawer on mobile -->
-    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminDrawer" aria-controls="adminDrawer" aria-label="Toggle navigation">
-      <i class="bi bi-list" style="font-size:1.4rem;"></i>
-    </button>
+    <div class="d-flex align-items-center gap-2 ms-auto me-2 me-lg-0 order-lg-last">
+      <!-- Notification Bell Dropdown (Visible on all screen sizes) -->
+      <div class="dropdown" id="adminNotifDropdown">
+        <button class="btn-circle-jc position-relative" type="button" id="notifBellBtn" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications & System Notices" style="width:34px;height:34px;min-width:34px;min-height:34px;border-radius:50%;background:var(--bg-card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;">
+          <i class="bi bi-bell-fill" style="font-size:0.95rem;"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" id="notifBadgeTotal" style="font-size:0.62rem;background:#f59e0b;color:#0f172a;display:none;font-weight:700;padding:0.2em 0.45em;">
+            0
+          </span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end shadow-lg py-0 mt-2" aria-labelledby="notifBellBtn" style="min-width:300px;max-width:360px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden;z-index:1060;">
+          <!-- Dropdown Header -->
+          <div class="p-3 d-flex justify-content-between align-items-center" style="border-bottom:1px solid var(--border);background:var(--bg-card2);">
+            <div class="d-flex align-items-center gap-2">
+              <strong style="font-size:0.86rem;color:var(--text);">System Notices</strong>
+              <span class="badge font-mono" id="notifHeaderBadge" style="font-size:0.65rem;background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.35);">0 Action Items</span>
+            </div>
+            <button class="btn btn-link p-0 text-decoration-none font-mono" onclick="API.playChime(); UI.toast('Notification chime played', 'info', 1500);" style="font-size:0.72rem;color:var(--primary);" title="Play notification sound">
+              <i class="bi bi-volume-up me-1"></i>Test Sound
+            </button>
+          </div>
+          <!-- Quick Notice Items -->
+          <div class="p-2" id="notifListContainer" style="max-height:280px;overflow-y:auto;">
+            <!-- Pending / Received quick action -->
+            <div class="notif-item p-2 rounded mb-1 cursor-pointer" onclick="filterByMetric('pending_received')" style="transition:background 0.15s;cursor:pointer;">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="p-1 px-2 rounded font-mono" style="background:rgba(245,158,11,0.18);color:#f59e0b;font-size:0.74rem;font-weight:700;" id="notifPendingCount">0</span>
+                  <span style="font-size:0.82rem;font-weight:600;color:var(--text);">Pending / Received</span>
+                </div>
+                <span style="font-size:0.72rem;color:var(--primary);"><i class="bi bi-chevron-right"></i></span>
+              </div>
+              <div style="font-size:0.72rem;color:var(--text-muted);margin-left:36px;margin-top:2px;">Service tickets awaiting diagnostics</div>
+            </div>
+            <!-- In Progress quick action -->
+            <div class="notif-item p-2 rounded mb-1 cursor-pointer" onclick="filterByMetric('In Progress')" style="transition:background 0.15s;cursor:pointer;">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="p-1 px-2 rounded font-mono" style="background:rgba(251,146,60,0.18);color:#fb923c;font-size:0.74rem;font-weight:700;" id="notifActiveCount">0</span>
+                  <span style="font-size:0.82rem;font-weight:600;color:var(--text);">In Progress</span>
+                </div>
+                <span style="font-size:0.72rem;color:var(--primary);"><i class="bi bi-chevron-right"></i></span>
+              </div>
+              <div style="font-size:0.72rem;color:var(--text-muted);margin-left:36px;margin-top:2px;">Repairs currently on workbench</div>
+            </div>
+            <!-- Customer Reviews quick action -->
+            <div class="notif-item p-2 rounded mb-1 cursor-pointer" onclick="switchAdminTab('feedback')" style="transition:background 0.15s;cursor:pointer;">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="p-1 px-2 rounded font-mono" style="background:rgba(0,168,150,0.18);color:var(--primary);font-size:0.74rem;font-weight:700;" id="notifReviewsCount">0</span>
+                  <span style="font-size:0.82rem;font-weight:600;color:var(--text);">Customer Reviews</span>
+                </div>
+                <span style="font-size:0.72rem;color:var(--primary);"><i class="bi bi-chevron-right"></i></span>
+              </div>
+              <div style="font-size:0.72rem;color:var(--text-muted);margin-left:36px;margin-top:2px;" id="notifReviewsSub">Latest customer feedback ratings</div>
+            </div>
+          </div>
+          <!-- Dropdown Footer -->
+          <div class="p-2 text-center" style="border-top:1px solid var(--border);background:var(--bg-card2);">
+            <a href="javascript:void(0)" onclick="filterByMetric('pending_received')" class="text-decoration-none font-mono" style="font-size:0.74rem;color:var(--primary);">
+              Filter Pending Tickets <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hamburger toggler: opens right-to-left offcanvas drawer on mobile -->
+      <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminDrawer" aria-controls="adminDrawer" aria-label="Toggle navigation">
+        <i class="bi bi-list" style="font-size:1.4rem;"></i>
+      </button>
+    </div>
 
     <!-- Desktop Nav Links -->
     <div class="collapse navbar-collapse d-none d-lg-flex" id="desktopNav">
@@ -715,11 +801,17 @@
 
   <!-- Admin Tabs -->
   <div class="admin-tabs-nav mb-4">
-    <button class="admin-tab active" data-tab="tickets">Ticket Dispatch</button>
+    <button class="admin-tab active" data-tab="tickets">
+      Ticket Dispatch
+      <span class="badge font-mono ms-1 tab-count-badge" id="tabBadgePending" style="display:none;background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.35);">0</span>
+    </button>
     <button class="admin-tab" data-tab="calendar">Schedule Calendar</button>
     <button class="admin-tab" data-tab="inventory">Hardware Inventory</button>
     <button class="admin-tab" data-tab="technicians">Technicians</button>
-    <button class="admin-tab" data-tab="feedback">Customer Reviews</button>
+    <button class="admin-tab" data-tab="feedback">
+      Customer Reviews
+      <span class="badge font-mono ms-1 tab-count-badge" id="tabBadgeReviews" style="display:none;background:rgba(0,168,150,0.2);color:var(--primary);border:1px solid rgba(0,168,150,0.35);">0</span>
+    </button>
   </div>
 
   <!-- TAB: Tickets -->
@@ -1319,6 +1411,9 @@ function updateCsatMetrics(summary) {
     $('#feedbackAvgStars').text('☆☆☆☆☆');
     $('#feedbackTotalReviewsCount').text('Based on 0 customer reviews');
     $('#feedbackPositivePctDisplay').text('0%');
+    $('#tabBadgeReviews').hide();
+    $('#notifReviewsCount').text('0');
+    $('#notifReviewsSub').text('No reviews submitted yet');
     return;
   }
   const avg = Number(summary.average_rating || 0).toFixed(1);
@@ -1330,6 +1425,10 @@ function updateCsatMetrics(summary) {
     color: summary.positive_percentage >= 80 ? 'var(--success)' : 'var(--warning)',
     borderColor: summary.positive_percentage >= 80 ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'
   });
+
+  $('#tabBadgeReviews').text(summary.total_reviews).show();
+  $('#notifReviewsCount').text(summary.total_reviews);
+  $('#notifReviewsSub').text(`${summary.positive_percentage}% positive sentiment (${summary.total_reviews} review${summary.total_reviews === 1 ? '' : 's'})`);
 
   $('#feedbackAvgDisplay').text(avg);
   $('#feedbackAvgStars').text(stars);
@@ -1462,10 +1561,34 @@ function applyTicketsFilter() {
 }
 
 function updateMetrics(tickets) {
-  $('#metricTotal').text(tickets.length);
-  $('#metricPending').text(tickets.filter(t => ['Received','Under Diagnostics'].includes(t.status)).length);
-  $('#metricActive').text(tickets.filter(t => t.status === 'In Progress').length);
-  $('#metricDone').text(tickets.filter(t => t.status === 'Completed').length);
+  const total = tickets.length;
+  const pending = tickets.filter(t => ['Received','Under Diagnostics'].includes(t.status)).length;
+  const active = tickets.filter(t => t.status === 'In Progress').length;
+  const done = tickets.filter(t => t.status === 'Completed').length;
+
+  $('#metricTotal').text(total);
+  $('#metricPending').text(pending);
+  $('#metricActive').text(active);
+  $('#metricDone').text(done);
+
+  // Tab Badge: Pending / Received count on Ticket Dispatch tab
+  if (pending > 0) {
+    $('#tabBadgePending').text(pending).show();
+  } else {
+    $('#tabBadgePending').hide();
+  }
+
+  // Navbar Notification Notice counts
+  $('#notifPendingCount').text(pending);
+  $('#notifActiveCount').text(active);
+
+  if (pending > 0) {
+    $('#notifBadgeTotal').text(pending).show();
+    $('#notifHeaderBadge').text(`${pending} Action Item${pending === 1 ? '' : 's'}`);
+  } else {
+    $('#notifBadgeTotal').hide();
+    $('#notifHeaderBadge').text('All Clear');
+  }
 }
 
 function renderTicketsTable(tickets) {
