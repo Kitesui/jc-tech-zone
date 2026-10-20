@@ -587,8 +587,9 @@ $(document).ready(() => {
   const params = new URLSearchParams(location.search);
   const ref = params.get('ref');
   if (ref) {
-    $('#refInput').val(ref);
-    doTrack(ref.toUpperCase());
+    const cleanRef = ref.trim().toUpperCase();
+    $('#refInput').val(cleanRef);
+    doTrack(cleanRef);
   }
 });
 </script>
