@@ -2310,6 +2310,13 @@ function initNotifications(tickets) {
     adminNotifications = [];
   }
 
+  // Filter out any legacy or tech-specific notifications like "Ticket assigned to you"
+  adminNotifications = adminNotifications.filter(n => {
+    if (n.title === 'Ticket assigned to you') return false;
+    if (n.tech_id && n.tech_id !== currentUser?.id) return false;
+    return true;
+  });
+
   // Seed with latest bookings if empty
   if (adminNotifications.length === 0 && tickets && tickets.length) {
     tickets.slice(0, 8).forEach(t => {
@@ -2337,6 +2344,12 @@ function saveNotifications() {
 
 function addLiveNotification(m) {
   if (!m || !m.title || !m.message) return;
+  // Ignore self-triggered actions (actions triggered by the logged-in admin user)
+  if (m.by && m.by === currentUser?.id) return;
+  // Ignore notifications targeted to a specific technician (e.g. "Ticket assigned to you")
+  if (m.tech_id && m.tech_id !== currentUser?.id) return;
+  if (m.title === 'Ticket assigned to you') return;
+
   const isRating = m.title.toLowerCase().includes('rating') || m.message.includes('★');
   const notif = {
     id: 'live_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
