@@ -1384,7 +1384,7 @@ $(document).on('click', '.admin-tab', function() {
   } else if (tab === 'tickets') {
     const val = $('#statusFilter').val();
     if (!val) setActiveMetricCard('all');
-    else if (val === 'pending_received' || val === 'Received' || val === 'Under Diagnostics') setActiveMetricCard('pending_received');
+    else if (val === 'pending_received' || val === 'Received') setActiveMetricCard('pending_received');
     else if (val === 'In Progress') setActiveMetricCard('In Progress');
     else if (val === 'Completed') setActiveMetricCard('Completed');
     else setActiveMetricCard(null);
@@ -1402,7 +1402,7 @@ function setActiveMetricCard(metricKey) {
   if (!metricKey) return;
   if (metricKey === 'all' || metricKey === 'total') {
     $('#cardMetricTotal').addClass('active-metric active-total');
-  } else if (metricKey === 'pending_received' || metricKey === 'Received' || metricKey === 'Under Diagnostics') {
+  } else if (metricKey === 'pending_received' || metricKey === 'Received') {
     $('#cardMetricPending').addClass('active-metric active-pending');
   } else if (metricKey === 'In Progress') {
     $('#cardMetricActive').addClass('active-metric active-progress');
@@ -1579,7 +1579,7 @@ function applyTicketsFilter() {
   let filtered = allTickets;
   if (status && status !== 'all') {
     if (status === 'pending_received') {
-      filtered = filtered.filter(t => ['Received', 'Under Diagnostics'].includes(t.status));
+      filtered = filtered.filter(t => t.status === 'Received');
     } else {
       filtered = filtered.filter(t => t.status === status);
     }
@@ -1602,7 +1602,7 @@ function updateDispatchBadge(count, status) {
   $badge.removeAttr('style').css('display', 'inline-block');
   $badge.removeClass('badge-dispatch-all badge-dispatch-pending badge-dispatch-active badge-dispatch-completed');
 
-  if (status === 'pending_received' || status === 'Received' || status === 'Under Diagnostics') {
+  if (status === 'pending_received' || status === 'Received') {
     $badge.addClass('badge-dispatch-pending');
   } else if (status === 'In Progress') {
     $badge.addClass('badge-dispatch-active');
@@ -1615,7 +1615,7 @@ function updateDispatchBadge(count, status) {
 
 function updateMetrics(tickets) {
   const total = tickets.length;
-  const pending = tickets.filter(t => ['Received','Under Diagnostics'].includes(t.status)).length;
+  const pending = tickets.filter(t => t.status === 'Received').length;
   const active = tickets.filter(t => t.status === 'In Progress').length;
   const done = tickets.filter(t => t.status === 'Completed').length;
 
@@ -2308,7 +2308,7 @@ $('#techForm').on('submit', function(e) {
 $('#statusFilter').on('change', function() {
   const val = $(this).val();
   if (!val) setActiveMetricCard('all');
-  else if (val === 'pending_received' || val === 'Received' || val === 'Under Diagnostics') setActiveMetricCard('pending_received');
+  else if (val === 'pending_received' || val === 'Received') setActiveMetricCard('pending_received');
   else if (val === 'In Progress') setActiveMetricCard('In Progress');
   else if (val === 'Completed') setActiveMetricCard('Completed');
   else setActiveMetricCard(null);
