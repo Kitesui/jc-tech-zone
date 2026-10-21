@@ -1,0 +1,20 @@
+name: Keep Render Warm
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping Health Endpoint
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping Server
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://jc-tech-zone.onrender.com/api/health)
+          echo "Render Health Check Status: $STATUS at $(date -u)"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Warning: Server returned status $STATUS"
+          fi
