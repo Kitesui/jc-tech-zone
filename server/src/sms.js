@@ -5,9 +5,11 @@
 
 function sanitizeNumber(phone) {
   if (!phone) return '';
-  const digits = String(phone).replace(/\D/g, '');
+  let digits = String(phone).replace(/\D/g, '');
   if (digits.startsWith('63') && digits.length === 12) {
-    return '0' + digits.slice(2);
+    digits = '0' + digits.slice(2);
+  } else if (digits.length === 10 && digits.startsWith('9')) {
+    digits = '0' + digits;
   }
   return digits;
 }
