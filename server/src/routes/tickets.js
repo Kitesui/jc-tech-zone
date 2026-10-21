@@ -20,18 +20,6 @@ function normalizeTicket(t) {
   };
 }
 
-function getAppBaseUrl(req) {
-  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/+$/, '');
-  const origin = req.headers.origin;
-  if (origin && !origin.includes('localhost:')) return origin.replace(/\/+$/, '');
-  const host = req.get('host');
-  if (host && !host.includes('localhost:')) {
-    const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-    return `${protocol}://${host}`;
-  }
-  return 'https://jc-tech-zone.onrender.com';
-}
-
 router.post('/', async (req, res) => {
   const {
     customer_name,
@@ -126,12 +114,11 @@ router.post('/', async (req, res) => {
   });
 
   if (finalContact) {
-    const baseUrl = getAppBaseUrl(req);
     const serviceLabel = service_type === 'home_service' ? 'Home Service' : 'Drop-off';
-    const deviceLabel = finalDevice ? `\nDevice: ${finalDevice}` : '';
-    const trackUrl = `${baseUrl}/track?ref=${createdTicket.ticket_reference_id}`;
+    const cleanDevice = finalDevice ? finalDevice.replace(/[\u2013\u2014]/g, '-') : '';
+    const deviceLabel = cleanDevice ? `\nDevice: ${cleanDevice}` : '';
 
-    const smsText = `JC Tech Zone: Hi ${finalName}! Your repair booking is confirmed.\nTicket: ${createdTicket.ticket_reference_id}${deviceLabel}\nService: ${serviceLabel}\nTrack live status here: ${trackUrl}`;
+    const smsText = `JC Tech Zone: Hi ${finalName}! Your repair booking is confirmed.\nTicket: ${createdTicket.ticket_reference_id}${deviceLabel}\nService: ${serviceLabel}\nTrack status anytime on our website with your Ticket ID.`;
 
     sendSMS(finalContact, smsText).catch(err => console.error('[SMS ERROR]', err.message));
   }
@@ -304,24 +291,22 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
   if (statusChanged) broadcast(ref, { to: 'staff', by: req.user.id, title: 'Status updated', message: `${ref} → ${status}` });
 
   if (updated.contact_number && (statusChanged || costChanged)) {
-    const baseUrl = getAppBaseUrl(req);
-    const trackUrl = `${baseUrl}/track?ref=${ref}`;
     const custName = updated.customer_name ? `Hi ${updated.customer_name}, ` : '';
-    const deviceStr = updated.device_type ? ` for ${updated.device_type}` : '';
+    const deviceStr = updated.device_type ? ` for ${updated.device_type.replace(/[\u2013\u2014]/g, '-')}` : '';
     const finalCostNum = parseFloat(updated.estimated_cost) || 0;
-    const costFormatted = `₱${finalCostNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const costFormatted = `P${finalCostNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     const statusNorm = (status || '').toLowerCase();
     let smsText = '';
 
     if (statusNorm === 'completed') {
-      smsText = `JC Tech Zone: ${custName}your repair${deviceStr} (Ticket ${ref}) is COMPLETED!\nTotal: ${costFormatted}\nLeave feedback & view receipt: ${trackUrl}`;
+      smsText = `JC Tech Zone: ${custName}your repair${deviceStr} (Ticket ${ref}) is COMPLETED!\nTotal: ${costFormatted}\nThank you for choosing JC Tech Zone!`;
     } else if (statusNorm === 'ready for pick-up') {
-      smsText = `JC Tech Zone: ${custName}your device${deviceStr} (Ticket ${ref}) is READY FOR PICK-UP!\nAmount Due: ${costFormatted}\nTrack details: ${trackUrl}`;
+      smsText = `JC Tech Zone: ${custName}your device${deviceStr} (Ticket ${ref}) is READY FOR PICK-UP!\nAmount Due: ${costFormatted}\nPlease bring your Ticket ID when claiming.`;
     } else if (costChanged && !statusChanged) {
-      smsText = `JC Tech Zone: ${custName}the total fee for Ticket ${ref} was finalized at ${costFormatted}.\nTrack details: ${trackUrl}`;
+      smsText = `JC Tech Zone: ${custName}the total fee for Ticket ${ref} was finalized at ${costFormatted}.\nTrack status anytime with your Ticket ID.`;
     } else if (statusChanged) {
-      smsText = `JC Tech Zone: ${custName}Ticket ${ref} update: Status is now "${status}".\nTrack live: ${trackUrl}`;
+      smsText = `JC Tech Zone: ${custName}Ticket ${ref} update: Status is now "${status}".\nTrack status anytime with your Ticket ID.`;
     }
 
     if (smsText) {

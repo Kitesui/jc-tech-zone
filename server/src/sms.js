@@ -23,9 +23,19 @@ function printMockBox(to, message, note) {
   console.log('========================================================\n');
 }
 
+function sanitizeMessage(message) {
+  if (!message) return '';
+  return String(message)
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/₱/g, 'P')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'");
+}
+
 export async function sendSMS(to, message) {
   const provider = (process.env.SMS_PROVIDER || 'mock').toLowerCase();
   const cleanTo = sanitizeNumber(to);
+  const cleanMsg = sanitizeMessage(message);
 
   if (!cleanTo || cleanTo.length < 10) {
     console.warn(`[SMS] Skipped: invalid phone number "${to}"`);
@@ -34,7 +44,7 @@ export async function sendSMS(to, message) {
 
   // 1. MOCK MODE (Zero cost, console output only)
   if (provider === 'mock') {
-    printMockBox(cleanTo, message, 'Dev/Mock Mode (SMS_PROVIDER=mock)');
+    printMockBox(cleanTo, cleanMsg, 'Dev/Mock Mode (SMS_PROVIDER=mock)');
     return { success: true, mode: 'mock' };
   }
 
@@ -45,7 +55,7 @@ export async function sendSMS(to, message) {
 
     if (!apiKey || !deviceId) {
       console.warn('[SMS] TEXTBEE_API_KEY or TEXTBEE_DEVICE_ID missing. Falling back to console.');
-      printMockBox(cleanTo, message, 'Fallback: missing TextBee credentials');
+      printMockBox(cleanTo, cleanMsg, 'Fallback: missing TextBee credentials');
       return { success: false, reason: 'missing_credentials' };
     }
 
@@ -59,7 +69,7 @@ export async function sendSMS(to, message) {
         },
         body: JSON.stringify({
           recipients: [cleanTo],
-          message: message,
+          message: cleanMsg,
         }),
       });
 
@@ -67,7 +77,7 @@ export async function sendSMS(to, message) {
 
       if (!res.ok) {
         console.warn(`[SMS] TextBee error (${res.status}):`, data);
-        printMockBox(cleanTo, message, `TextBee Error (${res.status})`);
+        printMockBox(cleanTo, cleanMsg, `TextBee Error (${res.status})`);
         return { success: false, status: res.status, error: data };
       }
 
@@ -75,7 +85,7 @@ export async function sendSMS(to, message) {
       return { success: true, data };
     } catch (err) {
       console.error('[SMS] Network failure calling TextBee:', err.message);
-      printMockBox(cleanTo, message, `Network failure (${err.message})`);
+      printMockBox(cleanTo, cleanMsg, `Network failure (${err.message})`);
       return { success: false, error: err.message };
     }
   }
