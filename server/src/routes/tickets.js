@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import supabase from '../db.js';
 import { requireAuth } from '../auth.js';
 import { broadcast } from '../events.js';
+import { sendSMS } from '../sms.js';
 
 const router = express.Router();
 
@@ -17,6 +18,18 @@ function normalizeTicket(t) {
     photo_url: t.attachment_url,
     total_cost: t.estimated_cost,
   };
+}
+
+function getAppBaseUrl(req) {
+  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/+$/, '');
+  const origin = req.headers.origin;
+  if (origin && !origin.includes('localhost:')) return origin.replace(/\/+$/, '');
+  const host = req.get('host');
+  if (host && !host.includes('localhost:')) {
+    const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    return `${protocol}://${host}`;
+  }
+  return 'https://jc-tech-zone.onrender.com';
 }
 
 router.post('/', async (req, res) => {
@@ -111,6 +124,17 @@ router.post('/', async (req, res) => {
     title: 'New ticket',
     message: `${createdTicket.ticket_reference_id} · ${service_type === 'home_service' ? 'Home service' : 'Drop-off'} from ${finalName}`,
   });
+
+  if (finalContact) {
+    const baseUrl = getAppBaseUrl(req);
+    const serviceLabel = service_type === 'home_service' ? 'Home Service' : 'Drop-off';
+    const deviceLabel = finalDevice ? `\nDevice: ${finalDevice}` : '';
+    const trackUrl = `${baseUrl}/track?ref=${createdTicket.ticket_reference_id}`;
+
+    const smsText = `JC Tech Zone: Hi ${finalName}! Your repair booking is confirmed.\nTicket: ${createdTicket.ticket_reference_id}${deviceLabel}\nService: ${serviceLabel}\nTrack live status here: ${trackUrl}`;
+
+    sendSMS(finalContact, smsText).catch(err => console.error('[SMS ERROR]', err.message));
+  }
   const normalized = normalizeTicket(createdTicket);
   res.status(201).json({
     message: 'Ticket created',
@@ -278,6 +302,33 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     message: statusChanged ? `Your ticket is now: ${status}` : 'The estimated cost of your repair was updated.',
   } : {});
   if (statusChanged) broadcast(ref, { to: 'staff', by: req.user.id, title: 'Status updated', message: `${ref} → ${status}` });
+
+  if (updated.contact_number && (statusChanged || costChanged)) {
+    const baseUrl = getAppBaseUrl(req);
+    const trackUrl = `${baseUrl}/track?ref=${ref}`;
+    const custName = updated.customer_name ? `Hi ${updated.customer_name}, ` : '';
+    const deviceStr = updated.device_type ? ` for ${updated.device_type}` : '';
+    const finalCostNum = parseFloat(updated.estimated_cost) || 0;
+    const costFormatted = `₱${finalCostNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    const statusNorm = (status || '').toLowerCase();
+    let smsText = '';
+
+    if (statusNorm === 'completed') {
+      smsText = `JC Tech Zone: ${custName}your repair${deviceStr} (Ticket ${ref}) is COMPLETED!\nTotal: ${costFormatted}\nLeave feedback & view receipt: ${trackUrl}`;
+    } else if (statusNorm === 'ready for pick-up') {
+      smsText = `JC Tech Zone: ${custName}your device${deviceStr} (Ticket ${ref}) is READY FOR PICK-UP!\nAmount Due: ${costFormatted}\nTrack details: ${trackUrl}`;
+    } else if (costChanged && !statusChanged) {
+      smsText = `JC Tech Zone: ${custName}the total fee for Ticket ${ref} was finalized at ${costFormatted}.\nTrack details: ${trackUrl}`;
+    } else if (statusChanged) {
+      smsText = `JC Tech Zone: ${custName}Ticket ${ref} update: Status is now "${status}".\nTrack live: ${trackUrl}`;
+    }
+
+    if (smsText) {
+      sendSMS(updated.contact_number, smsText).catch(err => console.error('[SMS ERROR]', err.message));
+    }
+  }
+
   if (assigned) broadcast(ref, { to: 'staff', by: req.user.id, tech_id: updates.assigned_technician_id, title: 'Ticket assigned to you', message: `${ref} · ${updated.customer_name}` });
   res.json({ message: 'Ticket updated', ticket: normalizeTicket(updated), logs: logs || [], work_logs: logs || [] });
 });
