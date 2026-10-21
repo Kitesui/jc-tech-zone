@@ -380,7 +380,7 @@ function renderTicketInfo(ticket) {
       fields.push({ label: 'Schedule', value: new Date(ticket.preferred_schedule).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) });
     }
   }
-  fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;">${escapeHtml(ticket.issue_description)}</span>`, full: true });
+  fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;overflow-wrap:anywhere;">${escapeHtml(ticket.issue_description)}</span>`, full: true });
   fields.push({ label: 'Submitted', value: new Date(ticket.created_at).toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' }) });
 
   if (ticket.attachment_url) {

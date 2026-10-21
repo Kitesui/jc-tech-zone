@@ -773,7 +773,7 @@ function selectJob(id, live = false) {
       { label:'Assigned Tech', value: `<span style="color:${techColor};"><i class="bi bi-person-badge me-1"></i>${escapeHtml(techName)}</span>` },
     ];
     if (selectedTicket.address) fields.push({ label:'Address', value: escapeHtml(selectedTicket.address), full: true });
-    fields.push({ label:'Issue', value: `<span style="color:var(--text-dim);font-size:.8rem;">${escapeHtml(selectedTicket.issue_description)}</span>`, full: true });
+    fields.push({ label:'Issue', value: `<span style="color:var(--text-dim);font-size:.8rem;overflow-wrap:anywhere;">${escapeHtml(selectedTicket.issue_description)}</span>`, full: true });
     if (selectedTicket.estimated_cost > 0) {
       fields.push({ label:'Est. Cost', value: `<span style="color:var(--success);" class="font-mono">₱${Number(selectedTicket.estimated_cost).toFixed(2)}</span>` });
     }
