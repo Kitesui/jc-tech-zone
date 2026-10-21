@@ -197,8 +197,6 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); color: var(--text); }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: border-color var(--transition);
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }
 .card-jc:hover {
   border-color: var(--primary-mid);
@@ -981,8 +979,6 @@ input[type="file"].form-control-jc::file-selector-button:hover {
   font-size: 0.82rem;
   color: var(--text-dim);
   line-height: 1.5;
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 /* Metric cards */
