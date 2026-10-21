@@ -782,8 +782,8 @@ function selectJob(id, live = false) {
     $grid.empty();
     fields.forEach(f => {
       const col = f.full ? 'col-12' : 'col-sm-6';
-      $grid.append(`<div class="${col}"><div class="form-label-jc">${f.label}</div>
-        <div style="font-size:.83rem;font-weight:500;">${f.value}</div></div>`);
+      $grid.append(`<div class="${col}" style="min-width:0;"><div class="form-label-jc">${f.label}</div>
+        <div style="font-size:.83rem;font-weight:500;overflow-wrap:anywhere;word-break:break-word;">${f.value}</div></div>`);
     });
     if (selectedTicket.attachment_url) {
       $('#panelPhotoThumb').attr('src', selectedTicket.attachment_url);

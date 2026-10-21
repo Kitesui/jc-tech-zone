@@ -380,7 +380,7 @@ function renderTicketInfo(ticket) {
       fields.push({ label: 'Schedule', value: new Date(ticket.preferred_schedule).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) });
     }
   }
-  fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;">${escapeHtml(ticket.issue_description)}</span>`, full: true });
+  fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;overflow-wrap:anywhere;word-break:break-word;">${escapeHtml(ticket.issue_description)}</span>`, full: true });
   fields.push({ label: 'Submitted', value: new Date(ticket.created_at).toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' }) });
 
   if (ticket.attachment_url) {
@@ -401,9 +401,9 @@ function renderTicketInfo(ticket) {
   fields.forEach(f => {
     const col = f.full ? 'col-12' : 'col-sm-6';
     $grid.append(`
-      <div class="${col}">
+      <div class="${col}" style="min-width:0;">
         <div class="form-label-jc">${f.label}</div>
-        <div style="font-size:.85rem;color:var(--text);font-weight:500;">${f.value}</div>
+        <div style="font-size:.85rem;color:var(--text);font-weight:500;overflow-wrap:anywhere;word-break:break-word;">${f.value}</div>
       </div>`);
   });
 }
