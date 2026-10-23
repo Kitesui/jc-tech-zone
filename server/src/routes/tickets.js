@@ -53,8 +53,54 @@ router.post('/', async (req, res) => {
   if (!['home_service', 'drop_off'].includes(service_type)) {
     return res.status(400).json({ error: 'service_type must be "home_service" or "drop_off"' });
   }
-  if (service_type === 'home_service' && !address) {
-    return res.status(400).json({ error: 'address is required for home_service bookings' });
+
+  let finalSchedule = preferred_schedule || null;
+  let homeSlotLabel = '';
+
+  if (service_type === 'home_service') {
+    if (!address) {
+      return res.status(400).json({ error: 'address is required for home_service bookings' });
+    }
+    if (!preferred_schedule) {
+      return res.status(400).json({ error: 'preferred_schedule date and time slot are required for home_service bookings' });
+    }
+
+    const dateMatch = String(preferred_schedule).match(/^(\d{4}-\d{2}-\d{2})/);
+    if (!dateMatch) {
+      return res.status(400).json({ error: 'Invalid preferred_schedule format. Expected YYYY-MM-DD date.' });
+    }
+    const schedDate = dateMatch[1];
+    const schedHour = new Date(preferred_schedule).getHours();
+    const isMorning = schedHour < 12;
+    finalSchedule = `${schedDate}T${isMorning ? '09:00:00' : '13:00:00'}`;
+    homeSlotLabel = isMorning ? 'Morning (9:00 AM – 11:00 AM)' : 'Afternoon (1:00 PM – 3:00 PM)';
+
+    // Enforce 2 daily home services limit (morning & afternoon) & prevent slot collisions
+    const { data: existingBookings, error: slotErr } = await supabase
+      .from('tickets')
+      .select('id, preferred_schedule, status')
+      .eq('service_type', 'home_service')
+      .neq('status', 'Cancelled');
+
+    if (slotErr) return res.status(500).json({ error: slotErr.message });
+
+    const dayVisits = (existingBookings || []).filter(t => t.preferred_schedule && t.preferred_schedule.startsWith(schedDate));
+    if (dayVisits.length >= 2) {
+      return res.status(400).json({
+        error: `All 2 daily home service slots for ${schedDate} are fully booked. Only 2 visits (Morning 9-11 AM & Afternoon 1-3 PM) are conducted daily.`
+      });
+    }
+
+    const slotTaken = dayVisits.some(t => {
+      const h = new Date(t.preferred_schedule).getHours();
+      return isMorning ? (h < 12) : (h >= 12);
+    });
+
+    if (slotTaken) {
+      return res.status(400).json({
+        error: `The ${homeSlotLabel} slot on ${schedDate} is already booked. Please choose the alternative slot or another date.`
+      });
+    }
   }
 
   const baseFee = service_type === 'home_service' ? 800.00 : 0.00;
@@ -76,7 +122,7 @@ router.post('/', async (req, res) => {
         device_type: finalDevice,
         issue_description: finalIssue,
         address: address ? address.trim() : null,
-        preferred_schedule: preferred_schedule || null,
+        preferred_schedule: finalSchedule,
         estimated_cost: initialCost,
         attachment_url: finalAttachment,
         assigned_technician_id: assigned_technician_id || null,
@@ -98,7 +144,7 @@ router.post('/', async (req, res) => {
 
   // Insert initial log
   const initialNote = service_type === 'home_service'
-    ? 'Home-service booking received. Fixed Home Service Fee: ₱800.00.'
+    ? `Home service booking registered (${homeSlotLabel || 'On-site'}) for address: ${address.trim()}. Fixed Mobilization Fee: ₱800.00.`
     : 'Drop-off booking received via online portal. Ticket dispatched.';
 
   await supabase.from('ticket_logs').insert([{
@@ -110,11 +156,11 @@ router.post('/', async (req, res) => {
   broadcast(createdTicket.ticket_reference_id, {
     to: 'staff',
     title: 'New ticket',
-    message: `${createdTicket.ticket_reference_id} · ${service_type === 'home_service' ? 'Home service' : 'Drop-off'} from ${finalName}`,
+    message: `${createdTicket.ticket_reference_id} · ${service_type === 'home_service' ? `Home service (${homeSlotLabel})` : 'Drop-off'} from ${finalName}`,
   });
 
   if (finalContact) {
-    const serviceLabel = service_type === 'home_service' ? 'Home Service' : 'Drop-off';
+    const serviceLabel = service_type === 'home_service' ? `Home Service (${homeSlotLabel || 'On-site'})` : 'Drop-off';
     const cleanDevice = finalDevice ? finalDevice.replace(/[\u2013\u2014]/g, '-') : '';
     const deviceLabel = cleanDevice ? `\nDevice: ${cleanDevice}` : '';
 
@@ -127,6 +173,41 @@ router.post('/', async (req, res) => {
     message: 'Ticket created',
     ...normalized,
     ticket: normalized
+  });
+});
+
+router.get('/home-service-slots', async (req, res) => {
+  const date = (req.query.date || '').trim();
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return res.status(400).json({ error: 'Valid date query parameter (YYYY-MM-DD) is required' });
+  }
+
+  const { data, error } = await supabase
+    .from('tickets')
+    .select('id, preferred_schedule, status')
+    .eq('service_type', 'home_service')
+    .neq('status', 'Cancelled');
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const dayVisits = (data || []).filter(t => t.preferred_schedule && t.preferred_schedule.startsWith(date));
+  let morningTaken = false;
+  let afternoonTaken = false;
+
+  for (const t of dayVisits) {
+    const h = new Date(t.preferred_schedule).getHours();
+    if (h < 12) morningTaken = true;
+    else afternoonTaken = true;
+  }
+
+  res.json({
+    date,
+    slots: [
+      { id: '09:00', label: 'Morning (9:00 AM – 11:00 AM)', available: !morningTaken },
+      { id: '13:00', label: 'Afternoon (1:00 PM – 3:00 PM)', available: !afternoonTaken }
+    ],
+    totalBooked: dayVisits.length,
+    isFullyBooked: morningTaken && afternoonTaken
   });
 });
 

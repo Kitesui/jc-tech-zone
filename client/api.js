@@ -123,6 +123,7 @@ const API = (() => {
 
     createTicket: (d) => request('POST', '/tickets', d),
     getTickets: (params) => request('GET', '/tickets?' + $.param(params || {})),
+    getHomeServiceSlots: (date) => request('GET', '/tickets/home-service-slots?date=' + encodeURIComponent(date)),
     trackTicket: (ref) => request('GET', `/tickets/track/${encodeURIComponent(ref)}`),
     getTicket: (id) => request('GET', `/tickets/${id}`),
     updateTicket: (id, d) => request('PUT', `/tickets/${id}`, d),

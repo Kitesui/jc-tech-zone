@@ -374,7 +374,10 @@ function renderTicketInfo(ticket) {
   if (ticket.service_type === 'home_service') {
     fields.push({ label: 'Address', value: ticket.address ? escapeHtml(ticket.address) : '—' });
     if (ticket.preferred_schedule) {
-      fields.push({ label: 'Schedule', value: new Date(ticket.preferred_schedule).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) });
+      const d = new Date(ticket.preferred_schedule);
+      const dStr = !isNaN(d.getTime()) ? d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : ticket.preferred_schedule;
+      const slotTxt = (!isNaN(d.getTime()) && d.getHours() < 12) ? 'Morning (9:00 AM – 11:00 AM)' : 'Afternoon (1:00 PM – 3:00 PM)';
+      fields.push({ label: 'Schedule', value: `${dStr} · <strong>${slotTxt}</strong>` });
     }
   }
   fields.push({ label: 'Issue Description', value: `<span style="color:var(--text-dim);font-size:.82rem;overflow-wrap:anywhere;">${escapeHtml(ticket.issue_description)}</span>`, full: true });

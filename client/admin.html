@@ -1129,12 +1129,19 @@
           <div id="wkHomeFields" class="col-12 d-none">
             <div class="row g-2">
               <div class="col-sm-6">
-                <label class="form-label-jc">Service Address</label>
-                <input type="text" id="wkAddress" class="form-control-jc" placeholder="Full address" />
+                <label class="form-label-jc">Service Address *</label>
+                <input type="text" id="wkAddress" class="form-control-jc" placeholder="Full address (Marikina & nearby)" />
               </div>
-              <div class="col-sm-6">
-                <label class="form-label-jc">Preferred Schedule</label>
-                <input type="datetime-local" id="wkSchedule" class="form-control-jc" />
+              <div class="col-sm-3">
+                <label class="form-label-jc">Preferred Date *</label>
+                <input type="date" id="wkDate" class="form-control-jc" />
+              </div>
+              <div class="col-sm-3">
+                <label class="form-label-jc">Daily Slot (Max 2) *</label>
+                <select id="wkSlot" class="form-select-jc">
+                  <option value="09:00">Morning (9:00 – 11:00 AM)</option>
+                  <option value="13:00">Afternoon (1:00 – 3:00 PM)</option>
+                </select>
               </div>
             </div>
           </div>
@@ -1759,6 +1766,9 @@ async function deleteTicketCurrent() {
 $('#wkMode').on('change', function() {
   if ($(this).val() === 'home_service') {
     $('#wkHomeFields').removeClass('d-none');
+    const todayStr = new Date().toISOString().split('T')[0];
+    $('#wkDate').attr('min', todayStr);
+    if (!$('#wkDate').val()) $('#wkDate').val(todayStr);
     if (!$('#wkCost').val() || parseFloat($('#wkCost').val()) === 0) {
       $('#wkCost').val('800.00');
     }
@@ -1772,6 +1782,11 @@ $('#wkMode').on('change', function() {
 
 $('#walkinForm').on('submit', function(e) {
   e.preventDefault();
+  const isHome = $('#wkMode').val() === 'home_service';
+  const prefSched = (isHome && $('#wkDate').val())
+    ? `${$('#wkDate').val()}T${$('#wkSlot').val()}:00`
+    : null;
+
   const payload = {
     customer_name:     $('#wkName').val().trim(),
     contact_number:    $('#wkPhone').val().trim(),
@@ -1780,7 +1795,7 @@ $('#walkinForm').on('submit', function(e) {
     device_type:       `${$('#wkCategory').val()} — ${$('#wkDevice').val().trim() || 'N/A'}`,
     issue_description: $('#wkIssue').val().trim(),
     address:           $('#wkAddress').val().trim() || null,
-    preferred_schedule:$('#wkSchedule').val() || null,
+    preferred_schedule:prefSched,
     estimated_cost:    parseFloat($('#wkCost').val()) || 0,
     assigned_technician_id: $('#wkTech').val() || null,
   };
@@ -1802,10 +1817,11 @@ $('#walkinModal').on('hidden.bs.modal', () => {
 });
 
 function formatTimeShort(isoStr) {
-  if (!isoStr) return '09:00 AM';
+  if (!isoStr) return '9-11 AM';
   const d = new Date(isoStr);
-  if (isNaN(d.getTime())) return '09:00 AM';
-  return d.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
+  if (isNaN(d.getTime())) return '9-11 AM';
+  const h = d.getHours();
+  return h < 12 ? '9-11 AM' : '1-3 PM';
 }
 
 function getStatusTheme(status) {

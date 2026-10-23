@@ -292,13 +292,13 @@
                 <button type="button" class="mode-btn mode-btn-home" id="modeHome" onclick="setMode('home_service')">
                   <div class="d-flex align-items-center justify-content-between w-100 mb-1">
                     <span class="mode-icon mb-0" style="color:var(--primary);font-size:1.25rem;"><i class="bi bi-house-door-fill"></i></span>
-                    <span class="badge" style="background:rgba(0,168,150,0.22);border:1px solid #00a896;color:#5eead4;font-size:0.65rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:4px;letter-spacing:0.04em;">ON-SITE VISIT</span>
+                    <span class="badge" style="background:rgba(0,168,150,0.22);border:1px solid #00a896;color:#5eead4;font-size:0.65rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:4px;letter-spacing:0.04em;">2 SLOTS DAILY</span>
                   </div>
                   <span class="mode-title d-flex align-items-center justify-content-between w-100">
                     <span style="font-size:0.95rem;font-weight:700;">Home Service</span>
                     <span class="badge" style="background:#00a896;color:#ffffff;font-size:0.75rem;font-weight:700;padding:0.22rem 0.5rem;">₱800 Fee</span>
                   </span>
-                  <span class="mode-desc">Technician visits your location</span>
+                  <span class="mode-desc">9-11 AM & 1-3 PM · Marikina</span>
                 </button>
               </div>
             </div>
@@ -361,9 +361,9 @@
 
           <div id="homeServiceFields" class="d-none">
             <div class="p-2 mb-3 rounded d-flex align-items-center gap-2" style="background:rgba(0,168,150,0.1);border:1px solid rgba(0,168,150,0.28);">
-              <i class="bi bi-geo-alt-fill" style="color:var(--primary);font-size:1.1rem;"></i>
+              <i class="bi bi-calendar-check-fill" style="color:var(--primary);font-size:1.1rem;"></i>
               <div style="font-size:0.75rem;color:var(--text);line-height:1.35;">
-                <strong>Home Service Selected:</strong> A JC Tech Zone technician will visit your location in Marikina / nearby areas with diagnostic tools.
+                <strong>Home Service Policy:</strong> Offered <strong>2 visits daily</strong> only (Morning: 9:00 AM – 11:00 AM & Afternoon: 1:00 PM – 3:00 PM) to ensure dedicated on-site diagnostics.
               </div>
             </div>
             <div class="mb-3">
@@ -371,16 +371,20 @@
               <input type="text" id="serviceAddress" class="form-control-jc"
                      placeholder="Full address (house no., street, barangay, city)" />
             </div>
-            <div class="row g-2 mb-3">
-              <div class="col-7">
-                <label class="form-label-jc">Preferred Date</label>
-                <input type="date" id="preferredDate" class="form-control-jc" />
+            <div class="row g-2 mb-2">
+              <div class="col-sm-6">
+                <label class="form-label-jc">Preferred Date *</label>
+                <input type="date" id="preferredDate" class="form-control-jc" onchange="refreshHomeServiceSlots()" />
               </div>
-              <div class="col-5">
-                <label class="form-label-jc">Preferred Time</label>
-                <input type="time" id="preferredTime" class="form-control-jc" value="09:00" />
+              <div class="col-sm-6">
+                <label class="form-label-jc">Time Slot (Max 2 Slots) *</label>
+                <select id="preferredTimeSlot" class="form-select-jc">
+                  <option value="09:00">Morning (9:00 AM – 11:00 AM)</option>
+                  <option value="13:00">Afternoon (1:00 PM – 3:00 PM)</option>
+                </select>
               </div>
             </div>
+            <div id="slotStatusAlert" class="small mb-3 d-none p-2 rounded" style="font-size:0.75rem;"></div>
           </div>
 
           <div class="card-jc p-3 mb-2" id="feeSummaryCard" style="background:var(--primary-dim);border-color:var(--primary-mid);">
@@ -530,7 +534,65 @@ function setMode(mode) {
     $('#feeSummaryLabel').text('Fixed Home Service Mobilization Fee');
     $('#feeSummaryAmount').text('₱800.00');
     $('#feeSummaryNote').text('Fixed dispatch & on-site diagnostics');
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    $('#preferredDate').attr('min', todayStr);
+    if (!$('#preferredDate').val()) {
+      $('#preferredDate').val(todayStr);
+    }
+    refreshHomeServiceSlots();
   }
+}
+
+function refreshHomeServiceSlots() {
+  const chosenDate = $('#preferredDate').val();
+  const $slotSelect = $('#preferredTimeSlot');
+  const $alert = $('#slotStatusAlert');
+
+  if (!chosenDate) {
+    $alert.addClass('d-none');
+    return;
+  }
+
+  API.getHomeServiceSlots(chosenDate)
+    .then(data => {
+      const morningSlot = (data.slots || []).find(s => s.id === '09:00') || { available: true };
+      const afternoonSlot = (data.slots || []).find(s => s.id === '13:00') || { available: true };
+
+      $slotSelect.empty();
+
+      if (morningSlot.available) {
+        $slotSelect.append('<option value="09:00">Morning (9:00 AM – 11:00 AM) — Available</option>');
+      } else {
+        $slotSelect.append('<option value="09:00" disabled>Morning (9:00 AM – 11:00 AM) — [Booked]</option>');
+      }
+
+      if (afternoonSlot.available) {
+        $slotSelect.append('<option value="13:00">Afternoon (1:00 PM – 3:00 PM) — Available</option>');
+      } else {
+        $slotSelect.append('<option value="13:00" disabled>Afternoon (1:00 PM – 3:00 PM) — [Booked]</option>');
+      }
+
+      if (data.isFullyBooked) {
+        $alert.removeClass('d-none')
+          .css({ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5' })
+          .html('<i class="bi bi-x-circle-fill me-1"></i> <strong>Fully Booked:</strong> All 2 daily slots (Morning & Afternoon) on this date are taken. Please choose another date.');
+        $('#submitBookingBtn').prop('disabled', true);
+      } else {
+        if (morningSlot.available) {
+          $slotSelect.val('09:00');
+        } else if (afternoonSlot.available) {
+          $slotSelect.val('13:00');
+        }
+        $alert.removeClass('d-none')
+          .css({ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#6ee7b7' })
+          .html(`<i class="bi bi-check-circle-fill me-1"></i> <strong>${2 - data.totalBooked} of 2 slots available</strong> on this date.`);
+        $('#submitBookingBtn').prop('disabled', false);
+      }
+    })
+    .catch(() => {
+      $alert.addClass('d-none');
+    });
 }
 
 $('#bookingForm').on('submit', function(e) {
@@ -547,9 +609,15 @@ $('#bookingForm').on('submit', function(e) {
     showBookingError('Please fill in all required fields (name, phone, issue description).');
     return;
   }
-  if (serviceMode === 'home_service' && !addr) {
-    showBookingError('Please enter your address for home service booking.');
-    return;
+  if (serviceMode === 'home_service') {
+    if (!addr) {
+      showBookingError('Please enter your address for home service booking.');
+      return;
+    }
+    if (!$('#preferredDate').val() || !$('#preferredTimeSlot').val()) {
+      showBookingError('Please select a preferred date and time slot (Morning 9-11 AM or Afternoon 1-3 PM).');
+      return;
+    }
   }
 
   $btn.prop('disabled', true);
@@ -568,7 +636,7 @@ $('#bookingForm').on('submit', function(e) {
     device_type:        fullDevice,
     issue_description:  issue,
     address:            addr || null,
-    preferred_schedule: $('#preferredDate').val() ? `${$('#preferredDate').val()}T${$('#preferredTime').val() || '09:00'}` : null,
+    preferred_schedule: serviceMode === 'home_service' ? `${$('#preferredDate').val()}T${$('#preferredTimeSlot').val()}:00` : null,
     estimated_cost:     serviceMode === 'home_service' ? 800 : 0,
     attachment_url:     attachedPhotoDataUrl || null,
   };
