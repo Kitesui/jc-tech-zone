@@ -267,25 +267,13 @@ router.get('/', requireAuth(['admin', 'technician']), async (req, res) => {
 });
 
 router.get('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
-  const { data: ticket, error } = await supabase
-    .from('tickets')
-    .select('*, technicians(id, full_name, role, phone)')
-    .eq('id', req.params.id)
-    .single();
+  const [{ data: ticket, error }, { data: logs }, { data: feedback }] = await Promise.all([
+    supabase.from('tickets').select('*, technicians(id, full_name, role, phone)').eq('id', req.params.id).single(),
+    supabase.from('ticket_logs').select('*, technicians(full_name)').eq('ticket_id', req.params.id).order('created_at', { ascending: true }),
+    supabase.from('ticket_feedback').select('*').eq('ticket_id', req.params.id).maybeSingle(),
+  ]);
 
   if (error || !ticket) return res.status(404).json({ error: 'Ticket not found' });
-
-  const { data: logs } = await supabase
-    .from('ticket_logs')
-    .select('*, technicians(full_name)')
-    .eq('ticket_id', ticket.id)
-    .order('created_at', { ascending: true });
-
-  const { data: feedback } = await supabase
-    .from('ticket_feedback')
-    .select('*')
-    .eq('ticket_id', ticket.id)
-    .maybeSingle();
 
   res.json({
     ticket: normalizeTicket(ticket),
@@ -407,7 +395,7 @@ router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) 
   // Guard: Work logs are locked on Completed or Cancelled tickets
   const { data: ticket, error: ticketErr } = await supabase
     .from('tickets')
-    .select('status, assigned_technician_id, ticket_reference_id')
+    .select('status, assigned_technician_id, ticket_reference_id, estimated_cost')
     .eq('id', req.params.id)
     .single();
 
@@ -437,7 +425,14 @@ router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) 
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
-  broadcast(ticket.ticket_reference_id, { to: 'customer', title: 'New repair note', message: 'The technician added an update to your ticket.' });
+
+  // Logged labor/parts cost is part of the customer's bill (on top of the base fee).
+  const logged = parseFloat(labor_cost) || 0;
+  if (logged > 0) {
+    const newTotal = (parseFloat(ticket.estimated_cost) || 0) + logged;
+    await supabase.from('tickets').update({ estimated_cost: newTotal, updated_at: new Date().toISOString() }).eq('id', req.params.id);
+  }
+  broadcast(ticket.ticket_reference_id, { to: 'customer', title: logged > 0 ? 'Cost updated' : 'New repair note', message: logged > 0 ? 'The estimated cost of your repair was updated.' : 'The technician added an update to your ticket.' });
   res.status(201).json(data);
 });
 

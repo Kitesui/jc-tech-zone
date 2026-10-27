@@ -1684,47 +1684,55 @@ function renderTicketsTable(tickets) {
   });
 }
 
-function openEditTicket(id) {
-  API.getTicket(id).then(res => {
-    const t = res.ticket;
-    $('#editTicketId').val(t.id);
-    $('#editTicketRef').text(t.ticket_reference_id);
-    $('#editStatus').val(t.status);
-    $('#editCost').val(t.estimated_cost || 0);
-    $('#editWorkNote').val('');
-    // Populate tech dropdown
-    const $sel = $('#editTech').empty().append('<option value="">— Unassigned —</option>');
-    allTechs.forEach(tech => {
-      $sel.append(`<option value="${tech.id}" ${t.assigned_technician_id === tech.id ? 'selected':''}>
-        ${tech.full_name} (${tech.role})
-      </option>`);
-    });
-
-    // Populate Customer Review if available
-    const fb = res.feedback;
-    if (fb) {
-      const sent = getSentimentBadge(fb.rating);
-      const stars = '★'.repeat(fb.rating) + '☆'.repeat(5 - fb.rating);
-      const dt = fb.created_at ? new Date(fb.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-      $('#editTicketFeedbackBadge').html(`
-        <span class="badge" style="background:${sent.color}22;border:1px solid ${sent.color}55;color:${sent.color};font-size:0.7rem;">
-          <i class="bi ${sent.icon} me-1"></i>${fb.rating}.0 · ${sent.label}
-        </span>
-      `);
-      $('#editTicketFeedbackContent').html(`
-        <div class="d-flex align-items-center gap-2 mb-1">
-          <span style="font-size:1.15rem;color:#f59e0b;letter-spacing:1px;">${stars}</span>
-          <span style="font-size:0.75rem;color:var(--text-muted);">${dt}</span>
-        </div>
-        ${fb.comments ? `<div style="font-style:italic;color:var(--text);margin-top:0.35rem;line-height:1.45;">"${escapeHtml(fb.comments)}"</div>` : '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic;">Customer submitted star rating without comments.</div>'}
-      `);
-      $('#editTicketFeedbackBox').removeClass('d-none');
-    } else {
-      $('#editTicketFeedbackBox').addClass('d-none');
-    }
-
-    bootstrap.Modal.getOrCreateInstance('#editTicketModal').show();
+function fillEditTicket(t) {
+  $('#editTicketId').val(t.id);
+  $('#editTicketRef').text(t.ticket_reference_id);
+  $('#editStatus').val(t.status);
+  $('#editCost').val(t.estimated_cost || 0);
+  $('#editWorkNote').val('');
+  const $sel = $('#editTech').empty().append('<option value="">— Unassigned —</option>');
+  allTechs.forEach(tech => {
+    $sel.append(`<option value="${tech.id}" ${t.assigned_technician_id === tech.id ? 'selected':''}>
+      ${tech.full_name} (${tech.role})
+    </option>`);
   });
+}
+
+function fillEditFeedback(fb) {
+  if (fb) {
+    const sent = getSentimentBadge(fb.rating);
+    const stars = '★'.repeat(fb.rating) + '☆'.repeat(5 - fb.rating);
+    const dt = fb.created_at ? new Date(fb.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    $('#editTicketFeedbackBadge').html(`
+      <span class="badge" style="background:${sent.color}22;border:1px solid ${sent.color}55;color:${sent.color};font-size:0.7rem;">
+        <i class="bi ${sent.icon} me-1"></i>${fb.rating}.0 · ${sent.label}
+      </span>
+    `);
+    $('#editTicketFeedbackContent').html(`
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span style="font-size:1.15rem;color:#f59e0b;letter-spacing:1px;">${stars}</span>
+        <span style="font-size:0.75rem;color:var(--text-muted);">${dt}</span>
+      </div>
+      ${fb.comments ? `<div style="font-style:italic;color:var(--text);margin-top:0.35rem;line-height:1.45;">"${escapeHtml(fb.comments)}"</div>` : '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic;">Customer submitted star rating without comments.</div>'}
+    `);
+    $('#editTicketFeedbackBox').removeClass('d-none');
+  } else {
+    $('#editTicketFeedbackBox').addClass('d-none');
+  }
+}
+
+function openEditTicket(id) {
+  const cached = allTickets.find(x => x.id === id);
+  const showModal = () => bootstrap.Modal.getOrCreateInstance('#editTicketModal').show();
+  if (cached) {
+    fillEditTicket(cached);
+    fillEditFeedback(null);
+    showModal();
+  }
+  API.getTicket(id).then(res => {
+    if (!cached) { fillEditTicket(res.ticket); showModal(); }
+    fillEditFeedback(res.feedback);
+  }).catch(err => UI.toast('Error: ' + err.message, 'error'));
 }
 
 $('#editTicketForm').on('submit', function(e) {
