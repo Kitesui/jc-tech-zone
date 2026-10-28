@@ -310,7 +310,7 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     .single();
 
   if (fetchErr || !current) return res.status(404).json({ error: 'Ticket not found' });
-  if (current.status === 'Cancelled' && req.user.role !== 'admin') {
+  if (current.status === 'Cancelled') {
     return res.status(400).json({ error: 'This ticket has been cancelled and cannot be edited.' });
   }
   if (current.status === 'Completed' && req.user.role !== 'admin') {

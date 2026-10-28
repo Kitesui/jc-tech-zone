@@ -56,10 +56,10 @@ const editAttempt = await call('PUT', `/tickets/${ticketId}`, tech.token, { stat
 assert.equal(editAttempt.status, 400, `Cancelled ticket must block tech edit, got ${editAttempt.status}: ${JSON.stringify(editAttempt.body)}`);
 console.log(`Cancelled lock OK: tech blocked with "${editAttempt.body.error}"`);
 
-// Admin CAN still edit a cancelled ticket
+// Admin is blocked too: cancelled is final
 const adminEdit = await call('PUT', `/tickets/${ticketId}`, A, { status: 'Received' });
-assert.equal(adminEdit.status, 200, `Admin must be able to edit cancelled ticket`);
-console.log(`Admin override OK`);
+assert.equal(adminEdit.status, 400, `Admin must also be blocked on cancelled ticket`);
+console.log('Admin also blocked OK');
 
 console.log('\nALL TESTS PASSED ✅');
 

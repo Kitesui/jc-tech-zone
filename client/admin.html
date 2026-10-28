@@ -1563,6 +1563,7 @@ function loadTickets(showToast = false) {
     allTickets = tickets || [];
     updateMetrics(allTickets);
     homeServiceTickets = allTickets.filter(t => t.service_type === 'home_service' && t.preferred_schedule);
+    if (typeof calYear !== 'undefined' && calYear !== undefined) renderCalendar();
     applyTicketsFilter();
     initNotifications(allTickets);
     if (showToast) UI.toast('Tickets refreshed', 'info', 1800);
