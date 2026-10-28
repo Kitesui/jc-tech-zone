@@ -933,12 +933,10 @@ function renderTechLogs(logs) {
 }
 
 function getActiveTechId() {
+  if (currentUser && currentUser.role === 'technician' && currentUser.id !== 'demo-tech') return currentUser.id;
   const rawTech = $('#techSelect').val();
   if (rawTech && rawTech !== '__unassigned__') return rawTech;
   if (selectedTicket && selectedTicket.assigned_technician_id) return selectedTicket.assigned_technician_id;
-  if (currentUser && currentUser.role === 'technician' && currentUser.id && currentUser.id !== 'demo-tech' && currentUser.id !== 'admin') {
-    return currentUser.id;
-  }
   return null;
 }
 

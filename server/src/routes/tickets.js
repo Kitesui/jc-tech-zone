@@ -20,6 +20,10 @@ function normalizeTicket(t) {
   };
 }
 
+// Technicians may only touch unassigned (claim) or their own tickets; admins unrestricted.
+const notOwner = (user, assignedId) => user.role === 'technician' && assignedId && assignedId !== user.id;
+const OWNER_ERR = { error: 'Forbidden: you can only update tickets assigned to you' };
+
 router.post('/', async (req, res) => {
   const {
     customer_name,
@@ -306,14 +310,15 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     .single();
 
   if (fetchErr || !current) return res.status(404).json({ error: 'Ticket not found' });
+  if (notOwner(req.user, current.assigned_technician_id)) return res.status(403).json(OWNER_ERR);
 
   const updates = { updated_at: new Date().toISOString() };
   if (status) updates.status = status;
   
   let techId = assigned_technician_id !== undefined ? assigned_technician_id : technician_id;
-  // Auto-claim unassigned tickets when technician updates status
-  if (!techId && !current.assigned_technician_id && req.user && req.user.role === 'technician' && req.user.id !== 'admin' && req.user.id !== 'demo-tech') {
-    techId = req.user.id;
+  if (req.user.role === 'technician') {
+    // Technicians cannot reassign to others; they can only claim an unassigned ticket as themselves
+    techId = current.assigned_technician_id ? undefined : req.user.id;
   }
   if (techId !== undefined) updates.assigned_technician_id = techId || null;
 
@@ -400,11 +405,13 @@ router.post('/:id/logs', requireAuth(['admin', 'technician']), async (req, res) 
     .single();
 
   if (ticketErr || !ticket) return res.status(404).json({ error: 'Ticket not found' });
+  if (notOwner(req.user, ticket.assigned_technician_id)) return res.status(403).json(OWNER_ERR);
   if (ticket.status === 'Completed' || ticket.status === 'Cancelled') {
     return res.status(400).json({ error: `Cannot add work logs to a ticket that is already ${ticket.status}.` });
   }
 
-  const effectiveTech = technician_id || (req.user && req.user.role === 'technician' && req.user.id !== 'admin' && req.user.id !== 'demo-tech' ? req.user.id : null);
+  // Identity comes from the verified token for technicians; body technician_id is admin-only
+  const effectiveTech = req.user.role === 'technician' ? (req.user.id === 'demo-tech' ? null : req.user.id) : (technician_id || null);
   if (!ticket.assigned_technician_id && effectiveTech) {
     await supabase.from('tickets').update({ assigned_technician_id: effectiveTech }).eq('id', req.params.id);
   }
