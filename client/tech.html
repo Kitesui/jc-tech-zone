@@ -775,7 +775,7 @@ function selectJob(id, live = false) {
     if (selectedTicket.preferred_schedule) {
       const d = new Date(selectedTicket.preferred_schedule);
       const dStr = !isNaN(d.getTime()) ? d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : selectedTicket.preferred_schedule;
-      const slotTxt = (!isNaN(d.getTime()) && d.getHours() < 12) ? 'Morning (9:00 AM – 11:00 AM)' : 'Afternoon (1:00 PM – 3:00 PM)';
+      const slotTxt = (parseInt(String(selectedTicket.preferred_schedule).substring(11,13),10) < 12) ? 'Morning (9:00 AM – 11:00 AM)' : 'Afternoon (1:00 PM – 3:00 PM)';
       fields.push({ label:'Schedule Slot', value: `<span style="color:var(--primary);font-weight:600;"><i class="bi bi-clock-history me-1"></i>${dStr} · ${slotTxt}</span>`, full: true });
     }
     if (selectedTicket.address) fields.push({ label:'Address', value: escapeHtml(selectedTicket.address), full: true });

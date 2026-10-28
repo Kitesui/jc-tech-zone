@@ -310,6 +310,12 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     .single();
 
   if (fetchErr || !current) return res.status(404).json({ error: 'Ticket not found' });
+  if (current.status === 'Cancelled' && req.user.role !== 'admin') {
+    return res.status(400).json({ error: 'This ticket has been cancelled and cannot be edited.' });
+  }
+  if (current.status === 'Completed' && req.user.role !== 'admin') {
+    return res.status(400).json({ error: 'This ticket is already completed and cannot be edited.' });
+  }
   if (notOwner(req.user, current.assigned_technician_id)) return res.status(403).json(OWNER_ERR);
 
   const updates = { updated_at: new Date().toISOString() };
