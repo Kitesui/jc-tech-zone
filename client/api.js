@@ -306,3 +306,8 @@ if (typeof window !== 'undefined') {
       .replace(/'/g, '&#039;');
   };
 }
+
+// Academic disclaimer: api.js is loaded by every page, so one injection covers the whole site.
+$(function () {
+  $('body').append('<div role="note" style="background:#0b1220;border-top:1px solid var(--border,#1f2a3a);color:#94a3b8;font-size:.72rem;line-height:1.4;text-align:center;padding:.6rem 1rem;"><strong style="color:#cbd5e1;">DISCLAIMER:</strong> This web application was created strictly for academic demonstration and evaluation purposes. It is not an official commercial portal of JC TECH ZONE.</div>');
+});
