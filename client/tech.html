@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -635,15 +635,13 @@ function getSentimentBadge(rating) {
 }
 
 function loadTechDropdown() {
-  // Technicians don't pick an identity or filter by staff; the server scopes their queue
-  if (currentUser.role === 'technician') $('#techSelect, #techSelectLabel').addClass('d-none');
   API.getTechnicians().then(techs => {
     // Technicians only see themselves; other staff names are never listed.
     allTechnicians = (techs || []).filter(t => currentUser.role !== 'technician' || t.id === currentUser.id);
     const $sel = $('#techSelect');
-    $sel.empty()
-      .append('<option value="">— All Technicians (Show All Queue) —</option>')
-      .append('<option value="__unassigned__">— Unassigned Tickets Only —</option>');
+    $sel.empty();
+    // Technicians see only their own name; All/Unassigned options are admin-only
+    if (currentUser.role !== 'technician') $sel.append('<option value="">- All Technicians (Show All Queue) -</option>').append('<option value="__unassigned__">- Unassigned Tickets Only -</option>');
     allTechnicians.forEach(t => $sel.append(`<option value="${t.id}" data-name="${t.full_name}">${t.full_name} (${t.role})</option>`));
     if (currentUser && currentUser.id !== 'admin' && currentUser.id !== 'demo-tech') {
       $sel.val(currentUser.id);
