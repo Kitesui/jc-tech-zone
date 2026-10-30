@@ -636,7 +636,8 @@ function getSentimentBadge(rating) {
 
 function loadTechDropdown() {
   API.getTechnicians().then(techs => {
-    allTechnicians = techs || [];
+    // Technicians only see themselves; other staff names are never listed.
+    allTechnicians = (techs || []).filter(t => currentUser.role !== 'technician' || t.id === currentUser.id);
     const $sel = $('#techSelect');
     $sel.empty()
       .append('<option value="">— All Technicians (Show All Queue) —</option>')
@@ -966,7 +967,8 @@ function promptClaimTicketModal(targetStatus) {
 
   if (!allTechnicians || !allTechnicians.length) {
     API.getTechnicians().then(techs => {
-      allTechnicians = techs || [];
+      // Technicians only see themselves; other staff names are never listed.
+    allTechnicians = (techs || []).filter(t => currentUser.role !== 'technician' || t.id === currentUser.id);
       populateClaimSelect();
       const modalEl = document.getElementById('claimTicketModal');
       bootstrap.Modal.getOrCreateInstance(modalEl).show();

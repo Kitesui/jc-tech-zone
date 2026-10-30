@@ -254,8 +254,13 @@ router.get('/', requireAuth(['admin', 'technician']), async (req, res) => {
     .select('*, technicians(id, full_name, role)')
     .order('created_at', { ascending: false });
 
+  if (req.user.role === 'technician') {
+    // Technicians only ever see their own tickets plus the unassigned pool (needed to claim work)
+    query = req.user.id === 'demo-tech'
+      ? query.is('assigned_technician_id', null)
+      : query.or(`assigned_technician_id.eq.${req.user.id},assigned_technician_id.is.null`);
+  } else if (technician_id) query = query.eq('assigned_technician_id', technician_id);
   if (status && status !== 'all') query = query.eq('status', status);
-  if (technician_id) query = query.eq('assigned_technician_id', technician_id);
   if (search) {
     const cleanSearch = search.replace(/[,()]/g, ' ').trim();
     if (cleanSearch) {
@@ -278,6 +283,7 @@ router.get('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
   ]);
 
   if (error || !ticket) return res.status(404).json({ error: 'Ticket not found' });
+  if (notOwner(req.user, ticket.assigned_technician_id)) return res.status(403).json(OWNER_ERR);
 
   res.json({
     ticket: normalizeTicket(ticket),
@@ -368,7 +374,7 @@ router.put('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
     title: statusChanged ? 'Status updated' : 'Cost updated',
     message: statusChanged ? `Your ticket is now: ${status}` : 'The estimated cost of your repair was updated.',
   } : {});
-  if (statusChanged) broadcast(ref, { to: 'staff', by: req.user.id, title: 'Status updated', message: `${ref} → ${status}` });
+  if (statusChanged) broadcast(ref, { to: 'staff', by: req.user.id, owner: updated.assigned_technician_id, title: 'Status updated', message: `${ref} → ${status}` });
 
   if (updated.contact_number && (statusChanged || costChanged)) {
     const custName = updated.customer_name ? `Hi ${updated.customer_name}, ` : '';

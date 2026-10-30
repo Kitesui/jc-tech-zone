@@ -13,17 +13,18 @@ function normalizeTech(t) {
   };
 }
 
-router.get('/', async (req, res) => {
-  const { data, error } = await supabase
-    .from('technicians')
-    .select('*')
-    .order('full_name', { ascending: true });
+router.get('/', requireAuth(['admin', 'technician']), async (req, res) => {
+  let q = supabase.from('technicians').select('*').order('full_name', { ascending: true });
+  // Technicians may only see their own record, never the staff directory
+  if (req.user.role === 'technician') q = q.eq('id', req.user.id);
+  const { data, error } = await q;
 
   if (error) return res.status(500).json({ error: error.message });
   res.json((data || []).map(normalizeTech));
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth(['admin', 'technician']), async (req, res) => {
+  if (req.user.role === 'technician' && req.params.id !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
   const { data, error } = await supabase
     .from('technicians')
     .select('*')

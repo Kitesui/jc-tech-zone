@@ -18,6 +18,9 @@ export function broadcast(ref = null, note = {}) {
     // to that specific technician! Never send "Ticket assigned to you" to admin or other staff.
     if (note.title && note.tech_id && user?.id !== note.tech_id) continue;
 
+    // Ticket-scoped staff notes go to admins and the owning technician only.
+    if (note.owner !== undefined && user?.role === 'technician' && user.id !== note.owner) continue;
+
     // Self-action: do not send notification note back to the user who triggered the action.
     if (note.title && note.by && user?.id === note.by) continue;
 

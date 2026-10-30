@@ -31,6 +31,18 @@ try {
   assert.equal(r.status, 200);
   assert.equal(r.body.ticket.assigned_technician_id, A.user.id, 'A should have claimed it');
 
+  // B cannot see A's ticket at all: not in list, not by id; staff directory is private
+  r = await call('GET', '/tickets', B.token);
+  assert(!r.body.some(t => t.id === id), 'A ticket must be hidden from B list');
+  assert(r.body.every(t => !t.assigned_technician_id || t.assigned_technician_id === B.user.id), 'B list leaks others tickets');
+  r = await call('GET', `/tickets/${id}`, B.token);
+  assert.equal(r.status, 403, 'B must not read A ticket');
+  r = await call('GET', '/tickets', A.token);
+  assert(r.body.some(t => t.id === id), 'A must still see own ticket');
+  r = await call('GET', '/technicians', B.token);
+  assert(r.body.length === 1 && r.body[0].id === B.user.id, 'B must only see self in directory');
+  r = await call('GET', '/technicians', null);
+  assert.equal(r.status, 401, 'technician directory must require login');
   // B is blocked from update, log, and reassign
   r = await call('PUT', `/tickets/${id}`, B.token, { status: 'In Progress' });
   assert.equal(r.status, 403, 'B must not update A ticket');
