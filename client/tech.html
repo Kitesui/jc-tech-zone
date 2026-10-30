@@ -1091,7 +1091,9 @@ function quickStatus(status) {
 
   // Auto-prompt price modal if finalizing repair but bill is unset (₱0.00)
   const currentCost = parseFloat(selectedTicket.estimated_cost) || 0;
-  if ((status === 'Ready for Pick-Up' || status === 'Completed') && currentCost === 0) {
+  // Home service starts with a fixed fee (never 0), so always confirm the final bill the first time it is finalized
+  const needsBill = currentCost === 0 || (selectedTicket.service_type === 'home_service' && selectedTicket.status !== 'Ready for Pick-Up');
+  if ((status === 'Ready for Pick-Up' || status === 'Completed') && needsBill) {
     openOverallPriceModal(status);
     return;
   }
