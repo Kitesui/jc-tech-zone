@@ -135,7 +135,7 @@
     <div class="d-flex flex-wrap align-items-center gap-3">
       <div style="flex:1;min-width:200px;">
         <div class="d-flex justify-content-between align-items-center mb-1">
-          <label class="form-label-jc mb-0">Working as Technician</label>
+          <label class="form-label-jc mb-0" id="techSelectLabel">Working as Technician</label>
           <button class="btn-circle-jc d-md-none" onclick="loadJobs(true)" title="Refresh Queue" aria-label="Refresh Queue" style="width:28px;height:28px;min-width:28px;min-height:28px;">
             <i class="bi bi-arrow-clockwise" style="font-size:.82rem;"></i>
           </button>
@@ -635,6 +635,8 @@ function getSentimentBadge(rating) {
 }
 
 function loadTechDropdown() {
+  // Technicians don't pick an identity or filter by staff; the server scopes their queue
+  if (currentUser.role === 'technician') $('#techSelect, #techSelectLabel').addClass('d-none');
   API.getTechnicians().then(techs => {
     // Technicians only see themselves; other staff names are never listed.
     allTechnicians = (techs || []).filter(t => currentUser.role !== 'technician' || t.id === currentUser.id);
@@ -666,7 +668,7 @@ function loadJobs(showToast = false) {
 
 function applyFilter() {
   const filter = $('#queueFilter').val();
-  const selectedTech = $('#techSelect').val();
+  const selectedTech = currentUser.role === 'technician' ? '' : $('#techSelect').val(); // server already scopes technicians
   let filtered = allJobs;
 
   // 1. Status Filter
