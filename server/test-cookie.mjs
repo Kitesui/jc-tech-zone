@@ -35,3 +35,4 @@ await api('DELETE', `/technicians/${created.id}`, { cookie, headers: { 'X-Reques
 const out = await api('POST', '/auth/logout');
 assert(/Max-Age=0/.test(out.headers.get('set-cookie')), 'logout must expire the cookie');
 console.log('ALL COOKIE CHECKS PASSED');
+

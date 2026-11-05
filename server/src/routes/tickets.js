@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import crypto from 'crypto';
 import supabase from '../db.js';
 import { requireAuth } from '../auth.js';
@@ -22,6 +22,9 @@ function normalizeTicket(t) {
 
 // Technicians may only touch unassigned (claim) or their own tickets; admins unrestricted.
 const notOwner = (user, assignedId) => user.role === 'technician' && assignedId && assignedId !== user.id;
+// Read the hour straight from the stored string: Date#getHours() shifts with the server's timezone and misclassifies slots.
+// ponytail: assumes schedules are stored as YYYY-MM-DDTHH:mm; a different storage format needs a real parser.
+const slotHour = (s) => parseInt(String(s).substring(11, 13), 10);
 const OWNER_ERR = { error: 'Forbidden: you can only update tickets assigned to you' };
 
 router.post('/', async (req, res) => {
@@ -74,7 +77,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid preferred_schedule format. Expected YYYY-MM-DD date.' });
     }
     const schedDate = dateMatch[1];
-    const schedHour = new Date(preferred_schedule).getHours();
+    const schedHour = slotHour(preferred_schedule);
     const isMorning = schedHour < 12;
     finalSchedule = `${schedDate}T${isMorning ? '09:00:00' : '13:00:00'}`;
     homeSlotLabel = isMorning ? 'Morning (9:00 AM – 11:00 AM)' : 'Afternoon (1:00 PM – 3:00 PM)';
@@ -96,7 +99,7 @@ router.post('/', async (req, res) => {
     }
 
     const slotTaken = dayVisits.some(t => {
-      const h = new Date(t.preferred_schedule).getHours();
+      const h = slotHour(t.preferred_schedule);
       return isMorning ? (h < 12) : (h >= 12);
     });
 
@@ -199,7 +202,7 @@ router.get('/home-service-slots', async (req, res) => {
   let afternoonTaken = false;
 
   for (const t of dayVisits) {
-    const h = new Date(t.preferred_schedule).getHours();
+    const h = slotHour(t.preferred_schedule);
     if (h < 12) morningTaken = true;
     else afternoonTaken = true;
   }
@@ -463,3 +466,4 @@ router.delete('/:id', requireAuth(['admin']), async (req, res) => {
 });
 
 export default router;
+
