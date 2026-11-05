@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -106,7 +106,7 @@ $(document).ready(function() {
   } else {
     // If already authenticated, redirect to appropriate portal
     const user = API.getUser();
-    if (user && API.getToken()) {
+    if (user) {
       if (user.role === 'admin') {
         window.location.href = '/admin';
         return;
@@ -153,3 +153,5 @@ $(document).ready(function() {
 </script>
 </body>
 </html>
+
+

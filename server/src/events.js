@@ -1,5 +1,5 @@
-import express from 'express';
-import { verifyToken } from './auth.js';
+﻿import express from 'express';
+import { verifyToken, readCookie } from './auth.js';
 
 // Server-Sent Events: staff (token) get every ticket change, customers (ref) only their own.
 // ponytail: in-process client set, so one server instance only. Scale-out needs Redis/pg LISTEN.
@@ -38,7 +38,7 @@ router.get('/', (req, res) => {
   if (req.query.ref) {
     scope = String(req.query.ref).trim().toUpperCase();
   } else {
-    user = verifyToken(req.query.token);
+    user = verifyToken(readCookie(req) || req.query.token);
     if (!user || !['admin', 'technician'].includes(user.role)) return res.sendStatus(401);
   }
 
@@ -50,3 +50,4 @@ router.get('/', (req, res) => {
 });
 
 export default router;
+

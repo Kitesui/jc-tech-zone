@@ -1,11 +1,10 @@
-// API client using jQuery AJAX with auth token handling and route guards.
+﻿// API client using jQuery AJAX with auth token handling and route guards.
 
 const API = (() => {
   const BASE = '/api';
 
-  function getToken() {
-    return localStorage.getItem('jc_token');
-  }
+  // The session token lives in an HttpOnly cookie the browser sends itself; scripts never see it.
+  localStorage.removeItem('jc_token'); // purge tokens stored by older versions
 
   function getUser() {
     try {
@@ -15,13 +14,11 @@ const API = (() => {
     }
   }
 
-  function setAuth(token, user) {
-    localStorage.setItem('jc_token', token);
+  function setAuth(user) {
     localStorage.setItem('jc_user', JSON.stringify(user));
   }
 
   function clearAuth() {
-    localStorage.removeItem('jc_token');
     localStorage.removeItem('jc_user');
   }
 
@@ -74,11 +71,7 @@ const API = (() => {
   }
 
   function request(method, endpoint, data) {
-    const token = getToken();
-    const headers = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+    const headers = { 'X-Requested-With': 'XMLHttpRequest' };
 
     return new Promise((resolve, reject) => {
       $.ajax({
@@ -106,20 +99,19 @@ const API = (() => {
   return {
     login: (username, password) =>
       request('POST', '/auth/login', { username, password }).then((res) => {
-        if (res.token && res.user) {
-          setAuth(res.token, res.user);
+        if (res.user) {
+          setAuth(res.user);
         }
         return res;
       }),
     logout: () => {
       clearAuth();
-      window.location.href = '/login';
+      request('POST', '/auth/logout').catch(() => {}).finally(() => { window.location.href = '/login'; });
     },
     clearAuth,
     getMe: () => request('GET', '/auth/me'),
     getUser,
-    getToken,
-    isAuthenticated: () => !!getToken(),
+    isAuthenticated: () => !!getUser(),
 
     createTicket: (d) => request('POST', '/tickets', d),
     getTickets: (params) => request('GET', '/tickets?' + $.param(params || {})),
@@ -154,7 +146,7 @@ const API = (() => {
       if (!ref && window.Notification && Notification.permission === 'default') {
         $(document).one('click', () => Notification.requestPermission());
       }
-      const es = new EventSource(BASE + '/events?' + (ref ? 'ref=' + encodeURIComponent(ref) : 'token=' + encodeURIComponent(getToken())));
+      const es = new EventSource(BASE + '/events?' + (ref ? 'ref=' + encodeURIComponent(ref) : ''));
       let timer, opened = false;
       const fire = (msg) => { clearTimeout(timer); timer = setTimeout(() => onChange(msg), 300); };
       es.onmessage = (e) => { const m = JSON.parse(e.data); notify(m, !ref); fire(m); };
@@ -311,3 +303,5 @@ if (typeof window !== 'undefined') {
 $(function () {
   $('body').append('<div role="note" style="background:#0b1220;border-top:1px solid var(--border,#1f2a3a);color:#94a3b8;font-size:.72rem;line-height:1.4;text-align:center;padding:.6rem 1rem;"><strong style="color:#cbd5e1;">DISCLAIMER:</strong> This web application was created strictly for academic demonstration and evaluation purposes. It is not an official commercial portal of JC TECH ZONE.</div>');
 });
+
+

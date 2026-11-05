@@ -1,5 +1,5 @@
-import express from 'express';
-import { signToken, requireAuth } from '../auth.js';
+﻿import express from 'express';
+import { signToken, requireAuth, setSessionCookie, clearSessionCookie } from '../auth.js';
 import supabase from '../db.js';
 
 const router = express.Router();
@@ -26,6 +26,7 @@ router.post('/login', async (req, res) => {
       email: 'admin@jctechzone.com',
     };
     const token = signToken(user);
+    setSessionCookie(req, res, token);
     return res.json({ message: 'Login successful', token, user });
   }
 
@@ -45,6 +46,7 @@ router.post('/login', async (req, res) => {
       email: defaultTech?.email || 'tech@jctechzone.com',
     };
     const token = signToken(user);
+    setSessionCookie(req, res, token);
     return res.json({ message: 'Login successful', token, user });
   }
 
@@ -79,10 +81,16 @@ router.post('/login', async (req, res) => {
       email: tech.email,
     };
     const token = signToken(user);
+    setSessionCookie(req, res, token);
     return res.json({ message: 'Login successful', token, user });
   }
 
   return res.status(401).json({ error: 'Invalid username or password' });
+});
+
+router.post('/logout', (req, res) => {
+  clearSessionCookie(res);
+  res.json({ message: 'Logged out' });
 });
 
 router.get('/me', requireAuth(), (req, res) => {
@@ -90,3 +98,4 @@ router.get('/me', requireAuth(), (req, res) => {
 });
 
 export default router;
+
